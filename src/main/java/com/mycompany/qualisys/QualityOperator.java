@@ -1,13 +1,21 @@
 package com.mycompany.qualisys;
 
-public class QualityOperator {
+import java.awt.BorderLayout;
+import java.awt.Color;
+import javax.swing.JPanel;
+
+public class QualityOperator extends JPanel{
     private String nombre;
     private String[] dominio; // Recibe un maximo de 5 argumentos ... seran strings, seran float ?
     private float rango;
 
-
+    public QualityOperator(){
+        this.setBackground(Color.red);
+        this.setVisible(true);
+    }
 
     public QualityOperator(String nombre, String[] dom){
+        
         try{
             this.nombre = nombre;
             this.dominio = dom;

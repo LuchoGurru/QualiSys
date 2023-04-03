@@ -245,8 +245,9 @@ public class PanelTexto extends JPanel {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
                         
+                        //add(new QualyGraphic());
 
-                        new QualyGraphic().setVisible(true);
+                        //new QualyGraphic().setVisible(true);
                         }
                     }); // left rigth justify
         color.addActionListener(new ActionListener() {

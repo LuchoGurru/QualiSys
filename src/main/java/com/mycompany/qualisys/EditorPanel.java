@@ -12,8 +12,8 @@ public class EditorPanel extends JFrame{
         this.setSize(1300,900);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.add(new PanelTexto());
-    //    this.add(new PanelGrafico());
+    //    this.add(new PanelTexto());
+        this.add(new QualyGraphic());
         this.setVisible(true);
     }
 

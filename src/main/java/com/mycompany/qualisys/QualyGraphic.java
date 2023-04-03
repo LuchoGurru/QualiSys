@@ -1,23 +1,77 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package com.mycompany.qualisys;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import javax.swing.ImageIcon;
 /**
  *
  * @author luciano
  */
 public class QualyGraphic extends javax.swing.JPanel {
 
-    /**
-     * Creates new form QualyGraphic
-     */
+    ImageIcon img = new ImageIcon("./src/main/resources/qualy_icon.png");
+    ImageIcon img2 = new ImageIcon("./src/main/resources/qualy_icon.png");
+    
+    final int IMG_WIDTH = img.getIconWidth();
+    final int IMG_HEIGHT = img.getIconHeight();
+    
+    Point image_corner;
+    Point image_corner2;
+    Point previousPoint;
+    
     public QualyGraphic() {
-        initComponents();
-        System.out.println("asdsadsadsad");
+       // initComponents();
+        image_corner = new Point(0,0);
+        image_corner2 = new Point(400,400);
+        ClickListener clickListener = new ClickListener();
+        this.addMouseListener(clickListener);
+        DragListener dragListener = new DragListener();
+        this.addMouseMotionListener(dragListener);
+        this.add(new QualityOperator());
     }
-
+    /*
+    public void paint(Graphics g){
+        super.paint(g);
+        System.out.println("asdsads");
+        
+        g.setColor(Color.yellow);
+        g.drawLine(0, 70, 100, 70);
+        Graphics2D graphic_2D = (Graphics2D) g;
+        int[] xPoints = {150,250,350};
+        int[] yPoints = {300,150,350};
+        graphic_2D.fillPolygon(xPoints,yPoints,3);
+    }*/
+    
+    public void paintComponent(Graphics g){
+        super.paintComponent(g); 
+        g.setColor(Color.yellow);
+        g.drawLine(0, 70, 100, 70);
+        img.paintIcon(this, g, (int) image_corner.getX(), (int) image_corner.getY());
+        img2.paintIcon(this, g, (int) image_corner2.getX(), (int) image_corner2.getY());
+    }
+    
+    private class ClickListener extends MouseAdapter {
+        public void mousePressed(MouseEvent evt){
+            previousPoint = evt.getPoint();
+        }
+    }
+    
+    private class DragListener extends MouseMotionAdapter {
+        public void mouseDragged(MouseEvent evt){
+            Point currentPoint = evt.getPoint();
+            image_corner.translate(
+                (int)(currentPoint.getX() - previousPoint.getX()),
+                (int)(currentPoint.getY() - previousPoint.getY())
+            );
+            previousPoint = currentPoint;
+            repaint();
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -27,76 +81,20 @@ public class QualyGraphic extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jSplitPane1 = new javax.swing.JSplitPane();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
-
-        jLabel1.setText("jLabel1");
-
-        jLabel2.setText("jLabel2");
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addContainerGap(49, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(76, 76, 76)
-                .addComponent(jLabel1)
-                .addGap(143, 143, 143)
-                .addComponent(jLabel2)
-                .addContainerGap(147, Short.MAX_VALUE))
-        );
-
-        jSplitPane1.setLeftComponent(jPanel1);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 520, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-
-        jSplitPane1.setRightComponent(jPanel2);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 625, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(153, Short.MAX_VALUE))
+            .addGap(0, 792, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jSplitPane1)
-                .addContainerGap())
+            .addGap(0, 412, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
 }
