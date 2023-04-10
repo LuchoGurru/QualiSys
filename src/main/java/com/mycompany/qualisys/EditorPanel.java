@@ -13,7 +13,8 @@ public class EditorPanel extends JFrame{
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     //    this.add(new PanelTexto());
-        this.add(new QualyGraphic());
+      //  this.add(new QualyOperatorsPanel());
+        this.add(new QualyGraphicPanel());
         this.setVisible(true);
     }
 
