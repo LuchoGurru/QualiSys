@@ -1,6 +1,11 @@
 package com.mycompany.qualisys;
 
 
+
+
+import GUIComponents.GUINodos.QualyVariable;
+import GUIComponents.Laminas.DragAndDropVariablesAndOperandsPanel;
+import GUIComponents.Laminas.QualyGraphicPanel;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,10 +17,15 @@ public class EditorPanel extends JFrame{
         this.setSize(1300,900);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-    //    this.add(new PanelTexto());
+       // this.add(new PanelTexto());
       //  this.add(new QualyOperatorsPanel());
+      
+         QualyVariable[] arr = new QualyVariable[10];
+         arr[0] = new QualyVariable("NOMBRE", 1f);
+      //  this.add(new DragAndDropVariablesAndOperandsPanel(arr));
         this.add(new QualyGraphicPanel());
-        this.setVisible(true);
+      this.setVisible(true);
+      
     }
 
     /*  private JPanel panel1;
