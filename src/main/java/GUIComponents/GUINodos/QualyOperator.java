@@ -2,12 +2,9 @@ package GUIComponents.GUINodos;
 
 import GUIComponents.Laminas.DragAndDropVariablesAndOperandsPanel;
 import GUIComponents.Laminas.QualyOperatorsPanel;
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -15,65 +12,33 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 public class QualyOperator extends JPanel{
     
-    
     private String nombre;
-    private String[] dominio; // Recibe un maximo de 5 argum
     private float rango;
-    private DragAndDropVariablesAndOperandsPanel padre;
-    Point previousPoint;
-    private QualyOperator yoOperador;
-    private String componentID;
-    private ArrayList<Line2D> lines = new ArrayList<>();
-
+    private DragAndDropVariablesAndOperandsPanel GUIParent; // Panel DandD padre ... si esta en el panel de operadores queda en null
+    private ArrayList<JPanel> dominio = new ArrayList<>();; //nodo hijo// Recibe un maximo de 5 argum 
     
     public QualyOperator(JPanel parent, int id){
         this.setName("operador" + id); 
         if(parent.getClass() == DragAndDropVariablesAndOperandsPanel.class){ 
-            this.padre = (DragAndDropVariablesAndOperandsPanel) parent;            
+            this.GUIParent = (DragAndDropVariablesAndOperandsPanel) parent;     // Para usar los metodos del DandD directamente
         }
         this.setPreferredSize(new Dimension(100,100));
-        //this.setVisible(true); 
         ClickListener clickListener = new ClickListener();
         this.addMouseListener(new ClickListener());
         DragListener dragListener = new DragListener();
         this.addMouseMotionListener(dragListener);
-        yoOperador = this; // PARA MANEJAR LA INSTANCIA DENTRO DE LOS LISTENERS
-        
-        
     } 
     
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-    //    g.setColor(Color.red);
-        g.drawOval(0, 0, 100, 100); // 50 hasta 150 // Diametro
-        g.drawOval(25, 25, 50, 50);   // 
-                Graphics2D g2 = (Graphics2D)g;
-    for (Line2D line : lines) {
-            g2.draw(line);
-        }
-    }
-    
-    public QualyOperator(String nombre, String[] dom){
-        
-        try{
-            this.nombre = nombre;
-            this.dominio = dom;
-        }catch(ArrayIndexOutOfBoundsException e){
-            System.out.println("Can not operate, to many arguments");
-        }
-    }
-
-    public String getComponentID() {
-        return componentID;
+        g.drawOval(0, 0, 100, 100);
+        g.drawOval(25, 25, 50, 50);   
     }
 
     public float evaluationFunction(){
@@ -81,64 +46,41 @@ public class QualyOperator extends JPanel{
         return rango;
     }
     
-    private class ClickListener extends MouseAdapter {
-        public void mousePressed(MouseEvent evt){
-            System.out.println("Soy un operador");
-            
-            yoOperador.setBorder(BorderFactory.createLineBorder(Color.BLACK, 10));
-        }
-        public void mouseReleased(MouseEvent e){
-            if(yoOperador.getPadre() != null ){
-                       Rectangle oldPosition = yoOperador.getBounds();
-                yoOperador.setBounds(yoOperador.getBounds().getLocation().x + e.getX(),
-                        yoOperador.getBounds().getLocation().y + e.getY(), 100, 100);
-                /*QualyOperator aux=null;
-            try {
-                aux = (QualyOperator) yoOperador.clone();
-            } catch (CloneNotSupportedException ex) {
-                Logger.getLogger(QualyOperator.class.getName()).log(Level.SEVERE, null, ex);
-            }*/
-                //aux.setBounds(yoOperador.getBounds().getLocation().x + e.getX(),
-                //    yoOperador.getBounds().getLocation().y + e.getY(),100,100);
-                boolean puedoMoverme = padre.listarOperadores(yoOperador);
-
-                if (!puedoMoverme) {
-                    yoOperador.setBounds(oldPosition);
-                    dibujarLineaBetweenOperators(e);
-
-                } else {
-                    dibujarLineaBetweenOperators(e);
-                }
-                //  if(this.get)
-                System.out.println("operador releaseEEEEEEE");
-            }else{
-                exportarOperadorADibujar(e);
-            }
-     
-  //            agregarOperadorANulLayout(e.getPoint());
-  //       Component panel = (Component)e.getSource();
-  //           System.out.println(panel.getBounds());
-        }
-        
-    }
-    
-    private class DragListener extends MouseMotionAdapter {
-        public void mouseDragged(MouseEvent evt){ 
-            
-            //previousPoint =  evt.getPoint(); 
-          //  System.out.println(evt.getPoint());
-            //repaint();
-        }
-    }
-
-    public Point getPreviousPoint() {
-        return previousPoint;
-    }
-
     public DragAndDropVariablesAndOperandsPanel getPadre() {
-        return padre;
+        return GUIParent;
+    }
+    public void dibujarHijos(Graphics g){
+        //Como soy un operador 
+        for(JPanel hijo : this.dominio){
+            Point origen = hijo.getLocation();
+            dibujarLineaHijo(g,origen);
+        }
+    }
+    public void dibujarLineaHijo(Graphics g, Point h){
+        Line2D linea = new Line2D.Double(h.getX(), h.getY(), this.getX(), this.getY()); 
     }
     
+    
+    /**
+     * Decide la accion a realizar en caso de que se haya hecho un soltado de click
+     * @param e evento del mouse
+     */
+    public void determinarAccionReleased(MouseEvent e){
+       if(this.getPadre() != null ){ // Verdadero si esta en DandD
+            Rectangle oldPosition = this.getBounds(); // Guardo la posision inicial
+            this.setBounds(this.getBounds().getLocation().x + e.getX(),
+                                 this.getBounds().getLocation().y + e.getY(),
+                                100, 100);
+            if (!GUIParent.isColision(this)) { 
+                GUIParent.repaint();
+            } else {
+                this.setBounds(oldPosition); //Vuelvo a la posision Inicial
+                this.addToFatherDomain(e.getPoint());//Sí 
+            }
+        }else{
+            exportarOperadorADibujar(e);
+        }
+   }
     public void dibujarLineaBetweenOperators(MouseEvent e ){
         Point p1 = new Point(e.getPoint().x , e.getPoint().y);
         Point p2 = new Point();
@@ -149,47 +91,20 @@ public class QualyOperator extends JPanel{
         p2.y = this.getLocation().y + p1.y;
         System.out.println("POINT2.0 : (" + p2.x +","+ p2.y + ")asdasdsadsad" + this.getPadre().getComponentAt(p2)); 
         Line2D linea = new Line2D.Double(p1.getX(), p1.getY(), p2.getX(), p2.getY());
-         this.lines.add(linea);
-    //    this.padre.dibujarLineaEntre2Copmponentes(linea);
-        
-        
-    //    COmponente lista3 asd 146 ),(29 //
-    //    (3,-7) asdasdsadsadnull //
-        
-        
-        
-    /*
-    Point aPoint = new Point();
-    Point bPoint = new Point(50, 25);
-    Point cPoint = new Point(bPoint);
-    
-    System.out.println("cPoint is located at: " + cPoint);
-    
-    System.out.println("aPoint is located at: " + aPoint);
-    aPoint.move(100, 50);
-    System.out.println("aPoint is located at: " + aPoint);
-
-    bPoint.x = 110;
-    bPoint.y = 70;
-    System.out.println("bPoint is located at: " + bPoint);
-
-    aPoint.translate(10, 20);
-    
-    System.out.println("aPoint is now at: " + aPoint);
-    
-
-    if (aPoint.equals(bPoint))
-      System.out.println("aPoint and bPoint are at the same location.");
-*/
     }    
-    
-        public void exportarOperadorADibujar(MouseEvent e ){
-            QualyOperatorsPanel papi = (QualyOperatorsPanel) this.getParent();
-            Point ubiActual = yoOperador.getLocation();
-            ubiActual.x += e.getPoint().x;
-            ubiActual.y += e.getPoint().y;
-            int tipoOperador; 
-            Color bg = this.getBackground();
+    public ArrayList<JPanel> getDominio(){
+        return this.dominio;
+    }
+    /**
+        Cuando el componente esta en el panel de operadores se arrastra hasta el DandD panel para crear una nueva instancia del operadore en la posicion deseada 
+    */ 
+    public void exportarOperadorADibujar(MouseEvent e ){
+        QualyOperatorsPanel papi = (QualyOperatorsPanel) this.getParent();
+        Point ubiActual = this.getLocation();
+        ubiActual.x += e.getPoint().x;
+        ubiActual.y += e.getPoint().y;
+        int tipoOperador; 
+        Color bg = this.getBackground();
         if (bg == Color.RED) {
             tipoOperador = 0;
         } else if (bg == Color.GRAY) {
@@ -200,5 +115,53 @@ public class QualyOperator extends JPanel{
             tipoOperador = 3;
         }
         papi.setPositionToDraw(ubiActual,tipoOperador);
+    }
+
+   /**
+    * Agregamos esta instancia al dominio del padre
+    */     
+   public void addToFatherDomain(Point padreRelativeLocation){ 
+         Point padreLocation = new Point();
+        // CREAR PUNTO QUE QUIERO REALMENTE 
+        padreLocation.x = this.getLocation().x + padreRelativeLocation.x;
+        padreLocation.y = this.getLocation().y + padreRelativeLocation.y;
+        GUIParent.canBeDomain(this,padreLocation);
+        
+        QualyOperator operadorPadre = (QualyOperator) this.getPadre().getComponentAt(padreLocation) ;
+        if(operadorPadre.addToDomain(this)){
+            this.getPadre().repaint();
+        }
+        
+        System.out.println("POINT2.0 : (" + padreLocation.x +","+ padreLocation.y + ")CERO KM" + this.getPadre().getComponentAt(padreLocation)); 
+        //Line2D linea = new Line2D.Double(this.getLocation().getX(), this.getLocation().getY(), padreLocation.getX(), padreLocation.getY());
+   }     
+
+   
+   /**
+    * Dado una entrada, agregamos la entrada al dominio
+    * @param entrada 
+    */
+   public boolean addToDomain(JPanel entrada){
+       boolean added=false;
+       if(this.dominio.size()<5){
+           this.dominio.add(entrada);
+           added=true;
+       }
+       return added;
+   }     
+    private class ClickListener extends MouseAdapter {
+        public void mousePressed(MouseEvent evt){
+            //.setBorder(BorderFactory.createLineBorder(Color.BLACK, 10));
+        }
+        public void mouseReleased(MouseEvent e){
+            determinarAccionReleased(e); 
+        }
+        
+    }
+    
+    private class DragListener extends MouseMotionAdapter {
+        public void mouseDragged(MouseEvent evt){ 
+             //TODO
+        }
     }
 }

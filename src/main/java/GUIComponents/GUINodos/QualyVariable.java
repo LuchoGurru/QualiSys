@@ -16,6 +16,7 @@ public class QualyVariable extends JPanel{
     
     
     
+    
 public QualyVariable(JComponent parent, double x, double y,String id, float value){
         this.setAlignmentX((float)x);
         this.setAlignmentY((float)y);
