@@ -21,7 +21,7 @@ public class EditorPanel extends JFrame{
       //  this.add(new QualyOperatorsPanel());
       
          QualyVariable[] arr = new QualyVariable[10];
-         arr[0] = new QualyVariable("NOMBRE", 1f);
+        // arr[0] = new QualyVariable("NOMBRE", 1f);
       //  this.add(new DragAndDropVariablesAndOperandsPanel(arr));
         this.add(new QualyGraphicPanel());
       this.setVisible(true);

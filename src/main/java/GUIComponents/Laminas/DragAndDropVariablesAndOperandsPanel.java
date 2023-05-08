@@ -65,10 +65,12 @@ public class DragAndDropVariablesAndOperandsPanel extends JPanel    {
     // Despues vamos a ir agarrando y editando atributos de los operadores para ir pintando 
     
     
-    private ArrayList<QualyOperator> operadores = new ArrayList<>();
-    private ArrayList<QualyVariable> variables = new ArrayList<>();
+    //private ArrayList<QualyOperator> operadores = new ArrayList<>();
+    //private ArrayList<QualyVariable> variables = new ArrayList<>();
+    private Map<String, QualyOperator> operadores = new HashMap<String, QualyOperator>();
+    private Map<String, QualyVariable> variables = new HashMap<String, QualyVariable>();
     private Map<String, ArrayList<JPanel>> relPadreHijos = new HashMap<String, ArrayList<JPanel>>();
-    
+
     // Los operadores que manejamos van a poder recibir de rango un valor y podran ser asignados como dominio de otro operador 
     public static int cantOperadores = 0;
     
@@ -81,27 +83,64 @@ public class DragAndDropVariablesAndOperandsPanel extends JPanel    {
      */
     @Override
     public void paintComponent(Graphics g){
+        System.out.println("Paint: ");
         super.paintComponent(g);
-       // pintarVariables();
+        pintarVariables(g);
         pintarOperadores(g);
+        dibujarLineas(g);
        // repaint();
+    } 
+    
+    private void pintarVariables(Graphics g){
+        for(QualyVariable qv: this.variables.values()){
+            System.out.println("qv.getName() = " + qv.getName());
+            this.add(qv);
+        }
     }
     
     private void pintarOperadores(Graphics g){
-        for(QualyOperator qo: this.operadores){
+        for(QualyOperator qo: this.operadores.values()){
+            System.out.println("qo.getName() = " + qo.getName());
             this.add(qo);
-            dibujarLineas(g,qo);
-          //  System.out.println("reealyy nigga");
         }
     }
-    
-    public void dibujarLineas(Graphics g,QualyOperator padre){
-        ArrayList<JPanel> hijos = padre.getDominio();
-        Point padreLocation = padre.getLocation();
-        for(JPanel son : hijos){
-            Point sonLocation = son.getLocation();
-            g.drawLine(sonLocation.x, sonLocation.y,padreLocation.x , padreLocation.y);
+   
+    public void dibujarLineas(Graphics g){
+        ArrayList<ArrayList<JPanel>> hermanos = new ArrayList<ArrayList<JPanel>>(this.relPadreHijos.values());
+        for(int j=0;j < hermanos.size(); j++){
+            ArrayList<JPanel> hijos = hermanos.get(j);
+            Point padreLocation=null;
+            for(int i=0;i< hijos.size();i++){
+                JPanel h = hijos.get(i);
+                if(padreLocation == null){
+                    padreLocation =obtenerPadreLocation(h);
+                }
+                g.drawLine(h.getLocation().x,h.getLocation().y, padreLocation.x,padreLocation.y);
+                g.fillOval(padreLocation.x-5, padreLocation.y-5, 10, 10);
+            }
         }
+    }
+    /*public void drawArrow(Graphics g, int x0,int y0,int x1,int y1){
+    double alfa=Math.atan2(y1-y0,x1-x0);
+    g.drawLine(x0,y0,x1,y1);
+    int k=5;
+    int xa=(int)(x1-k*Math.cos(alfa+1));
+    int ya=(int)(y1-k*Math.sin(alfa+1));
+    // Se dibuja un extremo de la dirección de la flecha.
+    g.drawLine(xa,ya,x1,y1); 
+    xa=(int)(x1-k*Math.cos(alfa-1));
+    ya=(int)(y1-k*Math.sin(alfa-1));
+    // Se dibuja el otro extremo de la dirección de la flecha.
+    g.drawLine(xa,ya,x1,y1); 
+    }*/
+    private Point obtenerPadreLocation(JPanel h){
+        Point padreLocation = null;
+        if(h.getClass() == QualyVariable.class){
+            padreLocation = this.variables.get(((QualyVariable)h).getPadreID()).getLocation();
+        }else{
+            padreLocation = this.operadores.get(((QualyOperator)h).getPadreID()).getLocation();
+        }
+        return padreLocation;
     }
     /**
      * Drawablecomponent ... Variables - Operadores y Flechas 
@@ -114,6 +153,7 @@ public class DragAndDropVariablesAndOperandsPanel extends JPanel    {
      */
      public DragAndDropVariablesAndOperandsPanel(){    
         this.setLayout(null);
+        
      }    
      /**
       * Chequea si colisiona con algun componente del panel operador o variable
@@ -137,37 +177,83 @@ public class DragAndDropVariablesAndOperandsPanel extends JPanel    {
         Component c = this.getComponentAt(loc);
         if(this.getComponentAt(loc).getClass() == QualyOperator.class){
             return (QualyOperator) c;
-        }System.out.println("Algo paso con la clase del get at component !! o es una variable");
+        }
         return null;
     }
-    
+    private boolean isVariable(JPanel var){
+        return var.getClass() == QualyVariable.class;
+    }
+    private QualyVariable getVariable(JPanel var){
+        return (QualyVariable) var;
+    }  
+    private QualyOperator getOperator(JPanel var){
+        return (QualyOperator) var;
+    }   
     /**
-     * 
-     * @param qo
-     * @param posX
-     * @param posY 
+     *              
+     * @param hijoCandidato
+     * @param padreLocation 
      */
-    public void canBeDomain(JPanel hijo, Point padreLoc){
-        //if(padreOperator != null){
-           // if(padreOperator.getDominio().size() < 5){
-                
-           // }else{
-             //   System.out.println("No podes ser dominio por que el operador esta lleno");
-           // }
-            
-            
-        //}else{
-          //  System.out.println("No podes ser dominio por que no es un operador o es una variable");
-       // }
+    public void addToDomain(JPanel hijoCandidato, Point  padreLocation){
+        QualyOperator operadorPadre = (QualyOperator) this.getComponentAt(padreLocation) ;
+        if(canBeDomain(hijoCandidato,operadorPadre)){
+            if(isVariable(hijoCandidato)){
+                QualyVariable op_candidato = (QualyVariable) hijoCandidato;
+                actualizarArbolGenealogico(op_candidato,op_candidato.getPadreID(),operadorPadre.getName());
+            }else{
+                QualyOperator op_candidato =(QualyOperator) hijoCandidato;
+                actualizarArbolGenealogico(op_candidato,op_candidato.getPadreID(),operadorPadre.getName());
+                op_candidato.setPadreID(operadorPadre.getName());//SETTEO PADRE ADOPTIVO
+            }
+            this.repaint();
+        }
         
     }
-    public void addOperator(QualyOperator q){
-        this.operadores.add(q);
+    /**
+     * Las variables pueden ser dominio de cualquier operador. Solo de uno a la vez.
+     * @param qo
+     * @param posX
+     * @param posY
+     */
+    public boolean canBeDomain(JPanel hijoCandidato, QualyOperator padreAdoptivo){
+        boolean allow=true;
+        if(padreAdoptivo != null){//OK
+            if(!isVariable(hijoCandidato)){// es un operador ... 
+                QualyOperator op_candidato = getOperator(hijoCandidato);
+                if(!padreAdoptivo.getPadreID().equals("")){ //operador con padre
+                    System.out.println("operador con padre");
+                    if(!noCicles(op_candidato,padreAdoptivo)){
+                        System.out.println("no podes ser parte de este dominio por que formaras un ciclo");
+                        allow = false;
+                        // Este padre soy yo ? no  
+                        // GetPadres ancestros  
+                        // este otro padre tiene padre ?  no 
+                        // op_candidato.setPadreID(padreAdoptivo.getName());
+                        // actualizarArbolGenealogico(op_candidato,op_candidato.getPadreID(),padreAdoptivo.getName());
+                    }else{
+                        System.out.println("!noCicles means that no hay cicles");
+                    }
+                    
+                }
+            }
+        }else{
+            System.out.println("No podes ser parte de su dominio por que no es un operador o es una variable");
+            allow = false;
+        }
+        return allow;
     }
-    /*
+    public void addOperator(QualyOperator q){
+        this.operadores.put(q.getName(),q);
+        this.relPadreHijos.put(q.getName(),new ArrayList<JPanel>());
+    }
+    /**
+     * El planteamiento del problema 
+     * @param hijo
+     * @param padreLoc 
+     */
     public void addHijoToRel(JPanel hijo, Point padreLoc){
         QualyOperator padreOperator = getOperatorByLocation(padreLoc);
-        if(canBeDomain(hijo, padreLoc)){
+        if(canBeDomain(hijo, padreOperator)){
             ArrayList<JPanel> sons = relPadreHijos.get(padreOperator.getName());
             if(sons.size() < 5){
                 sons.add(hijo);
@@ -176,12 +262,40 @@ public class DragAndDropVariablesAndOperandsPanel extends JPanel    {
                 System.out.println("YA tiene 5 hijos");
             }
         }
-    }*/
+    }
+    
+    public boolean noCicles(QualyOperator hijoCandidato, QualyOperator padreCandidato){
+        boolean adopto=true;     
+        String abuelo = padreCandidato.getPadreID();
+        //   System.out.println("No me digas que me quedo loopeando" + abuelo);
+        while(!abuelo.equals("") && adopto){ // esta restringido que sea yo mismo la primera vez 
+            QualyOperator abu = this.operadores.get(abuelo);
+            System.out.println("abu " + abu.getPadreID());
+            System.out.println("hijoCandidato " + hijoCandidato.getName());
+            if(abu.getName().equals(hijoCandidato.getName()))
+                adopto = false;
+            abuelo = abu.getPadreID();
+        }
+        return adopto;
+    }
+    /**
+     * Actualizo la estructura primero tengo que borrar el hijo del dominio 
+     * y agregarlo al nuevo dominio 
+     */
+    public void actualizarArbolGenealogico(JPanel adoptado, String padreViejo, String padreNuevo){
+        //Ahora
+        if(!padreViejo.equals("")){ // Si tenia padre
+            ArrayList<JPanel> hermanosViejos = this.relPadreHijos.get(padreViejo);
+            for(int i =0; i<hermanosViejos.size(); i++){
+                if(hermanosViejos.get(i).getName().equals(adoptado.getName())){
+                    hermanosViejos.remove(i);
+                    break;
+                }
+            }
+        }  
+        //Despues
+        ArrayList<JPanel> hermanosNuevos = this.relPadreHijos.get(padreNuevo);
+        hermanosNuevos.add(adoptado); 
+    }
+    
 }
-
-
-
-
-
-
-
