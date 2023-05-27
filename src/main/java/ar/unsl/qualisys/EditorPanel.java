@@ -1,4 +1,4 @@
-package com.mycompany.qualisys;
+package ar.unsl.qualisys;
 
 
 

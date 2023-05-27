@@ -4,6 +4,7 @@
  */
 package GUIComponents.Laminas;
 
+import GUIComponents.GUINodos.QsNodo;
 import GUIComponents.GUINodos.QualyOperator;
 import GUIComponents.GUINodos.QualyVariable;
 import java.awt.Color;
@@ -15,8 +16,14 @@ import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 
 /**
  * Lo que voy a hacer en este componente sera lo siguiente : 
@@ -68,28 +75,74 @@ public class DragAndDropVariablesAndOperandsPanel extends JPanel    {
     //private ArrayList<QualyOperator> operadores = new ArrayList<>();
     //private ArrayList<QualyVariable> variables = new ArrayList<>();
     private Map<String, QualyOperator> operadores = new HashMap<String, QualyOperator>();
+    
     private Map<String, QualyVariable> variables = new HashMap<String, QualyVariable>();
-    private Map<String, ArrayList<JPanel>> relPadreHijos = new HashMap<String, ArrayList<JPanel>>();
+    
+    private Map<String, ArrayList<QsNodo>> relPadreHijos = new HashMap<String, ArrayList<QsNodo>>();
+    
+    private QualyOperator operadorSeleccionado;
+    JPopupMenu menuDesplegable = new JPopupMenu();
+
 
     // Los operadores que manejamos van a poder recibir de rango un valor y podran ser asignados como dominio de otro operador 
     public static int cantOperadores = 0;
+
+    
+    
+    
+    public Map<String, QualyOperator> getOperadores(){
+        return operadores;
+    } 
+
+    public void setOperadores(Map<String, QualyOperator> operadores) {
+        this.operadores = operadores;
+    }
+
+    public Map<String, ArrayList<QsNodo>> getRelPadreHijos() {
+        return relPadreHijos;
+    }
+
+    public Map<String, QualyVariable> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, QualyVariable> variables) {
+        this.variables = variables;
+    }
+
+    public QualyOperator getOperadorSeleccionado() {
+        return operadorSeleccionado;
+    }
+
+    public void setOperadorSeleccionado(QualyOperator operadorSeleccionado) {
+        this.operadorSeleccionado = operadorSeleccionado;
+        if(this.operadorSeleccionado!=null)
+            this.operadorSeleccionado.setBorder(BorderFactory.createLineBorder(Color.BLACK, 10));
+    }
     
     /**
-     * Pintado del Drag And Drop component: 
+     * Pintado del Drag And Drop component:
      *      Parametros del constructor : 
      *          Lista de Variables,
      *          Lista de Operadores (inicialmente vacia)
      * @param g 
      */
+    public void setRelPadreHijos(Map<String, ArrayList<QsNodo>> relPadreHijos) {
+        this.relPadreHijos = relPadreHijos;
+    }
+
     @Override
-    public void paintComponent(Graphics g){
+    public void paintComponent(Graphics g) {
         System.out.println("Paint: ");
         super.paintComponent(g);
+        this.removeAll();
         pintarVariables(g);
         pintarOperadores(g);
         dibujarLineas(g);
-       // repaint();
+        // repaint();
     } 
+    
+    
     
     private void pintarVariables(Graphics g){
         for(QualyVariable qv: this.variables.values()){
@@ -106,33 +159,30 @@ public class DragAndDropVariablesAndOperandsPanel extends JPanel    {
     }
    
     public void dibujarLineas(Graphics g){
-        ArrayList<ArrayList<JPanel>> hermanos = new ArrayList<ArrayList<JPanel>>(this.relPadreHijos.values());
+        ArrayList<ArrayList<QsNodo>> hermanos = new ArrayList<ArrayList<QsNodo>>(this.relPadreHijos.values());
         for(int j=0;j < hermanos.size(); j++){
-            ArrayList<JPanel> hijos = hermanos.get(j);
+            ArrayList<QsNodo> hijos = hermanos.get(j);
             Point padreLocation=null;
             for(int i=0;i< hijos.size();i++){
-                JPanel h = hijos.get(i);
+                QsNodo h = hijos.get(i);
                 if(padreLocation == null){
                     padreLocation =obtenerPadreLocation(h);
                 }
+                
                 g.drawLine(h.getLocation().x,h.getLocation().y, padreLocation.x,padreLocation.y);
+                
+                System.out.println("X " + (padreLocation.x - h.getLocation().x)/2);
+                System.out.println("Y " + padreLocation.y);
+                System.out.println("X/2 " + padreLocation.x/2);
+                System.out.println("Y/2 " + padreLocation.y/2);
+                
+                g.drawString(""+h.getPonderacion(),h.getLocation().x + (padreLocation.x - h.getLocation().x)/2 ,
+                                                  -5 + h.getLocation().y + (padreLocation.y - h.getLocation().y)/2) ;
                 g.fillOval(padreLocation.x-5, padreLocation.y-5, 10, 10);
             }
         }
     }
-    /*public void drawArrow(Graphics g, int x0,int y0,int x1,int y1){
-    double alfa=Math.atan2(y1-y0,x1-x0);
-    g.drawLine(x0,y0,x1,y1);
-    int k=5;
-    int xa=(int)(x1-k*Math.cos(alfa+1));
-    int ya=(int)(y1-k*Math.sin(alfa+1));
-    // Se dibuja un extremo de la dirección de la flecha.
-    g.drawLine(xa,ya,x1,y1); 
-    xa=(int)(x1-k*Math.cos(alfa-1));
-    ya=(int)(y1-k*Math.sin(alfa-1));
-    // Se dibuja el otro extremo de la dirección de la flecha.
-    g.drawLine(xa,ya,x1,y1); 
-    }*/
+
     private Point obtenerPadreLocation(JPanel h){
         Point padreLocation = null;
         if(h.getClass() == QualyVariable.class){
@@ -189,14 +239,45 @@ public class DragAndDropVariablesAndOperandsPanel extends JPanel    {
     private QualyOperator getOperator(JPanel var){
         return (QualyOperator) var;
     }   
+    
+    private void setPonderValue(QsNodo hijo, QsNodo padre){
+        // create a dialog Box
+        Object[] possibilities = {"ham", "spam", "yam"};
+        String s = (String)JOptionPane.showInputDialog(
+                            null,
+                            "Complete the sentence:\n"
+                            + "\"Green eggs and...\"",
+                            "Customized Dialog",
+                            JOptionPane.PLAIN_MESSAGE,
+                            null,
+                            null,
+                            1f);
+
+        //If a string was returned, say so.
+        if ((s != null) && (s.length() > 0)) {
+            hijo.setPonderacion(Float.valueOf(s));
+            return;
+        }
+
+        //If you're here, the return value was null/empty.
+   //  setLabel("Come on, finish the sentence!");
+    }
     /**
-     *              
+     * Sí el hijo puede ser dominiio ... 
+     * se setea el peso ponderado de la relacion 
+     * y esta se agrega como nueva relacion controlando que no sea mayor a uno 
+     * 
      * @param hijoCandidato
      * @param padreLocation 
      */
-    public void addToDomain(JPanel hijoCandidato, Point  padreLocation){
+    public void addToDomain(QsNodo hijoCandidato, Point  padreLocation){
         QualyOperator operadorPadre = (QualyOperator) this.getComponentAt(padreLocation) ;
         if(canBeDomain(hijoCandidato,operadorPadre)){
+         
+            
+            this.setPonderValue(hijoCandidato,operadorPadre); 
+            
+            
             if(isVariable(hijoCandidato)){
                 QualyVariable op_candidato = (QualyVariable) hijoCandidato;
                 actualizarArbolGenealogico(op_candidato,op_candidato.getPadreID(),operadorPadre.getName());
@@ -244,17 +325,17 @@ public class DragAndDropVariablesAndOperandsPanel extends JPanel    {
     }
     public void addOperator(QualyOperator q){
         this.operadores.put(q.getName(),q);
-        this.relPadreHijos.put(q.getName(),new ArrayList<JPanel>());
+        this.relPadreHijos.put(q.getName(),new ArrayList<QsNodo>());
     }
     /**
      * El planteamiento del problema 
      * @param hijo
      * @param padreLoc 
      */
-    public void addHijoToRel(JPanel hijo, Point padreLoc){
+    public void addHijoToRel(QsNodo hijo, Point padreLoc){
         QualyOperator padreOperator = getOperatorByLocation(padreLoc);
         if(canBeDomain(hijo, padreOperator)){
-            ArrayList<JPanel> sons = relPadreHijos.get(padreOperator.getName());
+            ArrayList<QsNodo> sons = relPadreHijos.get(padreOperator.getName());
             if(sons.size() < 5){
                 sons.add(hijo);
                 relPadreHijos.put(padreOperator.getName(), sons);
@@ -282,10 +363,10 @@ public class DragAndDropVariablesAndOperandsPanel extends JPanel    {
      * Actualizo la estructura primero tengo que borrar el hijo del dominio 
      * y agregarlo al nuevo dominio 
      */
-    public void actualizarArbolGenealogico(JPanel adoptado, String padreViejo, String padreNuevo){
+    public void actualizarArbolGenealogico(QsNodo adoptado, String padreViejo, String padreNuevo){
         //Ahora
         if(!padreViejo.equals("")){ // Si tenia padre
-            ArrayList<JPanel> hermanosViejos = this.relPadreHijos.get(padreViejo);
+            ArrayList<QsNodo> hermanosViejos = this.relPadreHijos.get(padreViejo);
             for(int i =0; i<hermanosViejos.size(); i++){
                 if(hermanosViejos.get(i).getName().equals(adoptado.getName())){
                     hermanosViejos.remove(i);
@@ -294,8 +375,83 @@ public class DragAndDropVariablesAndOperandsPanel extends JPanel    {
             }
         }  
         //Despues
-        ArrayList<JPanel> hermanosNuevos = this.relPadreHijos.get(padreNuevo);
+        ArrayList<QsNodo> hermanosNuevos = this.relPadreHijos.get(padreNuevo);
         hermanosNuevos.add(adoptado); 
     }
     
+    /**
+     * Árbol Bien Formado : means, a imaginary tree. In wich the  leaves are variables and the root its an operator wich no father. Or a symbolic Father.
+     * Todas las hojas tienen padre y ningun hijo.
+     * Todos los nodos operadores - root tienen a lo más 5 hijos y minimo 2 excepto root que tiene a lo mas 5 hijos y ningun padre.
+     * Ningun nodo puede ser hijo de algun descendiente.
+    */
+    public boolean isArbolBienFormado(){
+        //THere is cicles ? 
+        // All variables HAve one father ? 
+        // All operators are ¨2,5* domain 
+        // Cant  operators with out father == 1 
+        boolean bienFormado = true; 
+        for(QualyVariable qv: this.variables.values()){
+            if(qv.getPadreID().equals("")){
+                bienFormado = false;
+                break;
+            }
+        }
+        if(bienFormado){
+            int onlyOneRoot = 0;
+            for(QualyOperator qo: this.operadores.values()){
+                if(qo.getPadreID().equals("")){
+                    onlyOneRoot ++;
+                    if(onlyOneRoot > 1){
+                        bienFormado = false;
+                        break;
+                    }
+                }
+            }
+            if(bienFormado)
+                bienFormado = onlyOneRoot > 0;
+        }
+        return bienFormado;
+    }
+    /**
+     * El árbol (imaginario) está formado por 3 estructuras de datos.
+     * Estas son 2 listas de nosod. una de variables y otra de operadores. las cuales se implementan mediante un hashMap distinguido por ID .
+     * Y Una estructura Auxiliar que contiene la relacion Padre - Hijos . La cual es la encargada de realizar todos lontroles y las restricciones necesarias en la formacion del arbol 
+     * implementada con un hasMap distinguido por Padre ID y un conjunto de hijos[2,5],  
+     */
 }
+/**
+ * *LISTENER DOBLE CLICK DESPLIEGO MENU *
+ * Simple click set Nodo Activo + shortcuts .
+
+
+        public void menuPopUp(){
+             
+        JMenuItem deshacer = new JMenuItem("Deshacer");
+        JMenuItem rehacer = new JMenuItem("Rehacer");
+        JMenuItem guardar = new JMenuItem("guardar");
+        JMenuItem abrir = new JMenuItem("abrir");
+        JMenuItem cerrar = new JMenuItem("cerrar");
+        JMenuItem archivosRecientes = new JMenuItem("archivos recientes");
+        JMenuItem exportar = new JMenuItem("exportar");
+
+        deshacer.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,InputEvent.CTRL_DOWN_MASK));
+        rehacer.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y,InputEvent.CTRL_DOWN_MASK));
+        cortar.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,InputEvent.CTRL_DOWN_MASK));
+        copiar.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,InputEvent.CTRL_DOWN_MASK));
+        pegar.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,InputEvent.CTRL_DOWN_MASK));
+        deshacer.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,InputEvent.CTRL_DOWN_MASK));
+        cortar.addActionListener(new eliminar.ejecutar());
+        copiar.addActionListener(new StyledEditorKit.CopyAction());
+        pegar.addActionListener(new StyledEditorKit.PasteAction());
+
+        menuDesplegable.add(deshacer);
+        menuDesplegable.add(rehacer);
+        menuDesplegable.add(cortar);
+        menuDesplegable.add(copiar);
+        menuDesplegable.add(pegar);
+
+        this.setComponentPopupMenu(menuDesplegable);
+    }
+
+*/

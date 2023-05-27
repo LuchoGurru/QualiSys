@@ -2,36 +2,52 @@ package GUIComponents.GUINodos;
 
 import GUIComponents.Laminas.DragAndDropVariablesAndOperandsPanel;
 import GUIComponents.Laminas.QualyOperatorsPanel;
+import ar.unsl.qualisys.utils.eliminarQsNodo;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
 
-public class QualyOperator extends JPanel{
+/**
+ * Esta clase forma parte de los operadores 
+ * tiene un nombre un symbolo, 
+ * @author luciano.gurruchaga
+ */
+public class QualyOperator extends QsNodo implements QsOperacion{
     
     private DragAndDropVariablesAndOperandsPanel GUIParent; // Solo se asigna en caso de que sea hijo del componente DAD (Drag and Drop).
     private String padreID;
     private float resultValue;
+    JPopupMenu menuDesplegable = new JPopupMenu();
+ 
     // private ArrayList<JPanel> dominio = new ArrayList<>();; //nodo hijo// Recibe un maximo de 5 argum 
     
     public QualyOperator(JPanel parent, int id){
-        
+        super();
+        this.menuPopUp();
         this.setName("op_" + id); 
         this.padreID = "";
         if(parent.getClass() == DragAndDropVariablesAndOperandsPanel.class){ 
             this.GUIParent = (DragAndDropVariablesAndOperandsPanel) parent;     // Para usar los metodos del DandD directamente
         }
         this.setPreferredSize(new Dimension(100,100));
-        ClickListener clickListener = new ClickListener();
-        this.addMouseListener(new ClickListener());
+        ClickListener clickListener = new ClickListener(this);
+        this.addMouseListener(clickListener);
         DragListener dragListener = new DragListener();
         this.addMouseMotionListener(dragListener);
     } 
@@ -42,7 +58,7 @@ public class QualyOperator extends JPanel{
         g.drawOval(0, 0, 100, 100);
         g.drawOval(25, 25, 50, 50);
         g.setFont(new Font("Serif", Font.BOLD, 24));
-        g.drawString("D-+", 30, 56);
+        g.drawString("D++", 30, 56);
         
         
     }
@@ -150,6 +166,21 @@ public class QualyOperator extends JPanel{
         this.GUIParent.addToDomain(this,padreLocation);
    }
 
+    @Override
+    public double calcularOperacion(double... dominio) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public double functionEvaluation() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public double calcularOperacion(ArrayList<Double> dominio) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
    
    /**
     * Dado una entrada, agregamos la entrada al dominio
@@ -161,11 +192,21 @@ public class QualyOperator extends JPanel{
            this.dominio.add(entrada);
            added=true;
        }
-       return added;
+       return added; ctrl +8
    }     */
     private class ClickListener extends MouseAdapter {
+        private QualyOperator qsOpInstance;
+        public ClickListener(QualyOperator qsOpInstance){
+            this.qsOpInstance = qsOpInstance;
+        }
+        /**
+         * El Click despliega el menu item
+         * @param evt 
+         */
         public void mousePressed(MouseEvent evt){
             //.setBorder(BorderFactory.createLineBorder(Color.BLACK, 10));
+            if(GUIParent!=null)
+                GUIParent.setOperadorSeleccionado(this.qsOpInstance);
         }
         public void mouseReleased(MouseEvent e){
             determinarAccionReleased(e); 
@@ -177,5 +218,36 @@ public class QualyOperator extends JPanel{
         public void mouseDragged(MouseEvent evt){ 
              //TODO
         }
+    }/*
+    private class menuDesplegableListener implements ActionListener{
+        private QualyOperator qsOpInstance;
+        public menuDesplegableListener(QualyOperator qsOpInstance){
+            this.qsOpInstance = qsOpInstance;
+        }
+        @Override
+        public void actionPerformed(ActionEvent e) {
+                new eliminarQsNodo(GUIParent,qsOpInstance).ejecutar();
+        }
+        
+    }*/
+    public void menuPopUp(){
+             
+        JMenuItem eliminar = new JMenuItem("Eliminar");
+        JMenuItem eliminarRel = new JMenuItem("Eliminar relación");
+        JMenuItem setPonderación = new JMenuItem("Settear ponderación");
+        eliminar.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE,InputEvent.CTRL_DOWN_MASK));
+        eliminar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("e = " + e);
+                new eliminarQsNodo(GUIParent).ejecutar();
+            }
+        });
+      
+        menuDesplegable.add(eliminar);
+        menuDesplegable.add(eliminarRel);
+        menuDesplegable.add(setPonderación);
+
+        this.setComponentPopupMenu(menuDesplegable);
     }
 }

@@ -8,13 +8,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.JPanel;
 
-public class QualyVariable extends JPanel{
-    private String padreID;
-    private float value; 
+public class QualyVariable extends QsNodo{
+    String nombre;
+    String nombreGrupo;// Categoría de la variable 
     
-    public QualyVariable(JPanel parent, double x, double y,int id, float value){
-        this.value = value;
-        this.padreID = "";
+    public QualyVariable (JPanel parent, double x, double y,int id, float value){
+        super(value);
         this.setName("var_" + id); 
         this.setBounds((int)x,(int)y,101,200);
         this.setBackground(Color.PINK);
@@ -22,31 +21,20 @@ public class QualyVariable extends JPanel{
         this.addMouseListener(new ClickListener());
     }
 
-    public String getPadreID() {
-        return padreID;
-    }
-
-    public void setPadreID(String padreID) {
-        this.padreID = padreID;
-    }
-
-    public float getValue() {
-        return value;
-    }
-
-    public void setValue(float value) {
-        this.value = value;
-    }
-
     /*                                                     *
      *  -------------------- GUI WORK ---------------------* 
      *                                                     */
-    
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawRect(1, 1, 100, 200); 
+        g.drawOval(0, 0, 350, 200);
+        g.drawString("" + super.getResValue(), 30, 56);
+        
+        
     }
+
+
     private class ClickListener extends MouseAdapter {
         public void mousePressed(MouseEvent evt){
             System.out.println("Soy una variablle");
