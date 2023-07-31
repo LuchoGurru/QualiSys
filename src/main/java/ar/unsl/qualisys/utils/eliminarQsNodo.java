@@ -4,8 +4,8 @@
  */
 package ar.unsl.qualisys.utils;
 
-import GUIComponents.GUINodos.QualyOperator;
-import GUIComponents.Laminas.DragAndDropVariablesAndOperandsPanel;
+import ar.unsl.qualisys.componentes.nodos.QualyOperator;
+import ar.unsl.qualisys.paneles.DragAndDropVariablesAndOperandsPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 

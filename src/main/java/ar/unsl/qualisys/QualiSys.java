@@ -4,6 +4,8 @@
 
 package ar.unsl.qualisys;
 
+import ar.unsl.qualisys.frames.QsFrame;
+
 /**
  *
  * @author luciano
@@ -11,6 +13,6 @@ package ar.unsl.qualisys;
 public class QualiSys {
 
 public static void main(String[] args){
-        new EditorPanel();
+        new QsFrame();
     }
 }

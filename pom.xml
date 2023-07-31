@@ -13,10 +13,12 @@
         </repository>
     </repositories>
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/net.java.timingframework/timingframework-core -->
         <dependency>
-            <groupId>unknown.binary</groupId>
-            <artifactId>AbsoluteLayout</artifactId>
-            <version>SNAPSHOT</version>
+            <groupId>net.java.timingframework</groupId>
+            <artifactId>timingframework-core</artifactId>
+            <version>7.3.1</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <properties>
@@ -25,4 +27,5 @@
         <maven.compiler.target>11</maven.compiler.target>
         <exec.mainClass>ar.unsl.qualisys.QualiSys</exec.mainClass>
     </properties>
+ 
 </project>
