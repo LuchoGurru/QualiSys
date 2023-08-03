@@ -474,7 +474,7 @@ public class QsTextPanel extends JPanel {
         if(lineaAnterior == lineaNueva){ // Modificamos la linea actual
             actualizarEstructuraDeLinea(lineaNueva,"");
         }else{
-            actualizarEstructuraDeTexto();
+             actualizarEstructuraDeTexto();
         }
         /* setItemActual();
         e.getOffset();
@@ -494,7 +494,7 @@ public class QsTextPanel extends JPanel {
     private void manejarEventosPanelDeTexto() {
         Document documento = panelDeTexto.getDocument();
         Set<Integer> pressedKeys = new HashSet<>();
-        //EVENTOS TECLADO ENTER
+        //EVENTOS TECLADO ENTER no se usa
         panelDeTexto.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
