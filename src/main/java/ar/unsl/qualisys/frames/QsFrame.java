@@ -33,7 +33,11 @@ public class QsFrame extends JFrame{
               JTabbedPane tabbedPane = new MaterialTabbed();
         
         this.setLayout(new BorderLayout());
-        this.add(new QsMenuSuperior(),BorderLayout.NORTH); 
+        
+        QsTextPanel panelDeLlenadoDeVariables = new QsTextPanel();
+        
+        this.add(new QsMenuSuperior(panelDeLlenadoDeVariables),BorderLayout.NORTH); 
+
         JPanel panel1, panel2, panel3, panel4, panel5;
         panel1 = new JPanel();
         panel2 = new JPanel();
@@ -41,7 +45,7 @@ public class QsFrame extends JFrame{
         panel4 = new JPanel();
         panel4.add(createChart());
         
-        tabbedPane.addTab("Variables de Preferencia", new QsTextPanel());
+        tabbedPane.addTab("Variables de Preferencia", panelDeLlenadoDeVariables);
         tabbedPane.addTab("Árbol ", new QualyGraphicPanel());
         tabbedPane.addTab("Llenado de Instancias ", new ValorInstancias());
         tabbedPane.addTab("Resultados ", panel4);

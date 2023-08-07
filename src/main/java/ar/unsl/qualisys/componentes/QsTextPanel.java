@@ -714,4 +714,12 @@ public class QsTextPanel extends JPanel {
     }
 
     //NOTA TENGO QUE HACER EL QUE CUANDMO E BORRE LA MITAD DE LOS NUMERITOS ME CREE LOS NUMERITOS DE NUEVO EN NEGRITA PARA QUE SENO TE O BUSCAR LA MANERA DE NOPPERMITIR ESO 
+
+    public JTextPane getPanelDeTexto() {
+        return panelDeTexto;
+    }
+
+    public void setPanelDeTexto(JTextPane panelDeTexto) {
+        this.panelDeTexto = panelDeTexto;
+    } 
 }
