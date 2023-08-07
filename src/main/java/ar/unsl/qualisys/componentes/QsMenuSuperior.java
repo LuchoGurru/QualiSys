@@ -87,11 +87,35 @@ public class QsMenuSuperior extends JMenuBar {
         JMenu edicion = new JMenu("Edicion");
         JMenu herramientas = new JMenu("Herramientas");
         JMenu ayuda = new JMenu("Ayuda");
-
-
-
+  
         //JMenuItems: Archivo
         JMenuItem abrirArchivo = new JMenuItem("Abrir");
+        abrirArchivo.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+               System.out.println("Reaccion, ahora abri el archivo y convertilo a indice...");
+             /*  JFileChooser fileExplorer = new JFileChooser(); // Elector de archivos
+               FileNameExtensionFilter fileExtensions = new FileNameExtensionFilter("Archivos de calidad", "txt"); // Filtro de archivos
+               fileExplorer.setFileFilter(fileExtensions);
+
+               int selected = fileExplorer.showOpenDialog(barra);// Archivo seleccionado
+               if (selected == fileExplorer.APPROVE_OPTION) {
+                   File fichero = fileExplorer.getSelectedFile();
+                   try (FileReader arch = new FileReader(fichero)) {
+                       String cadena = "";
+                       int valor = arch.read();
+                       while (valor != -1) {
+                           cadena = cadena + (char) valor;
+                           valor = arch.read();
+                       }
+                       panelDeTexto.setText(cadena);
+                       arch.close();
+                   } catch (IOException ex) {
+                       System.out.println("no file");
+                   }
+               }*/
+           }
+       });
         JMenuItem nuevoArchivo = new JMenuItem("Nuevo");
         JMenuItem guardarArchivo = new JMenuItem("Guardar");
         JMenuItem exportar = new JMenuItem("Exportar");
