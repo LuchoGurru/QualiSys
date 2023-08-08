@@ -111,9 +111,7 @@ public class QsMenuSuperior extends JMenuBar {
                             cadena = cadena + (char) valor;
                             valor = arch.read();
                         }
-                        JTextPane panelDeTexto = new JTextPane();
-                        panelDeTexto.setText(cadena);
-                        panelDeLlenadoDeVariables.setPanelDeTexto(panelDeTexto);
+                        panelDeLlenadoDeVariables.getPanelDeTexto().setText(cadena);
                         arch.close();
                     } catch (IOException ex) {
                         System.out.println("no file");
