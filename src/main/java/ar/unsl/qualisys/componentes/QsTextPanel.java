@@ -480,6 +480,7 @@ public class QsTextPanel extends JPanel {
         documento.addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
+                System.out.println(TURN_OFF_LISTENERS);
                  if(TURN_OFF_LISTENERS==false){
                     TURN_OFF_LISTENERS = true;
                     actualizarEstado();
@@ -553,6 +554,7 @@ public class QsTextPanel extends JPanel {
             itemActual.setCadenaDeTexto(textoLineaActual);
         }
             renglones.add(itemActual.getNumeroDeLinea(), itemActual);  
+            TURN_OFF_LISTENERS = false;
         }
     /**
      *
@@ -668,7 +670,7 @@ public class QsTextPanel extends JPanel {
         return panelDeTexto;
     }
 
-    public void setPanelDeTexto(JTextPane panelDeTexto) {
-        this.panelDeTexto = panelDeTexto;
+    public void setTexto(String texto) {
+        this.panelDeTexto.setText(texto); 
     } 
 }

@@ -110,10 +110,8 @@ public class QsMenuSuperior extends JMenuBar {
                         while (valor != -1) {
                             cadena = cadena + (char) valor;
                             valor = arch.read();
-                        }
-                        JTextPane panelDeTexto = new JTextPane();
-                        panelDeTexto.setText(cadena);
-                        panelDeLlenadoDeVariables.setPanelDeTexto(panelDeTexto);
+                        }  
+                        panelDeLlenadoDeVariables.setTexto(cadena);
                         arch.close();
                     } catch (IOException ex) {
                         System.out.println("no file");
@@ -156,7 +154,7 @@ public class QsMenuSuperior extends JMenuBar {
 
         //Agrego la barra al panel
         //this.add(BorderLayout.NORTH);
-                //Se agregan los menus a la barra
+        //Se agregan los menus a la barra
         this.add(archivo);
         this.add(edicion);
         this.add(herramientas);

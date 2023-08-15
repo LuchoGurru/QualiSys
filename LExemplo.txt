@@ -1,3 +1,10 @@
+Si hago set Text. 
+Se Activa el siguiente Stack de Listener
+
+1 ) EL remove update  - no lo he probado con texto.
+2 ) el caret Listener 
+3 ) el insert Listener 1 por linea
+
 
 ¿Qué es Lorem Ipsum?
 
