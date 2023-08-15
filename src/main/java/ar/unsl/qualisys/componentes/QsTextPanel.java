@@ -133,6 +133,7 @@ public class QsTextPanel extends JPanel {
                             cadena = cadena + (char) valor;
                             valor = arch.read();
                         }
+                        System.out.println(panelDeTexto.getText() +"chau");
                         panelDeTexto.setText(cadena);
                         arch.close();
                     } catch (IOException ex) {
@@ -443,39 +444,6 @@ public class QsTextPanel extends JPanel {
     private void manejarEventosPanelDeTexto() {
         Document documento = panelDeTexto.getDocument();
         Set<Integer> pressedKeys = new HashSet<>();
-        //EVENTOS TECLADO ENTER no se usa
-        panelDeTexto.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-           /**     if (pressedKeys.contains(KeyEvent.VK_ENTER) && pressedKeys.size() == 1) {
-                    StyledDocument doc = panelDeTexto.getStyledDocument();
-                    try {
-                        doc.remove(doc.getLength() - 1, 1);
-                    } catch (BadLocationException ex) {
-                        Logger.getLogger(QsTextPanel.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }*/
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-              /*  pressedKeys.add(e.getKeyCode());
-                if (pressedKeys.contains(KeyEvent.VK_ENTER) && pressedKeys.contains(KeyEvent.VK_SHIFT)) {
-                    agregarNivelANumeracion(renglones);
-                } else if (pressedKeys.contains(KeyEvent.VK_ENTER) && pressedKeys.contains(KeyEvent.VK_CONTROL)) {
-                    //retrocederNivel();
-                    //reordenarIndice(renglones);
-                } else if (pressedKeys.contains(KeyEvent.VK_ENTER)) { // Local 
-                    agregarItemANivel(renglones);
-                }*/
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-               // pressedKeys.remove(e.getKeyCode());
-
-            }
-        });
         //EVENTOS DE EDICION DE TEXTO . Añado los caret Listeners
         documento.addDocumentListener(new DocumentListener() {
             @Override
@@ -514,9 +482,9 @@ public class QsTextPanel extends JPanel {
         panelDeTexto.addCaretListener(new CaretListener() {
             @Override
             public void caretUpdate(CaretEvent e) {
-                
-                System.out.println(panelDeTexto.getText());
-                
+ 
+                System.out.println(panelDeTexto.getText()+"hola");
+                //panelDeTexto.setText("");
                 System.out.println(" " + e.getDot() + "ooo" + e.getMark());
                 int lineaAnterior = itemActual.getNumeroDeLinea();
                 int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto, panelDeTexto.getCaretPosition());
@@ -528,6 +496,8 @@ public class QsTextPanel extends JPanel {
                     }
 
                 }
+                actualizarEstado();
+                repaint();
             }
         });
     }
@@ -561,7 +531,7 @@ public class QsTextPanel extends JPanel {
      *
      */
     private void actualizarEstructuraDeTexto() {
- 
+        
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
