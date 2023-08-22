@@ -9,8 +9,11 @@ package ar.unsl.qualisys.utils;
  * @author luciano.gurruchaga
  */
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
@@ -123,9 +126,18 @@ public class JTextPaneUtils {
             columnNumber = caretPosition - offset + 1;
         } catch (javax.swing.text.BadLocationException ex) {
             ex.printStackTrace();
-        }
-
+        } 
         return columnNumber;
+    }
+    public static int getEndRow(JTextComponent textComponent) {
+        int caretPosition = textComponent.getCaretPosition();
+        int ret = 0;
+        try {
+            ret = Utilities.getRowStart(textComponent, caretPosition);
+        } catch (BadLocationException ex) {
+            System.out.println("SE ROMPE POR QUE ES HORRIBLE ESTO = ");
+        }
+        return ret ;
     }
         /**
          * Obtiene La línea contando desde 0. es decir la Primer Linea es la línea 0.
@@ -134,21 +146,13 @@ public class JTextPaneUtils {
          */
         public static int getIndexLineNumberByOffset(JTextComponent textComponent,int pos) {
         int lineIndex=0;
-        try {
-            int offset = pos;
-            while (offset > 0) { //Significa que todavía no es el principio del archivo, Le voy quitando el length de la línea hasta el principio.
-                offset = Utilities.getRowStart(textComponent, offset) - 1;
-                 // Claro le va sacando el desplazamiento linea a linea de forma descendente,
-                 //aumentando el contador hasta que llega al -1 cuando es el comienzo del archivo
-                 //El menos 1 es para que se vaya al ultimo elemento de la fila anterior, sino siempre me va a dar la misma fila                                                      
-                
-                lineIndex = offset>0 ? lineIndex + 1 : lineIndex+0   ;
-                
-            }
-        } catch (javax.swing.text.BadLocationException ex) {
+        try { 
+            DefaultStyledDocument doc = (DefaultStyledDocument) textComponent.getDocument();
+            lineIndex = doc.getDefaultRootElement().getElementIndex(pos);
+            System.out.println("Line Index: " + lineIndex);
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
-
         return lineIndex;
     }
     

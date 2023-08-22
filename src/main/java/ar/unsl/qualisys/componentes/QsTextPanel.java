@@ -1,16 +1,14 @@
 package ar.unsl.qualisys.componentes;
 
+import ar.unsl.qualisys.paneles.PanelTexto;
 import ar.unsl.qualisys.utils.Item;
 import ar.unsl.qualisys.utils.JTextPaneUtils;
-import static ar.unsl.qualisys.utils.JTextPaneUtils.insertStringAtTheEnd;
-//import ar.unsl.qualisys.utils.TextLineNumber;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledEditorKit;
@@ -24,74 +22,63 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.Element;
 import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
 
 public class QsTextPanel extends JPanel {
 
-    JPanel panelMenu = new JPanel();
-    JPanel panelEstado = new JPanel();
+    private static boolean TURN_OFF_LISTENERS = false;
 
-    JPanel panel1;
-
-    JMenuBar barra = new JMenuBar();
-
-    JToolBar menuHerramientas = new JToolBar();
-
-    JButton nuevo;
-    JButton abrir;
-    JButton guardar;
-
-    JButton deshacer;
-    JButton rehacer;
-
-    JButton color;
-    JSpinner tam;
-    JComboBox fuente;
-    JButton centrado;
-    String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-    private JTextPane panelDeTexto = new JTextPane();
+    private JTextPane panelDeTexto;
     private ArrayList<Item> renglones;
     private Item itemActual;
-    // POPUPMENU
-    JPopupMenu contextual = new JPopupMenu();
 
-    private static boolean TURN_OFF_LISTENERS = false;
+    /**
+     * Constructor Barra Herramientas - Panel de Texto - Menu popup
+     */
     public QsTextPanel() {
         this.setLayout(new BorderLayout());
-      //  barraDeMenu();
+        panelDeTexto = new JTextPane(){
+
+            @Override
+            public boolean getScrollableTracksViewportWidth() {
+                return getUI().getPreferredSize(this).width
+                                <= getParent().getSize().width;
+            }
+
+        };
+        renglones = new ArrayList<>();
+        itemActual = new Item(0,0,"1.",""); // inicializo item 
+        renglones.add(itemActual);
         barraDeHerramientas();
         textContent();
         menuPopUp();
-        //barraDeEstado();
         this.setVisible(true);
     }
 
+    /**
+     * Construye la barra de herramientas superior para editar texto
+     */
     public void barraDeHerramientas() {
+        JMenuBar barra = new JMenuBar();
+        JToolBar menuHerramientas = new JToolBar();
+        JButton nuevo = new JButton();
+        JButton abrir = new JButton();
+        JButton guardar = new JButton();
+        JButton deshacer = new JButton();
+        JButton rehacer = new JButton();
+        JButton color = new JButton();
+        JSpinner tam = new JSpinner(new SpinnerNumberModel(12, 0, 84, 2));
+        JButton centrado = new JButton();
+        String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+        JComboBox fuente = new JComboBox(fontNames);
         //Config
         menuHerramientas.setFloatable(false);
-        //
-        abrir = new JButton(); // new ImageIcon("src\\")
-        guardar = new JButton();
-
-        nuevo = new JButton();
-        deshacer = new JButton();
-        rehacer = new JButton();
-
-        color = new JButton();
-        tam = new JSpinner(new SpinnerNumberModel(12, 0, 84, 2));
-        fuente = new JComboBox(fontNames);
-        centrado = new JButton();
-        //
         abrir.setText("Open");
         nuevo.setText("New");
         guardar.setText("Save");
@@ -99,8 +86,6 @@ public class QsTextPanel extends JPanel {
         rehacer.setText("-->");
         color.setText("Color");
         centrado.setText("Centrado");
-        //
-
         fuente.setSelectedIndex(15);
 
         //onFocus Texto
@@ -115,6 +100,7 @@ public class QsTextPanel extends JPanel {
         menuHerramientas.add(centrado);
         menuHerramientas.add(fuente);
         menuHerramientas.add(tam);
+        // Listeners
         abrir.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -133,7 +119,7 @@ public class QsTextPanel extends JPanel {
                             cadena = cadena + (char) valor;
                             valor = arch.read();
                         }
-                        System.out.println(panelDeTexto.getText() +"chau");
+                        System.out.println(panelDeTexto.getText() + "chau");
                         panelDeTexto.setText(cadena);
                         arch.close();
                     } catch (IOException ex) {
@@ -246,34 +232,9 @@ public class QsTextPanel extends JPanel {
 
     }
 
-    public void textContent() {
-        //Scroll
-        JScrollPane scroll = new JScrollPane(panelDeTexto);
-        Font font = new Font("Sans_Serif", Font.PLAIN, 30);
-        panelDeTexto.setFont(font);
-        // Crear el documento
-        StyledDocument doc = panelDeTexto.getStyledDocument();
-
-        // Crear un estilo
-        Style style = panelDeTexto.addStyle("DefaultStyle", null);
-
-        // Configurar la alineación del estilo
-        StyleConstants.setAlignment(style, StyleConstants.ALIGN_LEFT);
-
-        // Añadir el estilo al documento
-        doc.setParagraphAttributes(0, doc.getLength(), style, false);
-
-        // Establecer el texto en el JTextPane
-        viewNumeracion(true, panelDeTexto, scroll);
-        //Wheel scroll
-        scroll.setWheelScrollingEnabled(true);
-        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        //Agregamos el texto al SctollPanel
-        initTextPanel();
-        this.add(scroll, BorderLayout.CENTER);
-    }
-
     public void menuPopUp() {
+        JPopupMenu contextual = new JPopupMenu();
+
         JMenuItem deshacer = new JMenuItem("Deshacer");
         JMenuItem rehacer = new JMenuItem("Rehacer");
         JMenuItem cortar = new JMenuItem("Cortar");
@@ -299,8 +260,38 @@ public class QsTextPanel extends JPanel {
         panelDeTexto.setComponentPopupMenu(contextual);
     }
 
-    public static void viewNumeracion(boolean numeracion, JTextPane textArea, JScrollPane scroll) {
+    public void textContent() {
+        //Scroll
+        JScrollPane scroll = new JScrollPane(panelDeTexto);
+        
+      //  Font font = new Font("Sans_Serif", Font.PLAIN, 30);
+       // panelDeTexto.setFont(font);
+        // Crear el documento
+        StyledDocument doc = panelDeTexto.getStyledDocument();
 
+        // Crear un estilo
+        Style style = panelDeTexto.addStyle("DefaultStyle", null);
+
+        // Configurar la alineación del estilo
+        StyleConstants.setAlignment(style, StyleConstants.ALIGN_LEFT);
+
+        // Añadir el estilo al documento
+        doc.setParagraphAttributes(0, doc.getLength(), style, false);
+
+        // Establecer el texto en el JTextPane
+        viewNumeracion(true, panelDeTexto, scroll);
+        //Wheel scroll
+        scroll.setWheelScrollingEnabled(true);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        
+        
+        //Agregamos el texto al SctollPanel
+        manejarEventosPanelDeTexto();
+        this.add(scroll, BorderLayout.CENTER);
+    }
+
+    public static void viewNumeracion(boolean numeracion, JTextPane textArea, JScrollPane scroll) {
 //        scroll.setRowHeaderView(new TextLineNumber(textArea));  
     }
 
@@ -333,114 +324,7 @@ public class QsTextPanel extends JPanel {
         return nuevoNivel;
 
     }
-    
-    
-    /**
-     * Instancia los renglones;
-     *
-     * @return
-     */
-    private void initTextPanel() {
-
-        renglones = new ArrayList<>(); // Hijos 
-        itemActual = new Item(0, 0, "1.", "Título.", null);
-        renglones.add(itemActual);
-        panelDeTexto.setText(itemActual.constructRenglon());
-
-        manejarEventosPanelDeTexto();
-
-    }
-
-    private void agregarItemANivel(ArrayList<Item> items) {
-        int linea = JTextPaneUtils.getLineNumberByCaret(panelDeTexto) - 1; // le resto uno para contar desde 0.
-        // Aumentar Nivel Actual
-        Item anterior = items.get(linea);
-        String nuevaNumeracion = aumentarNumeracion(anterior);
-        Item siguienteItem = new Item(linea, anterior.getNivel(), nuevaNumeracion, "", null);
-        insertStringAtTheEnd(panelDeTexto, "\n" + siguienteItem.constructRenglon());
-        items.add(siguienteItem);
-    }
-
-    private void agregarNivelANumeracion(ArrayList<Item> items) {
-        int linea = JTextPaneUtils.getLineNumberByCaret(panelDeTexto) - 1; // le resto uno para contar desde 0.
-        //Crear anidamiento desde nivel a nuevo nivel 
-        Item anterior = items.get(linea);
-        String nuevaNumeracion = aumentarNivel(anterior);
-        int nivelAumentado = anterior.getNivel() + 1;
-        Item siguienteItem = new Item(linea, nivelAumentado, nuevaNumeracion, "", null);
-        insertStringAtTheEnd(panelDeTexto, "\n" + siguienteItem.constructRenglon());
-        items.add(siguienteItem);
-
-    }
-
-    private boolean isTheEOFContainedInGruopSelectionSentenses() {
-        return true;
-    }
-
-    /**
-     * Huy ocurrio un hecho muy sucesoso en el cual me ha desordenado la
-     * enumeracion de renglones e identaciones. Esto podria traducirse a que me
-     * edíta uno o mas renglones los cuales no forman parte del el los renglones
-     * final / es
-     */
-    private void reordenarIndice(ArrayList<Item> items) {
-
-        //   documento.addDocumentListener(listener);
-        System.out.println("TEXTIIIOOOOTOTOTO" + panelDeTexto.getSelectionEnd());        //documento.
-        //   System.out.println("hjkl"+documento.getEndPosition());
-        //   System.out.println("hjkl"+documento.getLength());
-        JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto, panelDeTexto.getCaretPosition());
-        JTextPaneUtils.getLineNumberByCaret(panelDeTexto);
-
-        System.out.println("ASDDDDDD" + JTextPaneUtils.getLineNumberByCaret(panelDeTexto));
-
-        // Significa que me modifico algo en el medio del archivo ... osea que hay al menos una linea por debajo de la seleccion.
-        // }
-        /*
-        
-            Si yo linkeo desde el numero de linea al numero de indice, obtengo linea x indice n n.m n.m.p
-            
-            Entonces empiezo a reordenar desde ahí hasta end of file ... 
-        
-            1.  
-            2.
-                2.1
-                2.2
-                2.3
-            3.
-                3.1
-                    3.1.1
-                    3.1.2
-            4.
-            
-        
-         */
-    }
-    private void actualizarEstado(){
-        int lineaAnterior = itemActual.getNumeroDeLinea();
-        int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto,panelDeTexto.getCaretPosition());
-        System.out.println("lineaNueva " + lineaNueva);
-        System.out.println("lineaAnterior " + lineaAnterior);
-        if(lineaAnterior == lineaNueva){ // Modificamos la linea actual
-            actualizarEstructuraDeLinea(lineaNueva,"");
-        }else{
-             actualizarEstructuraDeTexto();
-        }
-        /* setItemActual();
-        e.getOffset();
-        e.getLength();
-        System.out.println("e.getOffset() = " + e.getOffset());
-
-        System.out.println("e.getLength() = " + e.getLength()); */
-    
-        }
-    private boolean isRenglonBienFormado(String renglon) {
-        String regex = "^\\t*(\\d\\.)+\\s.*$";
-        System.out.println("renglon " + renglon);
-        System.out.println("String matches regex: " + renglon.matches(regex));
-        return renglon.matches(regex);
-    }
-
+ 
     private void manejarEventosPanelDeTexto() {
         Document documento = panelDeTexto.getDocument();
         Set<Integer> pressedKeys = new HashSet<>();
@@ -448,30 +332,35 @@ public class QsTextPanel extends JPanel {
         documento.addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                System.out.println(TURN_OFF_LISTENERS);
-                 if(TURN_OFF_LISTENERS==false){
+                System.out.println("panelCaretPos = " + panelDeTexto.getCaretPosition());
+                System.out.println("Tipo = " + e.getType());
+                System.out.println("Longitud = " + e.getLength());
+                System.out.println("Offset = " + e.getOffset());
+                //System.out.println("INSERTUPDATE  = " + panelDeTexto.getText());
+                if (TURN_OFF_LISTENERS == false) {
                     TURN_OFF_LISTENERS = true;
-                    actualizarEstado();
-                    
+                    int lineaAnterior = itemActual.getNumeroDeLinea(); // inicialmente 0
+                    int offsetResultado  = e.getOffset() + e.getLength();
+                    int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto,offsetResultado);
+                    System.out.println("lineaNueva " + lineaNueva);
+                    System.out.println("lineaAnterior " + lineaAnterior);
+                    actualizarEstado(lineaAnterior,lineaNueva);
                 }
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                
-                
-                if(TURN_OFF_LISTENERS==false){
+                System.out.println("panelCaretPos = " + panelDeTexto.getCaretPosition());
+                System.out.println("Tipo = " + e.getType());
+                System.out.println("Longitud = " + e.getLength());
+                System.out.println("Offset = " + e.getOffset());
+            //    System.out.println("REMOVEUPDATE  = " + panelDeTexto.getText());
+                if (TURN_OFF_LISTENERS == false) {
                     TURN_OFF_LISTENERS = true;
-                    actualizarEstado();
+                    int lineaAnterior = itemActual.getNumeroDeLinea(); // inicialmente 0 
+                     int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto,e.getOffset());
+                    actualizarEstado(lineaAnterior,lineaNueva);
                 }
-                //   reordenarItems(items);
-                int lineaFinalDeLaSeleccion = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto, panelDeTexto.getSelectionEnd());
-                int lineaFinalDelDocumento = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto, documento.getLength());
-
-                if(lineaFinalDeLaSeleccion != lineaFinalDelDocumento){
-                // TODO : 
-                 
-                   }
             }
 
             @Override
@@ -480,26 +369,40 @@ public class QsTextPanel extends JPanel {
             }
         });
         panelDeTexto.addCaretListener(new CaretListener() {
+            //ACTUALIZA, o inicializa el itemActual by caret
             @Override
             public void caretUpdate(CaretEvent e) {
- 
-                System.out.println(panelDeTexto.getText()+"hola");
-                //panelDeTexto.setText("");
-                System.out.println(" " + e.getDot() + "ooo" + e.getMark());
-                int lineaAnterior = itemActual.getNumeroDeLinea();
-                int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto, panelDeTexto.getCaretPosition());
-                if (lineaAnterior != lineaNueva) { // Nos movemos en la líneaActual 
-                    if (renglones.size() <= lineaAnterior) {
-                        itemActual = renglones.get(lineaNueva);
-                    } else {
-                        System.out.println("lineaNueva " + lineaNueva);
-                    }
+                System.out.println("panelDeTexto.getCaretPosition() = " + panelDeTexto.getCaretPosition());
 
+                //System.out.println(panelDeTexto.getText() + "hola");
+                System.out.println(" " + e.getDot() + "ooo" + e.getMark()); // Mark donde empieza la selecion 
+                if(itemActual!=null){
+                    int posAnterior = itemActual.getNumeroDeLinea();
+                    int posNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto, panelDeTexto.getCaretPosition());
+                    if (posAnterior != posNueva) { //cambio de linea
+                        if (renglones.size() > posNueva) {
+                            itemActual = renglones.get(posNueva); // actualizo item
+                        }
+                    }
                 }
-                actualizarEstado();
-                repaint();
             }
         });
+    }
+    /**
+     * @param lineaAnterior posision de linea antes de la modificacion
+     * @param lineaNueva  posision de linea despues de la modificacion
+     */
+    private void actualizarEstado(int lineaAnterior, int lineaNueva) { 
+           if (lineaAnterior == lineaNueva) { // Modificamos la linea actual
+                actualizarEstructuraDeLinea(lineaNueva, "");
+            } else {
+                actualizarEstructuraDeTexto();
+            } 
+    }
+
+    private boolean isRenglonBienFormado(String renglon) {
+        String regex = "^\\t*(\\d*\\.)+\\s.*$";
+        return renglon.matches(regex);
     }
 
     private Item armarItem(String renglon, int numeroDeLinea) {
@@ -507,31 +410,32 @@ public class QsTextPanel extends JPanel {
         String numeracionAndNivel = arregloRenglon[0]; //obtengo la primer parte del renglon
         int nivelItem = numeracionAndNivel.split("\t").length - 1; //cantidad de tabs
         String numeracionItem = numeracionAndNivel.split("\t")[nivelItem];  //numeracion del indice
-        String textoItem = renglon.substring(arregloRenglon[0].length()); // obtengo el resto del texto
+        String textoItem = renglon.substring(arregloRenglon[0].length()+1); // obtengo el resto del texto
         System.out.println("textoItem = " + textoItem);
-        return new Item(numeroDeLinea, nivelItem, numeracionItem, textoItem, null);
+        return new Item(numeroDeLinea, nivelItem, numeracionItem, textoItem);
     }
-    
-    private void actualizarEstructuraDeLinea(int lineaActual,String textoLineaActual ) {
-                //int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto,panelDeTexto.getCaretPosition());
+
+    private void actualizarEstructuraDeLinea(int lineaActual, String textoLineaActual) {
+        //int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto,panelDeTexto.getCaretPosition());
         //String textoDeLinea = JTextPaneUtils.getTextoDeLineaByOffset(panelDeTexto,panelDeTexto.getCaretPosition()); // Obtengo el texto de la linea actual
-        if(isRenglonBienFormado(textoLineaActual)){
-            Item itemActualizado = armarItem(textoLineaActual,lineaActual);
+        if (isRenglonBienFormado(textoLineaActual)) {
+            Item itemActualizado = armarItem(textoLineaActual, lineaActual);
             itemActual.setCadenaDeTexto(itemActualizado.getCadenaDeTexto());
 
-        }else{
+        } else {
             //escribirlo bien.
             itemActual.setCadenaDeTexto(textoLineaActual);
         }
-            renglones.add(itemActual.getNumeroDeLinea(), itemActual);  
-            TURN_OFF_LISTENERS = false;
-        }
+        renglones.add(itemActual.getNumeroDeLinea(), itemActual);
+        TURN_OFF_LISTENERS = false;
+    }
+
     /**
      *
      *
      */
     private void actualizarEstructuraDeTexto() {
-        
+
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -539,61 +443,76 @@ public class QsTextPanel extends JPanel {
                 String nuevoTexto = "";
                 int caretPosition = panelDeTexto.getCaretPosition();
                 String texto = panelDeTexto.getText();
+                if(texto.lastIndexOf("\n") == texto.length()-1){// osea que no me tomo la ultima linea vacia 
+                    texto+= " "; // para que me tome la ultima linea sino confunde con EOF y da problemas
+                }
                 String[] lineas = texto.split("\n");
                 String lineaInicial = lineas[0];
-                itemActual = new Item(0, 0, "1.", lineaInicial, null);
+                renglones = new ArrayList<>();
+                itemActual = new Item(0, 0, "1.", lineaInicial);
+                renglones.add(itemActual);
                 if (isRenglonBienFormado(lineaInicial)) {
-                     itemActual.setCadenaDeTexto(armarItem(lineaInicial, 0).getCadenaDeTexto());//por ser el primero ignoro num.
+                    itemActual.setCadenaDeTexto(armarItem(lineaInicial, 0).getCadenaDeTexto());//por ser el primero ignoro num.
                 }
                 arregloDeNiveles[itemActual.getNivel()] = itemActual.getNumeration(); // numeracion[0] = "1."
                 nuevoTexto += itemActual.constructRenglon();
 
                 for (int i = 1; i < lineas.length; i++) {// Empiezo desde la segunda linea ok? es decir la linea ubicada en 1
-                    Item itemToBuild=null;
+                    Item itemToBuild = null;
                     if (isRenglonBienFormado(lineas[i])) { //el renglon esta bien formado
-                        
-                        itemToBuild = armarItem(lineas[i], i); 
-                        if(itemToBuild.getNivel() == itemActual.getNivel()){
+                        itemToBuild = armarItem(lineas[i], i);
+                        if (itemToBuild.getNivel() == itemActual.getNivel()) {
                             itemToBuild.setNumeration(aumentarNumeracion(itemActual)); // numeracion + 1 
                             arregloDeNiveles[itemToBuild.getNivel()] = itemToBuild.getNumeration();
-                        }else if(itemToBuild.getNivel() < itemActual.getNivel()){ 
+                        } else if (itemToBuild.getNivel() < itemActual.getNivel()) {
                             String num = arregloDeNiveles[itemToBuild.getNivel()]; // Obtengo numeracion del corriente nivel.
                             itemToBuild.setNumeration(num);
-                            itemToBuild.setNumeration(aumentarNumeracion(itemToBuild)); 
+                            itemToBuild.setNumeration(aumentarNumeracion(itemToBuild));
                             arregloDeNiveles[itemToBuild.getNivel()] = itemToBuild.getNumeration();
-                        }else{
-                            itemToBuild.setNivel(itemActual.getNivel()+1);//aumenta UN nivel
+                        } else {
+                            itemToBuild.setNivel(itemActual.getNivel() + 1);//aumenta UN nivel
                             itemToBuild.setNumeration(aumentarNivel(itemActual));
                             arregloDeNiveles[itemToBuild.getNivel()] = itemToBuild.getNumeration();
                         }
-                        
-                    }else{ // EL renglon está mal formado asique puede venir cualquier cosa, lo ignoro y pongo en el mismo nivel de la corriente numeracion ... 
-                        itemToBuild = new Item( i,  
-                                                itemActual.getNivel(), 
-                                                aumentarNumeracion(itemActual),
-                                                lineas[i], 
-                                                null);
+
+                    } else { // EL renglon está mal formado asique puede venir cualquier cosa, lo ignoro y pongo en el mismo nivel de la corriente numeracion ... 
+                        itemToBuild = new Item(i,
+                                itemActual.getNivel(),
+                                aumentarNumeracion(itemActual),
+                                lineas[i]);
                     }
-                    nuevoTexto+= "\n" +  itemToBuild.constructRenglon();
-                    System.out.println("nuevoTexto + i = " + nuevoTexto + " " + i);
-                    itemActual = itemToBuild; 
-                } 
+                    nuevoTexto += "\n" + itemToBuild.constructRenglon();
+                    //System.out.println("nuevoTexto + i = " + nuevoTexto + " " + i);
+                    itemActual = itemToBuild;
+
+                    renglones.add(itemActual);
+                }
                 panelDeTexto.setText(nuevoTexto); // actualizo el texto
-                System.out.println("ee qlia");
                 panelDeTexto.setCaretPosition(caretPosition);
-                
-                
+                int pos = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto, caretPosition);
+                itemActual = renglones.get(pos);
+
                 //Falta actualizar el caret
-                
                 TURN_OFF_LISTENERS = false;
             }
 
-         });
+        });
+    } 
+    public JTextPane getPanelDeTexto() {
+        return panelDeTexto;
     }
-    
-    /**
-     * IF an Action esta realizada en el No end of the File 
-     */
+
+    public void setTexto(String texto) {
+        TURN_OFF_LISTENERS = true;
+        this.panelDeTexto.setText(texto);
+        actualizarEstado(0,1);//Le paso lineas distintas para que actualice todo el texto.
+    }
+}
+
+/*    //NOTA TENGO QUE HACER EL QUE CUANDMO E BORRE LA MITAD DE LOS NUMERITOS ME CREE LOS NUMERITOS DE NUEVO EN NEGRITA PARA QUE SENO TE O BUSCAR LA MANERA DE NOPPERMITIR ESO 
+
+     * IF an Action esta realizada en el No end of the File
+     
     private void reordenarItems(ArrayList<Item> items) {
         //  View of the component has not been updated at the time
         //  the DocumentEvent is fired
@@ -629,18 +548,28 @@ public class QsTextPanel extends JPanel {
                                         add(n) = nuevo ;
                        Este es nuestro punto de partida pasa que hay que ver desde el caret para abajo
   
-                 */
+                 
             }
         });
     }
-
-    //NOTA TENGO QUE HACER EL QUE CUANDMO E BORRE LA MITAD DE LOS NUMERITOS ME CREE LOS NUMERITOS DE NUEVO EN NEGRITA PARA QUE SENO TE O BUSCAR LA MANERA DE NOPPERMITIR ESO 
-
-    public JTextPane getPanelDeTexto() {
-        return panelDeTexto;
+    private void agregarItemANivel(ArrayList<Item> items) {
+        int linea = JTextPaneUtils.getLineNumberByCaret(panelDeTexto) - 1; // le resto uno para contar desde 0.
+        // Aumentar Nivel Actual
+        Item anterior = items.get(linea);
+        String nuevaNumeracion = aumentarNumeracion(anterior);
+        Item siguienteItem = new Item(linea, anterior.getNivel(), nuevaNumeracion, "", null);
+        insertStringAtTheEnd(panelDeTexto, "\n" + siguienteItem.constructRenglon());
+        items.add(siguienteItem);
     }
 
-    public void setTexto(String texto) {
-        this.panelDeTexto.setText(texto); 
-    } 
-}
+    private void agregarNivelANumeracion(ArrayList<Item> items) {
+        int linea = JTextPaneUtils.getLineNumberByCaret(panelDeTexto) - 1; // le resto uno para contar desde 0.
+        //Crear anidamiento desde nivel a nuevo nivel 
+        Item anterior = items.get(linea);
+        String nuevaNumeracion = aumentarNivel(anterior);
+        int nivelAumentado = anterior.getNivel() + 1;
+        Item siguienteItem = new Item(linea, nivelAumentado, nuevaNumeracion, "", null);
+        insertStringAtTheEnd(panelDeTexto, "\n" + siguienteItem.constructRenglon());
+        items.add(siguienteItem);
+
+    }*/

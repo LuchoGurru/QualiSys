@@ -16,18 +16,16 @@ public class Item {
     private String numeration;// 1.
     private int nivel;// t
     private String cadenaDeTexto; // Name
-   // private Set<Item> arregloDeItems; // Hijos 
     //private int numeroDeColumna;
     private int numeroDeLinea;
     
     
     
-    public Item(int numeroDeLinea, int nivel,String numeration, String cadenaDeTexto, Set<Item> arregloDeItems) {
+    public Item(int numeroDeLinea, int nivel,String numeration, String cadenaDeTexto) {
         this.numeroDeLinea = numeroDeLinea;
         this.cadenaDeTexto = cadenaDeTexto;
         this.numeration = numeration;
         this.nivel = nivel;
-        //this.arregloDeItems = arregloDeItems;
     }
 
     public String getNumeration() {

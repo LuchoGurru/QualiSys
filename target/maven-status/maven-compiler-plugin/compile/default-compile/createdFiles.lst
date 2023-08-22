@@ -38,7 +38,6 @@ table/TextAreaCellRenderer.class
 javaswingdev/form/Form_Dashboard$1.class
 ar/unsl/qualisys/paneles/PanelTexto$5.class
 scroll/ScrollBarCustomUI.class
-ar/unsl/qualisys/componentes/QsTextPanel$13.class
 ar/unsl/qualisys/componentes/QsMenuSuperior$1.class
 com/raven/chart/Chart.class
 ar/unsl/qualisys/componentes/QsTextPanel$5.class
@@ -52,7 +51,6 @@ javaswingdev/swing/table/TableHeader.class
 ar/unsl/qualisys/componentes/QsTextPanel$6.class
 ar/unsl/qualisys/componentes/nodos/QualyVariable.class
 ar/unsl/qualisys/utils/ValorInstancias$1.class
-ar/unsl/qualisys/componentes/QsTextPanel$14.class
 table/TableCustom.class
 com/raven/chart/blankchart/SeriesSize.class
 ar/unsl/qualisys/componentes/nodos/QsOperacion.class
