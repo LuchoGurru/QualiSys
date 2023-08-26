@@ -71,6 +71,7 @@ public class QsTextPanel extends JPanel {
         JButton abrir = new JButton();
         JButton guardar = new JButton();
         JButton deshacer = new JButton();
+        JButton actualizar = new JButton(); // Haacer boton actualizar 
         JButton rehacer = new JButton();
         JButton color = new JButton();
         JSpinner tam = new JSpinner(new SpinnerNumberModel(12, 0, 84, 2));
@@ -83,6 +84,7 @@ public class QsTextPanel extends JPanel {
         nuevo.setText("New");
         guardar.setText("Save");
         deshacer.setText("<--");
+        actualizar.setText("F5");
         rehacer.setText("-->");
         color.setText("Color");
         centrado.setText("Centrado");
@@ -91,10 +93,12 @@ public class QsTextPanel extends JPanel {
         //onFocus Texto
         nuevo.setToolTipText("Nuevo Archivo");
         abrir.setToolTipText("Abrir Archivo");
+        actualizar.setToolTipText("Actualizar Texto");
         //
         menuHerramientas.add(guardar);
         menuHerramientas.add(abrir);
         menuHerramientas.add(deshacer);
+        menuHerramientas.add(actualizar);
         menuHerramientas.add(rehacer);
         menuHerramientas.add(color);
         menuHerramientas.add(centrado);
@@ -161,6 +165,14 @@ public class QsTextPanel extends JPanel {
                 }
             }
         });
+
+        actualizar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                actualizarEstado(1, 0);
+            }
+        }
+        );
         //
         UndoManager editManager = new UndoManager();
 
@@ -401,7 +413,8 @@ public class QsTextPanel extends JPanel {
     }
 
     private boolean isRenglonBienFormado(String renglon) {
-        String regex = "^\\t*(\\d*\\.)+\\s.*$";
+        String regex = "^\\t*(\\d+\\.)+\\s.*(?:\\r\\n|\\r|\\n)$"; // para la mariconeada de windol! 
+        System.out.println("renglon.matches(regex) = " + renglon.matches(regex));
         return renglon.matches(regex);
     }
 
