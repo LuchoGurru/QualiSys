@@ -498,8 +498,27 @@ public class QsTextPanel extends JPanel {
 
         });
     } 
-    public JTextPane getPanelDeTexto() {
-        return panelDeTexto;
+    private void agregarItemANivel(ArrayList<Item> items) {
+        int linea = JTextPaneUtils.getLineNumberByCaret(panelDeTexto) - 1; // le resto uno para contar desde 0.
+        // Aumentar Nivel Actual
+        Item anterior = items.get(linea);
+        String nuevaNumeracion = aumentarNumeracion(anterior);
+        Item siguienteItem = new Item(linea, anterior.getNivel(), nuevaNumeracion, "");
+        //insertStringAtTheEnd(panelDeTexto, "\n" + siguienteItem.constructRenglon());
+        items.add(siguienteItem);
+    }
+
+    private void agregarNivelANumeracion(ArrayList<Item> items) {
+        int linea = JTextPaneUtils.getLineNumberByCaret(panelDeTexto) - 1; // le resto uno para contar desde 0.
+        //Crear anidamiento desde nivel a nuevo nivel 
+        Item anterior = items.get(linea);
+        String nuevaNumeracion = aumentarNivel(anterior);
+        int nivelAumentado = anterior.getNivel() + 1;
+        Item siguienteItem = new Item(linea, nivelAumentado, nuevaNumeracion, "",);
+        insertStringAtRow
+        insertStringAtTheEnd(panelDeTexto, "\n" + siguienteItem.constructRenglon());
+        items.add(siguienteItem);
+
     }
 
     public void setTexto(String texto) {
@@ -551,25 +570,5 @@ public class QsTextPanel extends JPanel {
                  
             }
         });
-    }
-    private void agregarItemANivel(ArrayList<Item> items) {
-        int linea = JTextPaneUtils.getLineNumberByCaret(panelDeTexto) - 1; // le resto uno para contar desde 0.
-        // Aumentar Nivel Actual
-        Item anterior = items.get(linea);
-        String nuevaNumeracion = aumentarNumeracion(anterior);
-        Item siguienteItem = new Item(linea, anterior.getNivel(), nuevaNumeracion, "", null);
-        insertStringAtTheEnd(panelDeTexto, "\n" + siguienteItem.constructRenglon());
-        items.add(siguienteItem);
-    }
-
-    private void agregarNivelANumeracion(ArrayList<Item> items) {
-        int linea = JTextPaneUtils.getLineNumberByCaret(panelDeTexto) - 1; // le resto uno para contar desde 0.
-        //Crear anidamiento desde nivel a nuevo nivel 
-        Item anterior = items.get(linea);
-        String nuevaNumeracion = aumentarNivel(anterior);
-        int nivelAumentado = anterior.getNivel() + 1;
-        Item siguienteItem = new Item(linea, nivelAumentado, nuevaNumeracion, "", null);
-        insertStringAtTheEnd(panelDeTexto, "\n" + siguienteItem.constructRenglon());
-        items.add(siguienteItem);
-
     }*/
+    
