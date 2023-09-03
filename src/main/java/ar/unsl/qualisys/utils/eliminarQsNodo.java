@@ -5,7 +5,7 @@
 package ar.unsl.qualisys.utils;
 
 import ar.unsl.qualisys.componentes.nodos.QualyOperator;
-import ar.unsl.qualisys.paneles.DragAndDropVariablesAndOperandsPanel;
+import ar.unsl.qualisys.paneles.QsDadPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -15,9 +15,9 @@ import java.awt.event.ActionListener;
  */
 public class eliminarQsNodo implements IComando {
  
-    DragAndDropVariablesAndOperandsPanel pizzarra;
+    QsDadPanel pizzarra;
     
-    public eliminarQsNodo(DragAndDropVariablesAndOperandsPanel pizzarra){
+    public eliminarQsNodo(QsDadPanel pizzarra){
         this.pizzarra = pizzarra;
         
     }

@@ -4,7 +4,7 @@
  */
 package ar.unsl.qualisys.utils;
 
-import ar.unsl.qualisys.paneles.DragAndDropVariablesAndOperandsPanel;
+import ar.unsl.qualisys.paneles.QsDadPanel;
 
 /**
  *
@@ -12,9 +12,9 @@ import ar.unsl.qualisys.paneles.DragAndDropVariablesAndOperandsPanel;
  */
 public class editarPesoPonderado implements IComando {
          
-    DragAndDropVariablesAndOperandsPanel pizzarra;
+    QsDadPanel pizzarra;
     
-    public editarPesoPonderado(DragAndDropVariablesAndOperandsPanel pizzarra){
+    public editarPesoPonderado(QsDadPanel pizzarra){
         this.pizzarra = pizzarra;
         
     }

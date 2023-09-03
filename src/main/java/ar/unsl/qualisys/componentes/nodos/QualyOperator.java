@@ -1,6 +1,6 @@
 package ar.unsl.qualisys.componentes.nodos;
 
-import ar.unsl.qualisys.paneles.DragAndDropVariablesAndOperandsPanel;
+import ar.unsl.qualisys.paneles.QsDadPanel;
 import ar.unsl.qualisys.paneles.QualyOperatorsPanel;
 import ar.unsl.qualisys.utils.eliminarQsNodo;
 import java.awt.Color;
@@ -30,7 +30,7 @@ import javax.swing.KeyStroke;
  */
 public class QualyOperator extends QsNodo implements QsOperacion{
     
-    private DragAndDropVariablesAndOperandsPanel GUIParent; // Solo se asigna en caso de que sea hijo del componente DAD (Drag and Drop).
+    private QsDadPanel GUIParent; // Solo se asigna en caso de que sea hijo del componente DAD (Drag and Drop).
     private String padreID;
     private float resultValue;
     JPopupMenu menuDesplegable = new JPopupMenu();
@@ -42,8 +42,8 @@ public class QualyOperator extends QsNodo implements QsOperacion{
         this.menuPopUp();
         this.setName("op_" + id); 
         this.padreID = "";
-        if(parent.getClass() == DragAndDropVariablesAndOperandsPanel.class){ 
-            this.GUIParent = (DragAndDropVariablesAndOperandsPanel) parent;     // Para usar los metodos del DandD directamente
+        if(parent.getClass() == QsDadPanel.class){ 
+            this.GUIParent = (QsDadPanel) parent;     // Para usar los metodos del DandD directamente
         }
         this.setPreferredSize(new Dimension(100,100));
         ClickListener clickListener = new ClickListener(this);
@@ -63,7 +63,7 @@ public class QualyOperator extends QsNodo implements QsOperacion{
         
     }
 
-    public DragAndDropVariablesAndOperandsPanel getGUIParent() {
+    public QsDadPanel getGUIParent() {
         return GUIParent;
     } 
 
