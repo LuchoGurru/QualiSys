@@ -4,6 +4,7 @@
  */
 package ar.unsl.qualisys.paneles;
 
+import ar.unsl.qualisys.componentes.QsBarraHerramientas;
 import ar.unsl.qualisys.paneles.QualyOperatorsPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -15,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.JPanel;
 import ar.unsl.qualisys.componentes.nodos.QualyOperator;
+import ar.unsl.qualisys.frames.QsFrame;
 import java.awt.GraphicsEnvironment;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -29,17 +31,18 @@ import javax.swing.SpinnerNumberModel;
  */
 public class QualyGraphicPanel extends javax.swing.JPanel {
     private QualyOperatorsPanel menuOperadores;
-    private DragAndDropVariablesAndOperandsPanel DAD = new DragAndDropVariablesAndOperandsPanel();
+    private QsDadPanel DAD = new QsDadPanel();
     public boolean FLAG;
-   // private static int cantoOperators;
+    private QsFrame parent;
     
     /**
      * Creates new form examples
      */
-    public QualyGraphicPanel() {
+    public QualyGraphicPanel(QsFrame parent) {
+        this.parent=parent;
         this.setLayout(new BorderLayout());
         this.setName("GUIPanel");
-                barraDeHerramientas();
+        this.add(new QsBarraHerramientas(this.parent), BorderLayout.NORTH);
 
         //AGREGO LOS 2 PANELES
         menuOperadores = new QualyOperatorsPanel();
@@ -102,7 +105,7 @@ public class QualyGraphicPanel extends javax.swing.JPanel {
         
         QualyOperator operador = new QualyOperator(DAD,DAD.cantOperadores);
         
-        DragAndDropVariablesAndOperandsPanel.cantOperadores ++;
+        QsDadPanel.cantOperadores ++;
         
         int margin = menuOperadores.getWidth(); 
         
@@ -125,6 +128,14 @@ public class QualyGraphicPanel extends javax.swing.JPanel {
         
         DAD.addOperator(operador);
         DAD.repaint();
+    }
+
+    public QsDadPanel getDAD() {
+        return DAD;
+    }
+
+    public void setDAD(QsDadPanel DAD) {
+        this.DAD = DAD;
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

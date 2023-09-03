@@ -1,13 +1,16 @@
 package ar.unsl.qualisys.frames;
  
 import ar.unsl.qualisys.componentes.MaterialTabbed;
+import ar.unsl.qualisys.componentes.NewJDialog;
 import ar.unsl.qualisys.componentes.QsMenuSuperior;
+import ar.unsl.qualisys.componentes.QsModalPreview;
 import ar.unsl.qualisys.componentes.nodos.QualyVariable;
-import ar.unsl.qualisys.paneles.DragAndDropVariablesAndOperandsPanel;
+import ar.unsl.qualisys.paneles.QsDadPanel;
 import ar.unsl.qualisys.paneles.PanelTexto;
 import ar.unsl.qualisys.paneles.QsTabPanel;
 import ar.unsl.qualisys.componentes.QsTextPanel;
 import ar.unsl.qualisys.paneles.QualyGraphicPanel;
+import ar.unsl.qualisys.utils.Item;
 import ar.unsl.qualisys.utils.ValorInstancias;
 import com.raven.chart.Chart;
 import java.awt.BorderLayout;
@@ -17,56 +20,84 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import com.raven.chart.ModelChart;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import javaswingdev.form.Form_Dashboard;
 import javaswingdev.swing.RoundPanel;
 import javaswingdev.swing.table.Table;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 /**
  *          VENTANA
  * @author luciano.gurruchaga
  */
 public class QsFrame extends JFrame{
     
+    private QsTextPanel panelDeTexto; // panel donde se forma la estructura de variables
+    private QualyGraphicPanel panelGrafico; // panel grafico donde se forma el árbol de preferencias
+    private JPanel panelDeInstanciado;
+    private JPanel panelDelUtilidades; // Estadisticas TODO Opcion dejar como visual como propuesta de escalabilidad;
+    private int indiceAnterior;
+    private JTabbedPane tabbedPane = new MaterialTabbed();
+    
+    public ArrayList<Item> g_variables;
+  //GLOBALES
+   //cargarItems
+           //Nodos 
+            //Instancias
+    
+    
+    
+    // Otro panel que se me ocurra
+    
     public QsFrame(){
         this.setBounds(200,200,1300,700);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-              JTabbedPane tabbedPane = new MaterialTabbed();
-        
         this.setLayout(new BorderLayout());
-        
-        QsTextPanel panelDeLlenadoDeVariables = new QsTextPanel();
-        
-        this.add(new QsMenuSuperior(panelDeLlenadoDeVariables),BorderLayout.NORTH); 
-
-        JPanel panel1, panel2, panel3, panel4, panel5;
-        panel1 = new JPanel();
-        panel2 = new JPanel();
-        panel3 = new JPanel();
+        panelDeTexto = new QsTextPanel(this);
+        panelGrafico = new QualyGraphicPanel(this);
+        this.add(new QsMenuSuperior(panelDeTexto),BorderLayout.NORTH); 
+        JPanel panel4;
         panel4 = new JPanel();
-        panel4.add(createChart());
-        
-        tabbedPane.addTab("Variables de Preferencia", panelDeLlenadoDeVariables);
-        tabbedPane.addTab("Árbol ", new QualyGraphicPanel());
-        tabbedPane.addTab("Llenado de Instancias ", new ValorInstancias());
-        tabbedPane.addTab("Resultados ", panel4);
-        tabbedPane.setBackground(Color.decode("#F09757"));
+        panel4.add(createChart());     
         JPanel paneel = new RoundPanel();
         paneel.add(new Form_Dashboard());
+        tabbedPane.addTab("Variables de Preferencia", panelDeTexto);
+        tabbedPane.addTab("Árbol ", panelGrafico);
+        tabbedPane.addTab("Llenado de Instancias ", new ValorInstancias());
+        tabbedPane.addTab("Resultados ", panel4);
+        //tabbedPane.setBackground(Color.decode("#F09757"));
         tabbedPane.addTab("Resultados 5", paneel);
-            //this.add(new Table());
 
+        //LISTENER
+        indiceAnterior = 0 ; //indice anterior();
+
+   // Crear un MouseAdapter para el JTabbedPane
+        MouseAdapter clickListener = new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // No hacer nada cuando se hace clic en el JTabbedPane
+ 
+                manejarTabs(indiceAnterior,tabbedPane);
+            }
+        };
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                //manejarTabs(indiceAnterior,tabbedPane);
+                
+            }
+        });
         this.add(tabbedPane,BorderLayout.CENTER);
-        this.setVisible(true);  
-
-// this.add(new PanelTexto());
-      //  this.add(new QualyOperatorsPanel());
-      
-         //QualyVariable[] arr = new QualyVariable[10];
-        // arr[0] = new QualyVariable("NOMBRE", 1f);
+        this.setVisible(true);   
+    }
+    
+    private void manejarTabs(int index, JTabbedPane tabPanel){
+        int indicePrevio=tabPanel.getSelectedIndex();
+        tabPanel.setSelectedIndex(index);
+        indiceAnterior = indicePrevio; // AGARRAR Y desactivar mouse
         
-     //   this.add(new QualyGraphicPanel());
-      
-      
     }
 private Chart createChart (){
         Chart chart = new com.raven.chart.Chart();
@@ -85,6 +116,10 @@ private Chart createChart (){
         chart.addData(new ModelChart("June", new double[]{190, 280, 81,200}));
         return chart;
 }
+
+
+
+
     /*
     
     private JPanel panel1;  
@@ -101,4 +136,19 @@ private Chart createChart (){
     }
 */
 
+    public JTabbedPane getTabbedPane() {
+        return tabbedPane;
+    }
+
+    public void setTabbedPane(JTabbedPane tabbedPane) {
+        this.tabbedPane = tabbedPane;
+    }
+    
+    public int getIndiceAnterior(){
+        return this.indiceAnterior;
+    }
+
+    public void setIndiceAnterior(int indiceAnterior) {
+        this.indiceAnterior = indiceAnterior;
+    }
 }

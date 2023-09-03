@@ -1,5 +1,6 @@
 package ar.unsl.qualisys.componentes;
 
+import ar.unsl.qualisys.frames.QsFrame;
 import ar.unsl.qualisys.paneles.PanelTexto;
 import ar.unsl.qualisys.utils.Item;
 import ar.unsl.qualisys.utils.JTextPaneUtils;
@@ -36,13 +37,14 @@ public class QsTextPanel extends JPanel {
 
     private JTextPane panelDeTexto;
     private ArrayList<Item> renglones;
-    private Item itemActual;
-
+    private Item renglonActual;
+    private QsFrame parent;
     /**
      * Constructor Barra Herramientas - Panel de Texto - Menu popup
      */
-    public QsTextPanel() {
+    public QsTextPanel(QsFrame parent) {
         this.setLayout(new BorderLayout());
+        this.parent = parent;
         panelDeTexto = new JTextPane(){
 
             @Override
@@ -53,9 +55,11 @@ public class QsTextPanel extends JPanel {
 
         };
         renglones = new ArrayList<>();
-        itemActual = new Item(0,0,"1.",""); // inicializo item 
-        renglones.add(itemActual);
-        barraDeHerramientas();
+        renglonActual = new Item(0,0,"1.",""); // inicializo item  ... Cambiar por CARGAR ARCHHIVO O NUEVO ARCHIVO
+        renglones.add(renglonActual);
+        //barraDeHerramientas();
+                this.add(new QsBarraHerramientas(this.parent), BorderLayout.NORTH);
+
         textContent();
         menuPopUp();
         this.setVisible(true);
@@ -67,6 +71,8 @@ public class QsTextPanel extends JPanel {
     public void barraDeHerramientas() {
         JMenuBar barra = new JMenuBar();
         JToolBar menuHerramientas = new JToolBar();
+        JButton volver = new JButton();
+        JButton siguiente = new JButton();
         JButton nuevo = new JButton();
         JButton abrir = new JButton();
         JButton guardar = new JButton();
@@ -80,6 +86,8 @@ public class QsTextPanel extends JPanel {
         JComboBox fuente = new JComboBox(fontNames);
         //Config
         menuHerramientas.setFloatable(false);
+        volver.setText("< Volver");
+        siguiente.setText("Siguiente >");
         abrir.setText("Open");
         nuevo.setText("New");
         guardar.setText("Save");
@@ -95,6 +103,7 @@ public class QsTextPanel extends JPanel {
         abrir.setToolTipText("Abrir Archivo");
         actualizar.setToolTipText("Actualizar Texto");
         //
+        menuHerramientas.add(volver);
         menuHerramientas.add(guardar);
         menuHerramientas.add(abrir);
         menuHerramientas.add(deshacer);
@@ -104,6 +113,54 @@ public class QsTextPanel extends JPanel {
         menuHerramientas.add(centrado);
         menuHerramientas.add(fuente);
         menuHerramientas.add(tam);
+        menuHerramientas.add(siguiente);
+        
+        volver.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                
+//Read Only 
+               int anterior = parent.getIndiceAnterior() - 1;
+               int cantidadTabs = parent.getTabbedPane().getTabCount();
+               if(anterior>0 && anterior<cantidadTabs){
+                    parent.getTabbedPane().setSelectedIndex(anterior);
+                }
+            }
+        });
+        
+        siguiente.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               //Read Only
+               int siguiente = parent.getIndiceAnterior() + 1;
+               int cantidadTabs = parent.getTabbedPane().getTabCount();
+               if(siguiente>0 && siguiente<cantidadTabs){
+               
+                   
+                if(siguiente==1){
+                   /*       if(panelDeTexto.isTextoBienFormado()){
+                        tabPanel.setSelectedIndex(1);
+                        System.out.println("index = is tree good formed ? " + index);
+                        QsModalPreview  hijo = new QsModalPreview(this,"Vista Previa: VARIABLES A GRAFICAR.",true);
+                        hijo.setjTextoPane1(panelDeTexto.getPanelDeTexto().getText());
+                        hijo.setVisible(true);
+                    }else{
+                         tabPanel.setSelectedIndex(0);
+                         JOptionPane.showConfirmDialog(this, "El listado de variables no esta bien formado");
+                    }
+                    //TODO TOMAR TEXTO PANEL = 0 PASARLO A CONSTRUCTOR PANEL 1 
+
+                */}
+
+                   
+                   
+                   //parent.getTabbedPane().setSelectedIndex(siguiente);
+               
+               }
+            }
+        });
+        
         // Listeners
         abrir.addActionListener(new ActionListener() {
             @Override
@@ -169,6 +226,7 @@ public class QsTextPanel extends JPanel {
         actualizar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                TURN_OFF_LISTENERS = true;
                 actualizarEstado(1, 0);
             }
         }
@@ -239,7 +297,6 @@ public class QsTextPanel extends JPanel {
             }
         });
         //
-        this.add(menuHerramientas, BorderLayout.NORTH);
         //this.add(panelTexto, BorderLayout.CENTER);
 
     }
@@ -351,7 +408,7 @@ public class QsTextPanel extends JPanel {
                 //System.out.println("INSERTUPDATE  = " + panelDeTexto.getText());
                 if (TURN_OFF_LISTENERS == false) {
                     TURN_OFF_LISTENERS = true;
-                    int lineaAnterior = itemActual.getNumeroDeLinea(); // inicialmente 0
+                    int lineaAnterior = renglonActual.getNumeroDeLinea(); // inicialmente 0
                     int offsetResultado  = e.getOffset() + e.getLength();
                     int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto,offsetResultado);
                     System.out.println("lineaNueva " + lineaNueva);
@@ -369,7 +426,7 @@ public class QsTextPanel extends JPanel {
             //    System.out.println("REMOVEUPDATE  = " + panelDeTexto.getText());
                 if (TURN_OFF_LISTENERS == false) {
                     TURN_OFF_LISTENERS = true;
-                    int lineaAnterior = itemActual.getNumeroDeLinea(); // inicialmente 0 
+                    int lineaAnterior = renglonActual.getNumeroDeLinea(); // inicialmente 0 
                      int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto,e.getOffset());
                     actualizarEstado(lineaAnterior,lineaNueva);
                 }
@@ -388,12 +445,12 @@ public class QsTextPanel extends JPanel {
 
                 //System.out.println(panelDeTexto.getText() + "hola");
                 System.out.println(" " + e.getDot() + "ooo" + e.getMark()); // Mark donde empieza la selecion 
-                if(itemActual!=null){
-                    int posAnterior = itemActual.getNumeroDeLinea();
+                if(renglonActual!=null){
+                    int posAnterior = renglonActual.getNumeroDeLinea();
                     int posNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto, panelDeTexto.getCaretPosition());
                     if (posAnterior != posNueva) { //cambio de linea
                         if (renglones.size() > posNueva) {
-                            itemActual = renglones.get(posNueva); // actualizo item
+                            renglonActual = renglones.get(posNueva); // actualizo item
                         }
                     }
                 }
@@ -433,13 +490,12 @@ public class QsTextPanel extends JPanel {
         //String textoDeLinea = JTextPaneUtils.getTextoDeLineaByOffset(panelDeTexto,panelDeTexto.getCaretPosition()); // Obtengo el texto de la linea actual
         if (isRenglonBienFormado(textoLineaActual)) {
             Item itemActualizado = armarItem(textoLineaActual, lineaActual);
-            itemActual.setCadenaDeTexto(itemActualizado.getCadenaDeTexto());
-
+            renglonActual.setCadenaDeTexto(itemActualizado.getCadenaDeTexto());
         } else {
             //escribirlo bien.
-            itemActual.setCadenaDeTexto(textoLineaActual);
+            renglonActual.setCadenaDeTexto(textoLineaActual);
         }
-        renglones.add(itemActual.getNumeroDeLinea(), itemActual);
+        renglones.add(renglonActual.getNumeroDeLinea(), renglonActual);
         TURN_OFF_LISTENERS = false;
     }
 
@@ -452,65 +508,65 @@ public class QsTextPanel extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                String[] arregloDeNiveles = new String[10];
-                String nuevoTexto = "";
+                String[] arregloDeNiveles = new String[10]; // Permitimos una anidacion maximas de 10 niveles ... sobra para la practica 
+                String nuevoTexto = ""; 
                 int caretPosition = panelDeTexto.getCaretPosition();
                 String texto = panelDeTexto.getText();
+                //si la ultima linea es un /n, agrego espacio en blanco
                 if(texto.lastIndexOf("\n") == texto.length()-1){// osea que no me tomo la ultima linea vacia 
                     texto+= " "; // para que me tome la ultima linea sino confunde con EOF y da problemas
-                }
-                String[] lineas = texto.split("\n");
-                String lineaInicial = lineas[0];
+                } 
+                String[] lineas = texto.split("\n"); 
                 renglones = new ArrayList<>();
-                itemActual = new Item(0, 0, "1.", lineaInicial);
-                renglones.add(itemActual);
-                if (isRenglonBienFormado(lineaInicial)) {
-                    itemActual.setCadenaDeTexto(armarItem(lineaInicial, 0).getCadenaDeTexto());//por ser el primero ignoro num.
-                }
-                arregloDeNiveles[itemActual.getNivel()] = itemActual.getNumeration(); // numeracion[0] = "1."
-                nuevoTexto += itemActual.constructRenglon();
-
-                for (int i = 1; i < lineas.length; i++) {// Empiezo desde la segunda linea ok? es decir la linea ubicada en 1
-                    Item itemToBuild = null;
-                    if (isRenglonBienFormado(lineas[i])) { //el renglon esta bien formado
-                        itemToBuild = armarItem(lineas[i], i);
-                        if (itemToBuild.getNivel() == itemActual.getNivel()) {
-                            itemToBuild.setNumeration(aumentarNumeracion(itemActual)); // numeracion + 1 
-                            arregloDeNiveles[itemToBuild.getNivel()] = itemToBuild.getNumeration();
-                        } else if (itemToBuild.getNivel() < itemActual.getNivel()) {
-                            String num = arregloDeNiveles[itemToBuild.getNivel()]; // Obtengo numeracion del corriente nivel.
-                            itemToBuild.setNumeration(num);
-                            itemToBuild.setNumeration(aumentarNumeracion(itemToBuild));
-                            arregloDeNiveles[itemToBuild.getNivel()] = itemToBuild.getNumeration();
-                        } else {
-                            itemToBuild.setNivel(itemActual.getNivel() + 1);//aumenta UN nivel
-                            itemToBuild.setNumeration(aumentarNivel(itemActual));
-                            arregloDeNiveles[itemToBuild.getNivel()] = itemToBuild.getNumeration();
+                renglonActual = null;
+                for (int i = 0; i < lineas.length; i++) {// Empiezo desde la segunda linea ok? es decir la linea ubicada en 1
+                    Item renglon = null;
+                    if(i == 0){// i = 0 - Primer Renglon
+                        arregloDeNiveles[0] = "1.";
+                        if(isRenglonBienFormado(lineas[i])){ 
+                            renglonActual = new Item(i,0,"1.",armarItem(lineas[i], 0).getCadenaDeTexto()); // init primer item 
+                        }else{
+                            renglonActual = new Item(i,0,"1.",lineas[i]); // init 
                         }
-
+                        nuevoTexto = renglonActual.constructRenglon();
+                        renglones.add(renglonActual); 
+                        continue;// o break 
+                    }else if (isRenglonBienFormado(lineas[i])) { 
+                        renglon = armarItem(lineas[i], i); 
+                        if (renglon.getNivel() == renglonActual.getNivel()) { 
+                            renglon.setNumeration(aumentarNumeracion(renglonActual)); // numeracion + 1 
+                            arregloDeNiveles[renglon.getNivel()] = renglon.getNumeration();
+                        } else if (renglon.getNivel() < renglonActual.getNivel()) { 
+                            String num = arregloDeNiveles[renglon.getNivel()]; // Obtengo numeracion del corriente nivel.
+                            renglon.setNumeration(num);
+                            renglon.setNumeration(aumentarNumeracion(renglon));
+                            arregloDeNiveles[renglon.getNivel()] = renglon.getNumeration();
+                        } else { 
+                            renglon.setNivel(renglonActual.getNivel() + 1);//aumenta SOLO UN nivel
+                            renglon.setNumeration(aumentarNivel(renglonActual));
+                            arregloDeNiveles[renglon.getNivel()] = renglon.getNumeration();
+                        } 
                     } else { // EL renglon está mal formado asique puede venir cualquier cosa, lo ignoro y pongo en el mismo nivel de la corriente numeracion ... 
-                        itemToBuild = new Item(i,
-                                itemActual.getNivel(),
-                                aumentarNumeracion(itemActual),
+                        renglon = new Item(i,
+                                renglonActual.getNivel(),
+                                aumentarNumeracion(renglonActual),
                                 lineas[i]);
                     }
-                    nuevoTexto += "\n" + itemToBuild.constructRenglon();
-                    //System.out.println("nuevoTexto + i = " + nuevoTexto + " " + i);
-                    itemActual = itemToBuild;
-
-                    renglones.add(itemActual);
+                    nuevoTexto += "\n" + renglon.constructRenglon();
+                    renglonActual = renglon;
+                    renglones.add(renglonActual);
                 }
                 panelDeTexto.setText(nuevoTexto); // actualizo el texto
                 panelDeTexto.setCaretPosition(caretPosition);
                 int pos = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto, caretPosition);
-                itemActual = renglones.get(pos);
-
+                renglonActual = renglones.get(pos);
                 //Falta actualizar el caret
                 TURN_OFF_LISTENERS = false;
             }
 
         });
     } 
+   
     public JTextPane getPanelDeTexto() {
         return panelDeTexto;
     }
@@ -520,51 +576,17 @@ public class QsTextPanel extends JPanel {
         this.panelDeTexto.setText(texto);
         actualizarEstado(0,1);//Le paso lineas distintas para que actualice todo el texto.
     }
+    public boolean isTextoBienFormado(){
+        String[] lineas = this.panelDeTexto.getText().split("\n");
+        int i=0;
+        while(isRenglonBienFormado(lineas[i])){
+            i++;
+        }
+        return i==lineas.length-1;
+    }
 }
 
 /*    //NOTA TENGO QUE HACER EL QUE CUANDMO E BORRE LA MITAD DE LOS NUMERITOS ME CREE LOS NUMERITOS DE NUEVO EN NEGRITA PARA QUE SENO TE O BUSCAR LA MANERA DE NOPPERMITIR ESO 
-
-     * IF an Action esta realizada en el No end of the File
-     
-    private void reordenarItems(ArrayList<Item> items) {
-        //  View of the component has not been updated at the time
-        //  the DocumentEvent is fired
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-
-                int il = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto, panelDeTexto.getCaretPosition() - 1); // Esta el coso alterado.
-                if (il > 0) {        // Control de primer linea 
-                    int ilAnterior = il - 1;
-                    Item renglonAnterior = items.get(ilAnterior);
-                    renglonAnterior.getNumeration();
-                    renglonAnterior.getNivel();
-
-                }
-
-                Item renglonActual = items.get(il);
-                renglonActual.getNumeration();
-                renglonActual.getNivel();
-                JTextPaneUtils.insertStringAtRow(panelDeTexto, renglonActual.getNivel() + " " + renglonActual.getNumeration());
-
-                //aumentarElNivel
-                //Get linea anterior al coso 
-                //textoo.getCaretPosition();
-                /*        
-              hasta el anterior esta todo ordenado 
-                       hasta el anterior la lista ses mantiene ok
-        ell Item actual de  la linea actual tiene bien el Nivel como corresponde, a los sumo pintarlo bien y 
-                Tomar el End Selection y apartir de la linea posterior
-                        son elementos no corruptos entonces los tomo y los inserto en el nuevo orden 
-                                GET n-1
-                                Tomo el nuevo 
-                                        add(n) = nuevo ;
-                       Este es nuestro punto de partida pasa que hay que ver desde el caret para abajo
-  
-                 
-            }
-        });
-    }
     private void agregarItemANivel(ArrayList<Item> items) {
         int linea = JTextPaneUtils.getLineNumberByCaret(panelDeTexto) - 1; // le resto uno para contar desde 0.
         // Aumentar Nivel Actual

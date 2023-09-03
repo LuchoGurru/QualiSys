@@ -56,7 +56,7 @@ import javax.swing.JPopupMenu;
  * 
  * @author luciano.gurruchaga
  */
-public class DragAndDropVariablesAndOperandsPanel extends JPanel    {
+public class QsDadPanel extends JPanel    {
     // La estructura de datos conveniente es : 
     // Una lista por niveles ... jajaja
     // Una lista vinculada 
@@ -201,7 +201,7 @@ public class DragAndDropVariablesAndOperandsPanel extends JPanel    {
     /**
      * Constructores 
      */
-     public DragAndDropVariablesAndOperandsPanel(){    
+     public QsDadPanel(){    
         this.setLayout(null);
         
      }    

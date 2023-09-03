@@ -25,7 +25,7 @@ public class QsTabPanel extends JTabbedPane {
     
     public QsTabPanel (){
         super();
-        this.addTab("Variables de Preferencia",new QsTextPanel());
+  //    this.addTab("Variables de Preferencia",new QsTextPanel());
         this.setVisible(true);
     }
 
