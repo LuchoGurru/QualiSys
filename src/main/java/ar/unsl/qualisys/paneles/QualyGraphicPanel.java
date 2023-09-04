@@ -16,8 +16,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.JPanel;
 import ar.unsl.qualisys.componentes.nodos.QualyOperator;
+import ar.unsl.qualisys.componentes.nodos.QualyVariable;
 import ar.unsl.qualisys.frames.QsFrame;
+import ar.unsl.qualisys.utils.Item;
 import java.awt.GraphicsEnvironment;
+import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JMenuBar;
@@ -100,6 +104,18 @@ public class QualyGraphicPanel extends javax.swing.JPanel {
         //this.add(panelTexto, BorderLayout.CENTER);
 
     }
+
+    public void setVariables(ArrayList<Item> renglones){
+        
+        //TODO  AGREGAR VARIABLES 
+        HashMap mapaDeVariables = new HashMap<String, QualyVariable>();
+        for(Item item : renglones){
+            QualyVariable var = new QualyVariable(DAD, WIDTH, WIDTH, WIDTH, TOP_ALIGNMENT);
+            mapaDeVariables.put(var.getName(), var);
+        }
+        this.DAD.setVariables(mapaDeVariables);
+    }
+    
     public void agregarOperadorANulLayout(Point punto,int tipoOperador){ 
         
         

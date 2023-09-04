@@ -108,6 +108,7 @@ public class QsDadPanel extends JPanel    {
 
     public void setVariables(Map<String, QualyVariable> variables) {
         this.variables = variables;
+        this.repaint();
     }
 
     public QualyOperator getOperadorSeleccionado() {

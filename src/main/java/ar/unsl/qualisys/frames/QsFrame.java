@@ -34,11 +34,13 @@ import javax.swing.event.ChangeListener;
  */
 public class QsFrame extends JFrame{
     
+    private static boolean TURN_OFF_LISTENERS = false;    //ajjaja
+
     private QsTextPanel panelDeTexto; // panel donde se forma la estructura de variables
     private QualyGraphicPanel panelGrafico; // panel grafico donde se forma el árbol de preferencias
     private JPanel panelDeInstanciado;
     private JPanel panelDelUtilidades; // Estadisticas TODO Opcion dejar como visual como propuesta de escalabilidad;
-    private int indiceAnterior;
+    private int indiceActual;
     private JTabbedPane tabbedPane = new MaterialTabbed();
     
     public ArrayList<Item> g_variables;
@@ -72,33 +74,34 @@ public class QsFrame extends JFrame{
         tabbedPane.addTab("Resultados 5", paneel);
 
         //LISTENER
-        indiceAnterior = 0 ; //indice anterior();
+        indiceActual = 0 ; //indice anterior();
 
    // Crear un MouseAdapter para el JTabbedPane
         MouseAdapter clickListener = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // No hacer nada cuando se hace clic en el JTabbedPane
- 
-                manejarTabs(indiceAnterior,tabbedPane);
+                System.out.println("mouse clicked getSelectedIndice"+ tabbedPane.getSelectedIndex());                // No hacer nada cuando se hace clic en el JTabbedPane
+            //    int nuevoIndice = tabbedPane.getSelectedIndex();
+              //  tabbedPane.setSelectedIndex(indiceAnterior);
+                //indiceAnterior = indicePrevio;
             }
         };
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 //manejarTabs(indiceAnterior,tabbedPane);
-                
+                 System.out.println("mouse clicked stateChanged"+ tabbedPane.getSelectedIndex());                // No hacer nada cuando se hace clic en el JTabbedPane
+                System.out.println("mouse clicked getSelectedIndice"+ tabbedPane.getSelectedIndex());                // No hacer nada cuando se hace clic en el JTabbedPane
+                if (TURN_OFF_LISTENERS == false) {// para que no se vaya del limite
+                    tabbedPane.setSelectedIndex(indiceActual);
+                }
             }
         });
+        
+        tabbedPane.addMouseListener(clickListener);
         this.add(tabbedPane,BorderLayout.CENTER);
         this.setVisible(true);   
     }
-    
-    private void manejarTabs(int index, JTabbedPane tabPanel){
-        int indicePrevio=tabPanel.getSelectedIndex();
-        tabPanel.setSelectedIndex(index);
-        indiceAnterior = indicePrevio; // AGARRAR Y desactivar mouse
-        
-    }
+ 
 private Chart createChart (){
         Chart chart = new com.raven.chart.Chart();
 
@@ -117,24 +120,38 @@ private Chart createChart (){
         return chart;
 }
 
+    public static boolean isTURN_OFF_LISTENERS() {
+        return TURN_OFF_LISTENERS;
+    }
 
+    public static void setTURN_OFF_LISTENERS(boolean TURN_OFF_LISTENERS) {
+        QsFrame.TURN_OFF_LISTENERS = TURN_OFF_LISTENERS;
+    }
+    /**
+     * Llamar antes de cambiar la pestaña
+     */
+    public void initPanelGrafico(){
+        if(panelDeTexto.isTextoBienFormado()){
+            this.panelGrafico.setVariables(panelDeTexto.getRenglones());
+            
+        }
+    }
 
 
     /*
-    
-    private JPanel panel1;  
-    private JButton button1;
-    private JTabbedPane JTParchivo;
-    private JTextPane textPane1;
-    private JTextArea textArea1;
+        private JPanel panel1;  
+        private JButton button1;
+        private JTabbedPane JTParchivo;
+        private JTextPane textPane1;
+        private JTextArea textArea1;
 
-    public EditorPanel(){
-        this.setContentPane(new EditorPanel().panel1);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.pack();
-        this.setVisible(true);
-    }
-*/
+        public EditorPanel(){
+            this.setContentPane(new EditorPanel().panel1);
+            this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            this.pack();
+            this.setVisible(true);
+        }
+    */
 
     public JTabbedPane getTabbedPane() {
         return tabbedPane;
@@ -144,11 +161,11 @@ private Chart createChart (){
         this.tabbedPane = tabbedPane;
     }
     
-    public int getIndiceAnterior(){
-        return this.indiceAnterior;
+    public int getIndiceActual(){
+        return this.indiceActual;
     }
 
-    public void setIndiceAnterior(int indiceAnterior) {
-        this.indiceAnterior = indiceAnterior;
+    public void setIndiceActual(int indiceAnterior) {
+        this.indiceActual = indiceAnterior;
     }
 }
