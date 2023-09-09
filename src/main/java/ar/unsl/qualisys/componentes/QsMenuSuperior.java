@@ -4,6 +4,9 @@
  */
 package ar.unsl.qualisys.componentes;
 
+import ar.unsl.qualisys.frames.QsFrame;
+import ar.unsl.qualisys.paneles.QualyGraphicPanel;
+import ar.unsl.qualisys.utils.ValorInstancias;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GradientPaint;
@@ -49,39 +52,22 @@ import javax.swing.undo.UndoManager;
  *
  * @author luciano.gurruchaga
  */
-public class QsMenuSuperior extends JMenuBar {
+public class QsMenuSuperior extends JPanel {
    
-//    private JMenuBar barra = new JMenuBar();
-    private JButton nuevo;
-    private JButton abrir;
-    private JButton guardar;
-    private JTextPane textoo = new JTextPane();
-    private int ancho = 1300;
-    private int alto = 70;
-    private QsTextPanel panelDeLlenadoDeVariables;
+    private JMenuBar barra = new JMenuBar();
+    private QsFrame parent;
+    private QsTextPanel tabTexto; 
+    private QualyGraphicPanel tabGrafico; 
+    private ValorInstancias tabInstanciado;
     
-    public QsMenuSuperior (QsTextPanel panelDeLlenadoDeVariables){
-        System.out.println("1");
-        this.panelDeLlenadoDeVariables = panelDeLlenadoDeVariables;
-       // this.setLayout(new BorderLayout());
-        this.setBounds(0, 0, ancho, alto);
+    public QsMenuSuperior (QsFrame parent, QsTextPanel tabTexto,QualyGraphicPanel tabGrafico, ValorInstancias tabInstanciado){
+        this.setLayout(new BorderLayout());
         this.setBackground(Color.decode("#F09757"));
         barraDeMenu();
+        this.add(new QsBarraHerramientas(parent,tabTexto,tabGrafico,tabInstanciado),BorderLayout.CENTER);
         this.setVisible(true);
+  
     }
-
-/*    @Override 
-    public void paintComponent(Graphics g){
-        System.out.println("2");
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        GradientPaint gp = new GradientPaint(0,0, Color.decode("#F09757"), 0,getWidth(), Color.decode("#F000000"));
-        g2.setPaint(gp);
-        g2.fillRoundRect(0, 0, 1300,70, 15, 15);
-      //  g2.fillRect(500-20, 0, 15,15);
-    }*/
-    
     public void barraDeMenu(){
         //JMenus
         JMenu archivo = new JMenu("Archivo");
@@ -111,7 +97,7 @@ public class QsMenuSuperior extends JMenuBar {
                             cadena = cadena + (char) valor;
                             valor = arch.read();
                         }  
-                        panelDeLlenadoDeVariables.setTexto(cadena);
+                        tabTexto.setTexto(cadena);
                         arch.close();
                     } catch (IOException ex) {
                         System.out.println("no file");
@@ -132,7 +118,7 @@ public class QsMenuSuperior extends JMenuBar {
         archivo.add(nuevoArchivo);
         archivo.add(guardarArchivo);
         archivo.add(exportar);
-        archivo.add(salir);
+        archivo.add(salir); 
 
         //JMnuItems Editar
         JMenuItem buscarEdicion = new JMenuItem("Buscar");
@@ -155,9 +141,10 @@ public class QsMenuSuperior extends JMenuBar {
         //Agrego la barra al panel
         //this.add(BorderLayout.NORTH);
         //Se agregan los menus a la barra
-        this.add(archivo);
-        this.add(edicion);
-        this.add(herramientas);
-        this.add(ayuda);
+        barra.add(archivo);
+        barra.add(edicion);
+        barra.add(herramientas);
+        barra.add(ayuda);
+        this.add(barra,BorderLayout.NORTH);
     }
 }

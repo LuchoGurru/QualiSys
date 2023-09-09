@@ -5,6 +5,7 @@
 package ar.unsl.qualisys.utils;
 
 import java.awt.Color;
+import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import table.TableCustom;
@@ -18,7 +19,7 @@ public class ValorInstancias extends javax.swing.JPanel {
     /**
      * Creates new form ValorInstancias
      */
-    public ValorInstancias() {
+    public ValorInstancias(JFrame parent) {
         initComponents();
         TableCustom.apply(jScrollPane1, TableCustom.TableType.MULTI_LINE);
         testData(jTable1);

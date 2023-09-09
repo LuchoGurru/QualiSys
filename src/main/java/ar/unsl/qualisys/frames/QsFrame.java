@@ -2,6 +2,7 @@ package ar.unsl.qualisys.frames;
  
 import ar.unsl.qualisys.componentes.MaterialTabbed;
 import ar.unsl.qualisys.componentes.NewJDialog;
+import ar.unsl.qualisys.componentes.QsBarraHerramientas;
 import ar.unsl.qualisys.componentes.QsMenuSuperior;
 import ar.unsl.qualisys.componentes.QsModalPreview;
 import ar.unsl.qualisys.componentes.nodos.QualyVariable;
@@ -9,6 +10,7 @@ import ar.unsl.qualisys.paneles.QsDadPanel;
 import ar.unsl.qualisys.paneles.PanelTexto;
 import ar.unsl.qualisys.paneles.QsTabPanel;
 import ar.unsl.qualisys.componentes.QsTextPanel;
+import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.paneles.QualyGraphicPanel;
 import ar.unsl.qualisys.utils.Item;
 import ar.unsl.qualisys.utils.ValorInstancias;
@@ -35,21 +37,21 @@ import javax.swing.event.ChangeListener;
 public class QsFrame extends JFrame{
     
     private static boolean TURN_OFF_LISTENERS = false;    //ajjaja
-
-    private QsTextPanel panelDeTexto; // panel donde se forma la estructura de variables
-    private QualyGraphicPanel panelGrafico; // panel grafico donde se forma el árbol de preferencias
-    private JPanel panelDeInstanciado;
-    private JPanel panelDelUtilidades; // Estadisticas TODO Opcion dejar como visual como propuesta de escalabilidad;
+    
+    private QsTextPanel tabTexto; // panel donde se forma la estructura de variables
+    private QualyGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
+    private ValorInstancias tabInstanciado;
+    private JPanel tablUtilidades; // Estadisticas TODO Opcion dejar como visual como propuesta de escalabilidad;
     private int indiceActual;
     private JTabbedPane tabbedPane = new MaterialTabbed();
     
     public ArrayList<Item> g_variables;
+    public ArrayList<QsNodo> g_nodos;
+    //public ArrayList<QualyVariable> g_instancias;
   //GLOBALES
    //cargarItems
            //Nodos 
             //Instancias
-    
-    
     
     // Otro panel que se me ocurra
     
@@ -58,34 +60,25 @@ public class QsFrame extends JFrame{
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLayout(new BorderLayout());
-        panelDeTexto = new QsTextPanel(this);
-        panelGrafico = new QualyGraphicPanel(this);
-        this.add(new QsMenuSuperior(panelDeTexto),BorderLayout.NORTH); 
-        JPanel panel4;
+        tabTexto = new QsTextPanel(this);
+        tabGrafico = new QualyGraphicPanel(this);
+        tabInstanciado = new ValorInstancias(this);
+        this.add(new QsMenuSuperior(this,tabTexto,tabGrafico,tabInstanciado),BorderLayout.NORTH);  // PARA ABRIR Y CERRAR ARCHIVO
+        tabbedPane.addTab("Variables de Preferencia", tabTexto);
+        tabbedPane.addTab("Árbol ", tabGrafico);
+        tabbedPane.addTab("Llenado de Instancias ", tabInstanciado);
+        /*JPanel panel4;
         panel4 = new JPanel();
-        panel4.add(createChart());     
+        panel4.add(createChart());
         JPanel paneel = new RoundPanel();
         paneel.add(new Form_Dashboard());
-        tabbedPane.addTab("Variables de Preferencia", panelDeTexto);
-        tabbedPane.addTab("Árbol ", panelGrafico);
-        tabbedPane.addTab("Llenado de Instancias ", new ValorInstancias());
-        tabbedPane.addTab("Resultados ", panel4);
+        *///tabbedPane.addTab("Resultados ", panel4);
         //tabbedPane.setBackground(Color.decode("#F09757"));
-        tabbedPane.addTab("Resultados 5", paneel);
+        //tabbedPane.addTab("Resultados 5", paneel);
 
         //LISTENER
         indiceActual = 0 ; //indice anterior();
 
-   // Crear un MouseAdapter para el JTabbedPane
-        MouseAdapter clickListener = new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.out.println("mouse clicked getSelectedIndice"+ tabbedPane.getSelectedIndex());                // No hacer nada cuando se hace clic en el JTabbedPane
-            //    int nuevoIndice = tabbedPane.getSelectedIndex();
-              //  tabbedPane.setSelectedIndex(indiceAnterior);
-                //indiceAnterior = indicePrevio;
-            }
-        };
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 //manejarTabs(indiceAnterior,tabbedPane);
@@ -97,12 +90,12 @@ public class QsFrame extends JFrame{
             }
         });
         
-        tabbedPane.addMouseListener(clickListener);
+//        tabbedPane.addMouseListener(clickListener);
         this.add(tabbedPane,BorderLayout.CENTER);
         this.setVisible(true);   
     }
  
-private Chart createChart (){
+    private Chart createChart (){
         Chart chart = new com.raven.chart.Chart();
 
         setLocationRelativeTo(null);
@@ -131,8 +124,8 @@ private Chart createChart (){
      * Llamar antes de cambiar la pestaña
      */
     public void initPanelGrafico(){
-        if(panelDeTexto.isTextoBienFormado()){
-            this.panelGrafico.setVariables(panelDeTexto.getRenglones());
+        if(tabTexto.isTextoBienFormado()){
+            this.tabGrafico.setVariables(tabTexto.getRenglones());
             
         }
     }

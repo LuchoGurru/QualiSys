@@ -36,7 +36,7 @@ import javax.swing.SpinnerNumberModel;
 public class QualyGraphicPanel extends javax.swing.JPanel {
     private QualyOperatorsPanel menuOperadores;
     private QsDadPanel DAD = new QsDadPanel();
-    public boolean FLAG;
+    //public boolean FLAG;
     private QsFrame parent;
     
     /**
@@ -46,7 +46,7 @@ public class QualyGraphicPanel extends javax.swing.JPanel {
         this.parent=parent;
         this.setLayout(new BorderLayout());
         this.setName("GUIPanel");
-        this.add(new QsBarraHerramientas(this.parent), BorderLayout.NORTH);
+        //6this.add(new QsBarraHerramientas(this.parent,null), BorderLayout.NORTH);
 
         //AGREGO LOS 2 PANELES
         menuOperadores = new QualyOperatorsPanel();
@@ -56,55 +56,7 @@ public class QualyGraphicPanel extends javax.swing.JPanel {
         this.add(menuOperadores,BorderLayout.WEST);
         this.add(DAD ,BorderLayout.CENTER); 
     }
-      /**
-     * Construye la barra de herramientas superior para editar texto
-     */
-    public void barraDeHerramientas() {
-        JMenuBar barra = new JMenuBar();
-        JToolBar menuHerramientas = new JToolBar();
-        JButton nuevo = new JButton();
-        JButton abrir = new JButton();
-        JButton guardar = new JButton();
-        JButton deshacer = new JButton();
-        JButton actualizar = new JButton(); // Haacer boton actualizar 
-        JButton rehacer = new JButton();
-        JButton color = new JButton();
-        JSpinner tam = new JSpinner(new SpinnerNumberModel(12, 0, 84, 2));
-        JButton centrado = new JButton();
-        String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-        JComboBox fuente = new JComboBox(fontNames);
-        //Config
-        menuHerramientas.setFloatable(false);
-        abrir.setText("Open");
-        nuevo.setText("New");
-        guardar.setText("Save");
-        deshacer.setText("<--");
-        actualizar.setText("F5");
-        rehacer.setText("-->");
-        color.setText("Color");
-        centrado.setText("Centrado");
-        fuente.setSelectedIndex(15);
-
-        //onFocus Texto
-        nuevo.setToolTipText("Nuevo Archivo");
-        abrir.setToolTipText("Abrir Archivo");
-        actualizar.setToolTipText("Actualizar Texto");
-        //
-        menuHerramientas.add(guardar);
-        menuHerramientas.add(abrir);
-        menuHerramientas.add(deshacer);
-        menuHerramientas.add(actualizar);
-        menuHerramientas.add(rehacer);
-        menuHerramientas.add(color);
-        menuHerramientas.add(centrado);
-        menuHerramientas.add(fuente);
-        menuHerramientas.add(tam);
- 
-        this.add(menuHerramientas, BorderLayout.NORTH);
-        //this.add(panelTexto, BorderLayout.CENTER);
-
-    }
-
+    
     public void setVariables(ArrayList<Item> renglones){
         
         //TODO  AGREGAR VARIABLES 

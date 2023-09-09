@@ -40,7 +40,7 @@ public class QsTextPanel extends JPanel {
     private Item renglonActual;
     private QsFrame parent;
     /**
-     * Constructor Barra Herramientas - Panel de Texto - Menu popup
+     * Constructor Panel de Texto - Menu popup
      */
     public QsTextPanel(QsFrame parent) {
         this.setLayout(new BorderLayout());
@@ -59,10 +59,8 @@ public class QsTextPanel extends JPanel {
         renglones.add(renglonActual);
         
         
-        this.add(new QsBarraHerramientas(this.parent), BorderLayout.NORTH);
+    //     this.add(new QsBarraHerramientas(this.parent,null), BorderLayout.NORTH);
 
-        
-        
         textContent();
         menuPopUp();
         this.setVisible(true);
@@ -239,7 +237,7 @@ public class QsTextPanel extends JPanel {
     }
 
     private boolean isRenglonBienFormado(String renglon) {
-        String regex = "^\\t*(\\d+\\.)+\\s.*(?:\\r\\n|\\r|\\n)$"; // para la mariconeada de windol! 
+        String regex = "^\\t*(\\d+\\.)+\\s.*(\\r\\n|\\r|\\n|^$)?$"; // para la mariconeada de windol! 
         System.out.println("renglon.matches(regex) = " + renglon.matches(regex));
         return renglon.matches(regex);
     }
@@ -358,6 +356,10 @@ public class QsTextPanel extends JPanel {
 
     }
 
+    public String getTexto(){
+        return this.panelDeTexto.getText();
+    }
+    
     public void setTexto(String texto) {
         TURN_OFF_LISTENERS = true;
         this.panelDeTexto.setText(texto);
