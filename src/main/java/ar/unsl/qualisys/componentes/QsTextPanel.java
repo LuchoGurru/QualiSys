@@ -1,7 +1,6 @@
 package ar.unsl.qualisys.componentes;
 
 import ar.unsl.qualisys.frames.QsFrame;
-import ar.unsl.qualisys.paneles.PanelTexto;
 import ar.unsl.qualisys.utils.Item;
 import ar.unsl.qualisys.utils.JTextPaneUtils;
 import javax.swing.*;

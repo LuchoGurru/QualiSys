@@ -5,8 +5,8 @@
 package ar.unsl.qualisys.paneles;
 
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
-import ar.unsl.qualisys.componentes.nodos.QualyOperator;
-import ar.unsl.qualisys.componentes.nodos.QualyVariable;
+import ar.unsl.qualisys.componentes.nodos.QsOperator;
+import ar.unsl.qualisys.componentes.nodos.QsVariable;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -74,13 +74,13 @@ public class QsDadPanel extends JPanel    {
     
     //private ArrayList<QualyOperator> operadores = new ArrayList<>();
     //private ArrayList<QualyVariable> variables = new ArrayList<>();
-    private Map<String, QualyOperator> operadores = new HashMap<String, QualyOperator>();
+    private Map<String, QsOperator> operadores = new HashMap<String, QsOperator>();
     
-    private Map<String, QualyVariable> variables = new HashMap<String, QualyVariable>();
+    private Map<String, QsVariable> variables = new HashMap<String, QsVariable>();
     
     private Map<String, ArrayList<QsNodo>> relPadreHijos = new HashMap<String, ArrayList<QsNodo>>();
     
-    private QualyOperator operadorSeleccionado;
+    private QsOperator operadorSeleccionado;
     JPopupMenu menuDesplegable = new JPopupMenu();
 
 
@@ -90,11 +90,11 @@ public class QsDadPanel extends JPanel    {
     
     
     
-    public Map<String, QualyOperator> getOperadores(){
+    public Map<String, QsOperator> getOperadores(){
         return operadores;
     } 
 
-    public void setOperadores(Map<String, QualyOperator> operadores) {
+    public void setOperadores(Map<String, QsOperator> operadores) {
         this.operadores = operadores;
     }
 
@@ -102,20 +102,20 @@ public class QsDadPanel extends JPanel    {
         return relPadreHijos;
     }
 
-    public Map<String, QualyVariable> getVariables() {
+    public Map<String, QsVariable> getVariables() {
         return variables;
     }
 
-    public void setVariables(Map<String, QualyVariable> variables) {
+    public void setVariables(Map<String, QsVariable> variables) {
         this.variables = variables;
         this.repaint();
     }
 
-    public QualyOperator getOperadorSeleccionado() {
+    public QsOperator getOperadorSeleccionado() {
         return operadorSeleccionado;
     }
 
-    public void setOperadorSeleccionado(QualyOperator operadorSeleccionado) {
+    public void setOperadorSeleccionado(QsOperator operadorSeleccionado) {
         this.operadorSeleccionado = operadorSeleccionado;
         if(this.operadorSeleccionado!=null)
             this.operadorSeleccionado.setBorder(BorderFactory.createLineBorder(Color.BLACK, 10));
@@ -146,14 +146,14 @@ public class QsDadPanel extends JPanel    {
     
     
     private void pintarVariables(Graphics g){
-        for(QualyVariable qv: this.variables.values()){
+        for(QsVariable qv: this.variables.values()){
             System.out.println("qv.getName() = " + qv.getName());
             this.add(qv);
         }
     }
     
     private void pintarOperadores(Graphics g){
-        for(QualyOperator qo: this.operadores.values()){
+        for(QsOperator qo: this.operadores.values()){
             System.out.println("qo.getName() = " + qo.getName());
             this.add(qo);
         }
@@ -186,10 +186,10 @@ public class QsDadPanel extends JPanel    {
 
     private Point obtenerPadreLocation(JPanel h){
         Point padreLocation = null;
-        if(h.getClass() == QualyVariable.class){
-            padreLocation = this.variables.get(((QualyVariable)h).getPadreID()).getLocation();
+        if(h.getClass() == QsVariable.class){
+            padreLocation = this.variables.get(((QsVariable)h).getPadreID()).getLocation();
         }else{
-            padreLocation = this.operadores.get(((QualyOperator)h).getPadreID()).getLocation();
+            padreLocation = this.operadores.get(((QsOperator)h).getPadreID()).getLocation();
         }
         return padreLocation;
     }
@@ -211,7 +211,7 @@ public class QsDadPanel extends JPanel    {
       * @param colisionador
       * @return 
       */
-    public boolean isColision(QualyOperator colisionador){
+    public boolean isColision(QsOperator colisionador){
         boolean legal = false;
         for(int i=0;i<this.getComponents().length;i++){
             Component c = this.getComponent(i);
@@ -224,21 +224,21 @@ public class QsDadPanel extends JPanel    {
         return legal;
     }
     
-    private QualyOperator getOperatorByLocation(Point loc){
+    private QsOperator getOperatorByLocation(Point loc){
         Component c = this.getComponentAt(loc);
-        if(this.getComponentAt(loc).getClass() == QualyOperator.class){
-            return (QualyOperator) c;
+        if(this.getComponentAt(loc).getClass() == QsOperator.class){
+            return (QsOperator) c;
         }
         return null;
     }
     private boolean isVariable(JPanel var){
-        return var.getClass() == QualyVariable.class;
+        return var.getClass() == QsVariable.class;
     }
-    private QualyVariable getVariable(JPanel var){
-        return (QualyVariable) var;
+    private QsVariable getVariable(JPanel var){
+        return (QsVariable) var;
     }  
-    private QualyOperator getOperator(JPanel var){
-        return (QualyOperator) var;
+    private QsOperator getOperator(JPanel var){
+        return (QsOperator) var;
     }   
     private boolean isGoodPonder(String s,String padre){
         boolean isGood = true;
@@ -287,7 +287,7 @@ public class QsDadPanel extends JPanel    {
      * @param padreLocation 
      */
     public void addToDomain(QsNodo hijoCandidato, Point  padreLocation){
-        QualyOperator operadorPadre = (QualyOperator) this.getComponentAt(padreLocation) ;
+        QsOperator operadorPadre = (QsOperator) this.getComponentAt(padreLocation) ;
         if(canBeDomain(hijoCandidato,operadorPadre)){
          
             
@@ -295,10 +295,10 @@ public class QsDadPanel extends JPanel    {
             
             
             if(isVariable(hijoCandidato)){
-                QualyVariable op_candidato = (QualyVariable) hijoCandidato;
+                QsVariable op_candidato = (QsVariable) hijoCandidato;
                 actualizarArbolGenealogico(op_candidato,op_candidato.getPadreID(),operadorPadre.getName());
             }else{
-                QualyOperator op_candidato =(QualyOperator) hijoCandidato;
+                QsOperator op_candidato =(QsOperator) hijoCandidato;
                 actualizarArbolGenealogico(op_candidato,op_candidato.getPadreID(),operadorPadre.getName());
                 op_candidato.setPadreID(operadorPadre.getName());//SETTEO PADRE ADOPTIVO
             }
@@ -312,11 +312,11 @@ public class QsDadPanel extends JPanel    {
      * @param posX
      * @param posY
      */
-    public boolean canBeDomain(JPanel hijoCandidato, QualyOperator padreAdoptivo){
+    public boolean canBeDomain(JPanel hijoCandidato, QsOperator padreAdoptivo){
         boolean allow=true;
         if(padreAdoptivo != null){//OK
             if(!isVariable(hijoCandidato)){// es un operador ... 
-                QualyOperator op_candidato = getOperator(hijoCandidato);
+                QsOperator op_candidato = getOperator(hijoCandidato);
                 if(!padreAdoptivo.getPadreID().equals("")){ //operador con padre
                     System.out.println("operador con padre");
                     if(!noCicles(op_candidato,padreAdoptivo)){
@@ -339,7 +339,7 @@ public class QsDadPanel extends JPanel    {
         }
         return allow;
     }
-    public void addOperator(QualyOperator q){
+    public void addOperator(QsOperator q){
         this.operadores.put(q.getName(),q);
         this.relPadreHijos.put(q.getName(),new ArrayList<QsNodo>());
     }
@@ -349,7 +349,7 @@ public class QsDadPanel extends JPanel    {
      * @param padreLoc 
      */
     public void addHijoToRel(QsNodo hijo, Point padreLoc){
-        QualyOperator padreOperator = getOperatorByLocation(padreLoc);
+        QsOperator padreOperator = getOperatorByLocation(padreLoc);
         if(canBeDomain(hijo, padreOperator)){
             ArrayList<QsNodo> sons = relPadreHijos.get(padreOperator.getName());
             if(sons.size() < 5){
@@ -361,12 +361,12 @@ public class QsDadPanel extends JPanel    {
         }
     }
     
-    public boolean noCicles(QualyOperator hijoCandidato, QualyOperator padreCandidato){
+    public boolean noCicles(QsOperator hijoCandidato, QsOperator padreCandidato){
         boolean adopto=true;     
         String abuelo = padreCandidato.getPadreID();
         //   System.out.println("No me digas que me quedo loopeando" + abuelo);
         while(!abuelo.equals("") && adopto){ // esta restringido que sea yo mismo la primera vez 
-            QualyOperator abu = this.operadores.get(abuelo);
+            QsOperator abu = this.operadores.get(abuelo);
             System.out.println("abu " + abu.getPadreID());
             System.out.println("hijoCandidato " + hijoCandidato.getName());
             if(abu.getName().equals(hijoCandidato.getName()))
@@ -407,7 +407,7 @@ public class QsDadPanel extends JPanel    {
         // All operators are ¨2,5* domain 
         // Cant  operators with out father == 1 
         boolean bienFormado = true; 
-        for(QualyVariable qv: this.variables.values()){
+        for(QsVariable qv: this.variables.values()){
             if(qv.getPadreID().equals("")){
                 bienFormado = false;
                 break;
@@ -415,7 +415,7 @@ public class QsDadPanel extends JPanel    {
         }
         if(bienFormado){
             int onlyOneRoot = 0;
-            for(QualyOperator qo: this.operadores.values()){
+            for(QsOperator qo: this.operadores.values()){
                 if(qo.getPadreID().equals("")){
                     onlyOneRoot ++;
                     if(onlyOneRoot > 1){
