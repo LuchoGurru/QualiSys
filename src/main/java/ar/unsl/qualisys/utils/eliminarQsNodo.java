@@ -4,7 +4,7 @@
  */
 package ar.unsl.qualisys.utils;
 
-import ar.unsl.qualisys.componentes.nodos.QualyOperator;
+import ar.unsl.qualisys.componentes.nodos.QsOperator;
 import ar.unsl.qualisys.paneles.QsDadPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

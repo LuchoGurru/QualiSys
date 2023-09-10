@@ -5,8 +5,8 @@
 package ar.unsl.qualisys.componentes;
 
 import ar.unsl.qualisys.frames.QsFrame;
-import ar.unsl.qualisys.paneles.QualyGraphicPanel;
-import ar.unsl.qualisys.utils.ValorInstancias;
+import ar.unsl.qualisys.paneles.QsGraphicPanel;
+import ar.unsl.qualisys.paneles.QsInstanciasPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GraphicsEnvironment;
@@ -50,8 +50,8 @@ public class QsBarraHerramientas extends JToolBar{
     
     protected QsFrame parent;
     private QsTextPanel tabTexto; // panel donde se forma la estructura de variables
-    private QualyGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
-    private ValorInstancias tabInstanciado;
+    private QsGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
+    private QsInstanciasPanel tabInstanciado;
     
     
     

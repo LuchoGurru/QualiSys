@@ -5,29 +5,28 @@ import ar.unsl.qualisys.componentes.NewJDialog;
 import ar.unsl.qualisys.componentes.QsBarraHerramientas;
 import ar.unsl.qualisys.componentes.QsMenuSuperior;
 import ar.unsl.qualisys.componentes.QsModalPreview;
-import ar.unsl.qualisys.componentes.nodos.QualyVariable;
+import ar.unsl.qualisys.componentes.nodos.QsVariable;
 import ar.unsl.qualisys.paneles.QsDadPanel;
-import ar.unsl.qualisys.paneles.PanelTexto;
 import ar.unsl.qualisys.paneles.QsTabPanel;
 import ar.unsl.qualisys.componentes.QsTextPanel;
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
-import ar.unsl.qualisys.paneles.QualyGraphicPanel;
+import ar.unsl.qualisys.paneles.QsGraphicPanel;
 import ar.unsl.qualisys.utils.Item;
-import ar.unsl.qualisys.utils.ValorInstancias;
-import com.raven.chart.Chart;
+import ar.unsl.qualisys.paneles.QsInstanciasPanel;
+import GUIUtils.Chart;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import com.raven.chart.ModelChart;
+import GUIUtils.ModelChart;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import javaswingdev.form.Form_Dashboard;
-import javaswingdev.swing.RoundPanel;
-import javaswingdev.swing.table.Table;
+import GUIUtils.Form_Dashboard;
+import GUIUtils.RoundPanel;
+import GUIUtils.Table;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 /**
@@ -39,8 +38,8 @@ public class QsFrame extends JFrame{
     private static boolean TURN_OFF_LISTENERS = false;    //ajjaja
     
     private QsTextPanel tabTexto; // panel donde se forma la estructura de variables
-    private QualyGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
-    private ValorInstancias tabInstanciado;
+    private QsGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
+    private QsInstanciasPanel tabInstanciado;
     private JPanel tablUtilidades; // Estadisticas TODO Opcion dejar como visual como propuesta de escalabilidad;
     private int indiceActual;
     private JTabbedPane tabbedPane = new MaterialTabbed();
@@ -61,8 +60,8 @@ public class QsFrame extends JFrame{
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLayout(new BorderLayout());
         tabTexto = new QsTextPanel(this);
-        tabGrafico = new QualyGraphicPanel(this);
-        tabInstanciado = new ValorInstancias(this);
+        tabGrafico = new QsGraphicPanel(this);
+        tabInstanciado = new QsInstanciasPanel(this);
         this.add(new QsMenuSuperior(this,tabTexto,tabGrafico,tabInstanciado),BorderLayout.NORTH);  // PARA ABRIR Y CERRAR ARCHIVO
         tabbedPane.addTab("Variables de Preferencia", tabTexto);
         tabbedPane.addTab("Árbol ", tabGrafico);
@@ -96,7 +95,7 @@ public class QsFrame extends JFrame{
     }
  
     private Chart createChart (){
-        Chart chart = new com.raven.chart.Chart();
+        Chart chart = new GUIUtils.Chart();
 
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(250, 250, 250));
