@@ -58,12 +58,13 @@ public class QualyGraphicPanel extends javax.swing.JPanel {
     }
     
     public void setVariables(ArrayList<Item> renglones){
-        
+        int desplazamiento = 120;
         //TODO  AGREGAR VARIABLES 
         HashMap mapaDeVariables = new HashMap<String, QualyVariable>();
         for(Item item : renglones){
-            QualyVariable var = new QualyVariable(DAD, WIDTH, WIDTH, WIDTH, TOP_ALIGNMENT);
+            QualyVariable var = new QualyVariable(DAD, 250 , desplazamiento, item.getNumeration());
             mapaDeVariables.put(var.getName(), var);
+            desplazamiento+=desplazamiento;
         }
         this.DAD.setVariables(mapaDeVariables);
     }

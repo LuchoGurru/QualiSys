@@ -37,6 +37,7 @@ import javax.swing.event.UndoableEditListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledEditorKit;
 import javax.swing.undo.UndoManager;
 
 /**
@@ -44,6 +45,7 @@ import javax.swing.undo.UndoManager;
  * @author luciano.gurruchaga
  */
 public class QsBarraHerramientas extends JToolBar{
+    // Rest of the code for your JPanel
     
     
     protected QsFrame parent;
@@ -53,11 +55,11 @@ public class QsBarraHerramientas extends JToolBar{
     
     
     
-    public QsBarraHerramientas(QsFrame parentt,QsTextPanel tabTexto,QualyGraphicPanel panelDeGraficos,JPanel panelDeInstancias){//[Mostrar resultados en el panel de instancias todo junto],JPanel panelDeResultados) {
+    public QsBarraHerramientas(QsFrame parentt,QsTextPanel tabText,QualyGraphicPanel tabGrafic,ValorInstancias tabInstancias){//[Mostrar resultados en el panel de instancias todo junto],JPanel panelDeResultados) {
         this.parent = parentt;
-        this.tabTexto = tabTexto; // panel donde se forma la estructura de variables
-        this.tabGrafico = tabGrafico;
-        this.tabInstanciado = tabInstanciado;
+        this.tabTexto = tabText; // panel donde se forma la estructura de variables
+        this.tabGrafico = tabGrafic;
+        this.tabInstanciado = tabInstancias;
       //  JToolBar menuHerramientas = new JToolBar();
         JButton volver = new JButton();
         JButton siguiente = new JButton();
@@ -127,47 +129,21 @@ public class QsBarraHerramientas extends JToolBar{
         guardar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-            /*    JFileChooser fileChooser = new JFileChooser();
-                int selected = fileChooser.showSaveDialog(barra); // componente padre
-                if (selected == fileChooser.APPROVE_OPTION) {
-                    File fichero = fileChooser.getSelectedFile();
-                    if (fichero.exists()) {
-                        int abrir = JOptionPane.showConfirmDialog(null, "El fichero ya Existe");
-                    } else {
-                        File dir = fichero.getParentFile();
-                        dir.mkdir();
-                        try {
-                            fichero.createNewFile();
-                        } catch (IOException ex) {
-                            System.out.println("No se pudo crear");
-                        }
-                    }
-                    try {
-                        FileWriter f = new FileWriter(fichero);
-                        String texto = panelDeTexto.getText();
-                        String lineas[] = texto.split("\n");
-                        for (String linea : lineas) {
-                            f.write(linea + "\n");
-                        }
-                        f.close();
-                    } catch (IOException ex) {
-                        System.out.println("No se pudo escribir el fichero");
-                    }
-                }*/
+                guardarArchivo();
             }
         });
 
         actualizar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                tabTexto.setTexto(tabTexto.getTexto());// El setTexto llama ala ctualizar  estado
+                tabTexto.setTexto(tabTexto.getJTextPanel().getText());// El setTexto llama ala ctualizar  estado
             }
         }
         );
-        /*
+        
         UndoManager editManager = new UndoManager();
 
-        panelDeTexto.getDocument().addUndoableEditListener(new UndoableEditListener() {
+        tabTexto.getJTextPanel().getDocument().addUndoableEditListener(new UndoableEditListener() {
             @Override
             public void undoableEditHappened(UndoableEditEvent undoableEditEvent) {
                 editManager.addEdit(undoableEditEvent.getEdit());
@@ -193,18 +169,11 @@ public class QsBarraHerramientas extends JToolBar{
         });
 
         //Stylos
-        centrado.addActionListener(
-                new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-
-                //add(new QualyGraphic());
-                //new QualyGraphic().setVisible(true);
-            }
-        }); // left rigth justify
+        centrado.addActionListener(new StyledEditorKit.AlignmentAction("Medio", StyleConstants.ALIGN_CENTER)); // left rigth justify
         color.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                JTextPane panelDeTexto = tabTexto.getJTextPanel();
                 SimpleAttributeSet atributos = new SimpleAttributeSet(panelDeTexto.getCharacterAttributes());//Obtenemos los atributos actuales
                 Color c = JColorChooser.showDialog(null, "Elije un color", panelDeTexto.getSelectedTextColor());// usamos el elector decolot
                 if (c != null) {
@@ -216,6 +185,7 @@ public class QsBarraHerramientas extends JToolBar{
         tam.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent changeEvent) {
+                JTextPane panelDeTexto = tabTexto.getJTextPanel();
                 SimpleAttributeSet atributos = new SimpleAttributeSet(panelDeTexto.getCharacterAttributes());
                 StyleConstants.setFontSize(atributos, (int) tam.getValue());
                 panelDeTexto.setCharacterAttributes(atributos, false); // le damos los atributos al texto
@@ -224,43 +194,33 @@ public class QsBarraHerramientas extends JToolBar{
         fuente.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
+                JTextPane panelDeTexto = tabTexto.getJTextPanel();
                 SimpleAttributeSet atributos = new SimpleAttributeSet(panelDeTexto.getCharacterAttributes());
                 StyleConstants.setFontFamily(atributos, "" + fuente.getSelectedItem());
                 panelDeTexto.setCharacterAttributes(atributos, false); // le damos los atributos al texto
             }
         });
-        */
-        //this.add(menuHerramientas, BorderLayout.NORTH);
-        //this.add(panelTexto, BorderLayout.CENTER);
-
-   
     } 
-    
+     
         
-        
-        
-        
-        public boolean controlarTexto(){
-        /*if(panelDeTexto.isTextoBienFormado()){
-                        tabPanel.setSelectedIndex(1);
-                        System.out.println("index = is tree good formed ? " + index);
-                        QsModalPreview  hijo = new QsModalPreview(this,"Vista Previa: VARIABLES A GRAFICAR.",true);
-                        hijo.setjTextoPane1(panelDeTexto.getPanelDeTexto().getText());
-                        hijo.setVisible(true);
-                    }else{
-                         tabPanel.setSelectedIndex(0);
-                         JOptionPane.showConfirmDialog(this, "El listado de variables no esta bien formado");
-                    }*/
-                    //TODO TOMAR TEXTO PANEL = 0 PASARLO A CONSTRUCTOR PANEL 1 
-
-        return true;
+    public void mostrarPanelGrafico(int pagina){
+        parent.setTURN_OFF_LISTENERS(true);         
+        parent.getTabbedPane().setSelectedIndex(pagina);
+        parent.setIndiceActual(pagina);
+        parent.setTURN_OFF_LISTENERS(false); 
+        parent.initPanelGrafico();
     }
+    
     public void manejarCambioDePagina(int pagina){
         switch(pagina){
             case 1:{
-                if(controlarTexto()){
-                    //TODO CAMBIO PAGINA 
-                    parent.initPanelGrafico();
+                if(tabTexto.isTextoBienFormado()){
+                    QsModalPreview  hijo = new QsModalPreview(parent,this,"Vista Previa: VARIABLES A GRAFICAR.",true);
+                    hijo.setjTextoPane1(tabTexto.getJTextPanel().getText());
+                    hijo.setVisible(true);
+                }else{
+                    parent.getTabbedPane().setSelectedIndex(0);
+                    JOptionPane.showConfirmDialog(this, "El listado de variables no esta bien formado");
                 }
                 break;
             }
@@ -291,18 +251,13 @@ public class QsBarraHerramientas extends JToolBar{
        }
        parent.setTURN_OFF_LISTENERS(false);
     }
+    
     private void avanzarTab(){
-        parent.setTURN_OFF_LISTENERS(true);         
-        // SET READ ONLY 
         int siguiente = parent.getIndiceActual() + 1;
         int cantidadTabs = parent.getTabbedPane().getTabCount();
         if(siguiente<cantidadTabs){
-            parent.getTabbedPane().setSelectedIndex(siguiente);
-            parent.setIndiceActual(siguiente);
             manejarCambioDePagina(siguiente);
         }
-        parent.setTURN_OFF_LISTENERS(false);
-
     }
     private void abrirArchivo(){
         JFileChooser fileExplorer = new JFileChooser(); // Elector de archivos
@@ -326,6 +281,34 @@ public class QsBarraHerramientas extends JToolBar{
             }
         }
     }
-    
+    private void guardarArchivo(){
+        /*    JFileChooser fileChooser = new JFileChooser();
+                int selected = fileChooser.showSaveDialog(barra); // componente padre
+                if (selected == fileChooser.APPROVE_OPTION) {
+                    File fichero = fileChooser.getSelectedFile();
+                    if (fichero.exists()) {
+                        int abrir = JOptionPane.showConfirmDialog(null, "El fichero ya Existe");
+                    } else {
+                        File dir = fichero.getParentFile();
+                        dir.mkdir();
+                        try {
+                            fichero.createNewFile();
+                        } catch (IOException ex) {
+                            System.out.println("No se pudo crear");
+                        }
+                    }
+                    try {
+                        FileWriter f = new FileWriter(fichero);
+                        String texto = panelDeTexto.getText();
+                        String lineas[] = texto.split("\n");
+                        for (String linea : lineas) {
+                            f.write(linea + "\n");
+                        }
+                        f.close();
+                    } catch (IOException ex) {
+                        System.out.println("No se pudo escribir el fichero");
+                    }
+                }*/
+    }
 }          
 

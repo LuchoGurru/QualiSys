@@ -153,6 +153,7 @@ public class QsDadPanel extends JPanel    {
     }
     
     private void pintarOperadores(Graphics g){
+        
         for(QualyOperator qo: this.operadores.values()){
             System.out.println("qo.getName() = " + qo.getName());
             this.add(qo);

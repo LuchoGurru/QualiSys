@@ -12,10 +12,9 @@ public class QualyVariable extends QsNodo{
     String nombre;
     String nombreGrupo;// Categoría de la variable 
     
-    public QualyVariable (JPanel parent, double x, double y,int id, float value){
-        super(value);
+    public QualyVariable (JPanel parent, double x, double y,String id){ 
         this.setName("var_" + id); 
-        this.setBounds((int)x,(int)y,101,200);
+        this.setBounds((int)x,(int)y,50,100);
         this.setBackground(Color.PINK);
         ClickListener clickListener = new ClickListener();
         this.addMouseListener(new ClickListener());

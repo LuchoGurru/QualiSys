@@ -356,8 +356,8 @@ public class QsTextPanel extends JPanel {
 
     }
 
-    public String getTexto(){
-        return this.panelDeTexto.getText();
+    public JTextPane getJTextPanel(){
+        return this.panelDeTexto;
     }
     
     public void setTexto(String texto) {
@@ -368,7 +368,7 @@ public class QsTextPanel extends JPanel {
     public boolean isTextoBienFormado(){
         String[] lineas = this.panelDeTexto.getText().split("\n");
         int i=0;
-        while(isRenglonBienFormado(lineas[i])){
+        while(isRenglonBienFormado(lineas[i]) && i<lineas.length-1){
             i++;
         }
         return i==lineas.length-1;

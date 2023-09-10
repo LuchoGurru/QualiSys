@@ -4,8 +4,10 @@
  */
 package ar.unsl.qualisys.componentes;
 
+import ar.unsl.qualisys.frames.QsFrame;
 import java.awt.BorderLayout;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextPane;
 
@@ -13,13 +15,16 @@ import javax.swing.JTextPane;
  *
  * @author luciano.gurruchaga
  */
-public class QsModalPreview  extends javax.swing.JDialog {
+public class QsModalPreview  extends JDialog {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextPane jTextPane1;
-    
-    public QsModalPreview(java.awt.Frame parent, String titulo, boolean modal) {
-        super(parent,titulo, modal);
+    private QsBarraHerramientas parent;
+    private JDialog este;
+    public QsModalPreview(QsFrame frame, QsBarraHerramientas parent,String titulo, boolean modal) {
+        super(frame,titulo, modal);
         this.setLayout(new BorderLayout());
+        this.parent = parent;
+        this.este = this;
         initComponents();
     }
     
@@ -33,7 +38,8 @@ public class QsModalPreview  extends javax.swing.JDialog {
         jButton1.setText("Aceptar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                // TODO : MANDAR A GRAFICAR A PANEL GRAFICO CON LAS jButton1ActionPerformed(evt);
+                parent.mostrarPanelGrafico(1);
+                este.dispose();
             }
         });
         jScrollPane1 = new javax.swing.JScrollPane();
