@@ -58,13 +58,13 @@ public class QsGraphicPanel extends javax.swing.JPanel {
     }
     
     public void setVariables(ArrayList<Item> renglones){
-        int desplazamiento = 120;
+        int desplazamiento = 5;
         //TODO  AGREGAR VARIABLES 
         HashMap mapaDeVariables = new HashMap<String, QsVariable>();
         for(Item item : renglones){
-            QsVariable var = new QsVariable(DAD, WIDTH, WIDTH, WIDTH, TOP_ALIGNMENT);
+            QsVariable var = new QsVariable(DAD, 50, desplazamiento, item.getNumeration(),item.getCadenaDeTexto());
             mapaDeVariables.put(var.getName(), var);
-            desplazamiento+=desplazamiento;
+            desplazamiento+= 35;
         }
         this.DAD.setVariables(mapaDeVariables);
     }
@@ -78,7 +78,7 @@ public class QsGraphicPanel extends javax.swing.JPanel {
         
         int margin = menuOperadores.getWidth(); 
         
-        operador.setBounds((int)punto.getX() - margin ,(int)punto.getY(),100,100);
+        operador.setBounds((int)punto.getX() - margin ,(int)punto.getY(),35,35);
         
         switch (tipoOperador) {
             case 0:

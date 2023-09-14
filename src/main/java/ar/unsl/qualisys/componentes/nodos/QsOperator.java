@@ -34,14 +34,20 @@ public class QsOperator extends QsNodo implements QsOperacion{
     private String padreID;
     private float resultValue;
     JPopupMenu menuDesplegable = new JPopupMenu();
- 
+    private String symbol ;
+    private float d;
+    private double r2;
+    private double r3;
+    private double r4;
+    private double r5;
     // private ArrayList<JPanel> dominio = new ArrayList<>();; //nodo hijo// Recibe un maximo de 5 argum 
     
-    public QsOperator(JPanel parent, int id){
+    public QsOperator(JPanel parent, int id,String nombre,String symbol, float d, double r2, double r3, double r4, double r5){
         super();
         this.menuPopUp();
         this.setName("op_" + id); 
         this.padreID = "";
+        this.symbol ="C++";
         if(parent.getClass() == QsDadPanel.class){ 
             this.GUIParent = (QsDadPanel) parent;     // Para usar los metodos del DandD directamente
         }
@@ -50,15 +56,16 @@ public class QsOperator extends QsNodo implements QsOperacion{
         this.addMouseListener(clickListener);
         DragListener dragListener = new DragListener();
         this.addMouseMotionListener(dragListener);
+        
     } 
     
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawOval(0, 0, 100, 100);
-        g.fillOval(25, 25, 50, 50);
-        g.setFont(new Font("Serif", Font.BOLD, 24));
-        g.drawString("D++", 30, 56);
+        g.drawOval(10, 10, 20, 20);
+        g.fillOval(5, 5, 10, 10); // (25,25,50,50)
+        g.setFont(new Font("Serif", Font.BOLD, 12));
+        g.drawString(this.symbol, 30, 56);
         
         
     }
@@ -180,6 +187,8 @@ public class QsOperator extends QsNodo implements QsOperacion{
     public double calcularOperacion(ArrayList<Double> dominio) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+
+
 
    
    /**

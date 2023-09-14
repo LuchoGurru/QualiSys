@@ -1,7 +1,6 @@
 package ar.unsl.qualisys.frames;
  
 import ar.unsl.qualisys.componentes.MaterialTabbed;
-import ar.unsl.qualisys.componentes.NewJDialog;
 import ar.unsl.qualisys.componentes.QsBarraHerramientas;
 import ar.unsl.qualisys.componentes.QsMenuSuperior;
 import ar.unsl.qualisys.componentes.QsModalPreview;

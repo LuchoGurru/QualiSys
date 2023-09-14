@@ -28,21 +28,53 @@ public class QsOperatorsPanel extends JPanel {
     private JPanel operador4;
     private JPanel operador5;
     private JPanel operador6;
+    private JPanel operador7;
+    private JPanel operador8;
+    private JPanel operador9;
+    private JPanel operador10;
+    private JPanel operador11;
+    private JPanel operador12;
+    private JPanel operador13;
+    private JPanel operador14;
+    private JPanel operador15;
+    private JPanel operador16;
+    private JPanel operador17;
+    private JPanel operador18;
+    private JPanel operador19;
+    private JPanel operador20;
     private Point position;
     public QsOperatorsPanel() {
-        operador1= new QsOperator(this,101);
-        operador2= new QsOperator(this,102);
-        operador3= new QsOperator(this,103);
-        operador4= new QsOperator(this,104);
-        operador5= new QsOperator(this,105);
-        operador6= new QsOperator(this,106);
         
-        operador1.setBackground(Color.red);
-        operador2.setBackground(Color.GRAY);
-        operador3.setBackground(Color.GREEN);
-        operador4.setBackground(Color.YELLOW);
-        operador5.setBackground(Color.WHITE);
-        operador6.setBackground(Color.PINK);
+        
+        operador1= new QsOperator(this,101,"Disjunction","D",1f,1700d,1700d,1700d,1700d);
+        operador2= new QsOperator(this,102,"Strong QD (+)","D++",0.9375f,1700d,1700d,1700d,1700d);
+        operador3= new QsOperator(this,103,"Strong QD","D+",0.8750f,1700d,1700d,1700d,1700d);
+        operador4= new QsOperator(this,104,"Strong QD (-)","D+-",0.8125f,1700d,1700d,1700d,1700d);
+        operador5= new QsOperator(this,105,"Medium QD","DA",0.7500f,1700d,1700d,1700d,1700d);
+        operador6= new QsOperator(this,106,"Weak QD (+)","D-+",0.6875f,1700d,1700d,1700d,1700d);
+        operador7= new QsOperator(this,107,"Weak QD","D-",0.6250f,1700d,1700d,1700d,1700d);        
+        operador8= new QsOperator(this,108,"Square Mean","SQU",0.6232f,1700d,1700d,1700d,1700d);        
+        operador9= new QsOperator(this,109,"Weak QD (-)","D--",0.5625f,1700d,1700d,1700d,1700d);        
+        operador10= new QsOperator(this,110,"Arithmetic Mean","A",0.5f,1700d,1700d,1700d,1700d);        
+        operador11= new QsOperator(this,111,"Weak QC (-)","C--",0.4375f,1700d,1700d,1700d,1700d);        
+        operador12= new QsOperator(this,112,"Weak QC","C-",0.3750f,1700d,1700d,1700d,1700d);        
+        operador13= new QsOperator(this,113,"Geometric Mean","GEO",0.3333f,1700d,1700d,1700d,1700d);      
+        operador14= new QsOperator(this,114,"Weak QC (+)","C-+",0.3125f,1700d,1700d,1700d,1700d);        
+        operador15= new QsOperator(this,115,"Medium QC","CA",0.2500f,1700d,1700d,1700d,1700d);        
+        operador16= new QsOperator(this,116,"Harmonic Mean","HAR",0.2274f,1700d,1700d,1700d,1700d);        
+        operador17= new QsOperator(this,117,"Strong QC (-)","C+-",0.1875f,1700d,1700d,1700d,1700d);        
+        operador18= new QsOperator(this,118,"Strong QC","C+",0.1250f,1700d,1700d,1700d,1700d);        
+        operador19= new QsOperator(this,119,"Stronc QC (+)","C++",0.0625f,1700d,1700d,1700d,1700d);        
+        operador20= new QsOperator(this,120,"Conjunction","C",0.0000f,1700d,1700d,1700d,1700d);
+        
+        // operador12= new QsOperator(this,106,"Weak QD (+)","D-+",0.6875f,1700d,1700d,1700d,1700d));
+        
+        operador13.setBackground(Color.red);
+        operador14.setBackground(Color.GRAY);
+        operador15.setBackground(Color.GREEN);
+        operador16.setBackground(Color.YELLOW);
+        operador17.setBackground(Color.WHITE);
+        operador18.setBackground(Color.PINK);
 
         this.add(operador1);
         this.add(operador2);

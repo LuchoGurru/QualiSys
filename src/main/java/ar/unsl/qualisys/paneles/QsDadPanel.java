@@ -56,7 +56,7 @@ import javax.swing.JPopupMenu;
  * 
  * @author luciano.gurruchaga
  */
-public class QsDadPanel extends JPanel    {
+public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesArbolLSP
     // La estructura de datos conveniente es : 
     // Una lista por niveles ... jajaja
     // Una lista vinculada 
@@ -141,7 +141,7 @@ public class QsDadPanel extends JPanel    {
         pintarOperadores(g);
         dibujarLineas(g);
         // repaint();
-    } 
+    }
     
     
     
@@ -158,7 +158,10 @@ public class QsDadPanel extends JPanel    {
             this.add(qo);
         }
     }
-   
+    /**
+     * Recorre, anidacion de arreglos.
+     * @param g 
+     */
     public void dibujarLineas(Graphics g){
         ArrayList<ArrayList<QsNodo>> hermanos = new ArrayList<ArrayList<QsNodo>>(this.relPadreHijos.values());
         for(int j=0;j < hermanos.size(); j++){
@@ -169,28 +172,25 @@ public class QsDadPanel extends JPanel    {
                 if(padreLocation == null){
                     padreLocation =obtenerPadreLocation(h);
                 }
-                
+                //Pinto (x,y) to (x',y')
                 g.drawLine(h.getLocation().x,h.getLocation().y, padreLocation.x,padreLocation.y);
                 
                 System.out.println("X " + (padreLocation.x - h.getLocation().x)/2);
                 System.out.println("Y " + padreLocation.y);
                 System.out.println("X/2 " + padreLocation.x/2);
                 System.out.println("Y/2 " + padreLocation.y/2);
-                
+                // Dibujo peso, ponderaje de la relacion
                 g.drawString(""+h.getPonderacion(),h.getLocation().x + (padreLocation.x - h.getLocation().x)/2 ,
-                                                  -5 + h.getLocation().y + (padreLocation.y - h.getLocation().y)/2) ;
+                    -5 + h.getLocation().y + (padreLocation.y - h.getLocation().y)/2) ;
+                //Flecha
                 g.fillOval(padreLocation.x-5, padreLocation.y-5, 10, 10);
             }
         }
     }
 
-    private Point obtenerPadreLocation(JPanel h){
+    private Point obtenerPadreLocation(QsNodo h){
         Point padreLocation = null;
-        if(h.getClass() == QsVariable.class){
-            padreLocation = this.variables.get(((QsVariable)h).getPadreID()).getLocation();
-        }else{
-            padreLocation = this.operadores.get(((QsOperator)h).getPadreID()).getLocation();
-        }
+        padreLocation = this.operadores.get((h).getPadreID()).getLocation();   
         return padreLocation;
     }
     /**
@@ -211,7 +211,7 @@ public class QsDadPanel extends JPanel    {
       * @param colisionador
       * @return 
       */
-    public boolean isColision(QsOperator colisionador){
+    public boolean isColision(QsNodo colisionador){
         boolean legal = false;
         for(int i=0;i<this.getComponents().length;i++){
             Component c = this.getComponent(i);
@@ -224,7 +224,7 @@ public class QsDadPanel extends JPanel    {
         return legal;
     }
     
-    private QsOperator getOperatorByLocation(Point loc){
+    public QsOperator getOperatorByLocation(Point loc){
         Component c = this.getComponentAt(loc);
         if(this.getComponentAt(loc).getClass() == QsOperator.class){
             return (QsOperator) c;
@@ -289,14 +289,13 @@ public class QsDadPanel extends JPanel    {
     public void addToDomain(QsNodo hijoCandidato, Point  padreLocation){
         QsOperator operadorPadre = (QsOperator) this.getComponentAt(padreLocation) ;
         if(canBeDomain(hijoCandidato,operadorPadre)){
-         
-            
+
             this.setPonderValue(hijoCandidato,operadorPadre); 
             
-            
             if(isVariable(hijoCandidato)){
-                QsVariable op_candidato = (QsVariable) hijoCandidato;
-                actualizarArbolGenealogico(op_candidato,op_candidato.getPadreID(),operadorPadre.getName());
+                QsVariable var_candidato = (QsVariable) hijoCandidato;
+                actualizarArbolGenealogico(var_candidato,var_candidato.getPadreID(),operadorPadre.getName());
+                var_candidato.setPadreID(operadorPadre.getName());//SETTEO PADRE ADOPTIVO
             }else{
                 QsOperator op_candidato =(QsOperator) hijoCandidato;
                 actualizarArbolGenealogico(op_candidato,op_candidato.getPadreID(),operadorPadre.getName());
@@ -347,7 +346,6 @@ public class QsDadPanel extends JPanel    {
      * El planteamiento del problema 
      * @param hijo
      * @param padreLoc 
-     */
     public void addHijoToRel(QsNodo hijo, Point padreLoc){
         QsOperator padreOperator = getOperatorByLocation(padreLoc);
         if(canBeDomain(hijo, padreOperator)){
@@ -359,7 +357,8 @@ public class QsDadPanel extends JPanel    {
                 System.out.println("YA tiene 5 hijos");
             }
         }
-    }
+    }     */
+
     
     public boolean noCicles(QsOperator hijoCandidato, QsOperator padreCandidato){
         boolean adopto=true;     

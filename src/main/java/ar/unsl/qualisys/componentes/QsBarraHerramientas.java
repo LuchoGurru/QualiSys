@@ -55,7 +55,7 @@ public class QsBarraHerramientas extends JToolBar{
     
     
     
-    public QsBarraHerramientas(QsFrame parentt,QsTextPanel tabText,QualyGraphicPanel tabGrafic,ValorInstancias tabInstancias){//[Mostrar resultados en el panel de instancias todo junto],JPanel panelDeResultados) {
+    public QsBarraHerramientas(QsFrame parentt,QsTextPanel tabText,QsGraphicPanel tabGrafic,QsInstanciasPanel tabInstancias){//[Mostrar resultados en el panel de instancias todo junto],JPanel panelDeResultados) {
         this.parent = parentt;
         this.tabTexto = tabText; // panel donde se forma la estructura de variables
         this.tabGrafico = tabGrafic;
