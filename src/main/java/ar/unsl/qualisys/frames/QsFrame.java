@@ -13,6 +13,7 @@ import java.awt.Color;
 import javax.swing.*;
 
 import GUIUtils.ModelChart;
+import ar.unsl.qualisys.componentes.nodos.QsVariable;
 import java.util.ArrayList;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -26,7 +27,7 @@ public class QsFrame extends JFrame{
     
     private QsTextPanel tabTexto; // panel donde se forma la estructura de variables
     private QsGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
-    private QsInstanciasPanel tabInstanciado;
+    private QsInstanciasPanel tabModelos;
     private JPanel tablUtilidades; // Estadisticas TODO Opcion dejar como visual como propuesta de escalabilidad;
     private int indiceActual;
     private JTabbedPane tabbedPane = new QsTabPanel();
@@ -48,11 +49,11 @@ public class QsFrame extends JFrame{
         this.setLayout(new BorderLayout());
         tabTexto = new QsTextPanel(this);
         tabGrafico = new QsGraphicPanel(this);
-        tabInstanciado = new QsInstanciasPanel(this);
-        this.add(new QsMenuSuperior(this,tabTexto,tabGrafico,tabInstanciado),BorderLayout.NORTH);  // PARA ABRIR Y CERRAR ARCHIVO
+        tabModelos = new QsInstanciasPanel(this);
+        this.add(new QsMenuSuperior(this,tabTexto,tabGrafico,tabModelos),BorderLayout.NORTH);  // PARA ABRIR Y CERRAR ARCHIVO
         tabbedPane.addTab("Variables de Preferencia", tabTexto);
         tabbedPane.addTab("Árbol ", tabGrafico);
-        tabbedPane.addTab("Llenado de Instancias ", tabInstanciado);
+        tabbedPane.addTab("Llenado de Instancias ", tabModelos);
         /*JPanel panel4;
         panel4 = new JPanel();
         panel4.add(createChart());
@@ -111,10 +112,19 @@ public class QsFrame extends JFrame{
      */
     public void initPanelGrafico(){
         if(tabTexto.isTextoBienFormado()){
-            this.tabGrafico.setVariables(tabTexto.getRenglones()); 
+            
+            
+            this.tabGrafico.setVariables(tabTexto.getVariables()); 
         }
     }
 
+    /**
+     * Llamar antes de cambiar la pestaña
+     */
+    public void initPanelModelos(){
+        ArrayList<QsVariable> vars = (ArrayList<QsVariable>) this.tabGrafico.getDAD().getVariables().values(); 
+        this.tabModelos.setVars(vars);
+    }
 
     /*
         private JPanel panel1;  

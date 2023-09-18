@@ -1,5 +1,6 @@
 package ar.unsl.qualisys.paneles;
 
+import ar.unsl.qualisys.componentes.nodos.QsVariable;
 import ar.unsl.qualisys.frames.QsFrame;
 import ar.unsl.qualisys.utils.Item;
 import ar.unsl.qualisys.utils.JTextPaneUtils;
@@ -281,11 +282,11 @@ public class QsTextPanel extends JPanel {
                 //si la ultima linea es un /n, agrego espacio en blanco
                 if(texto.lastIndexOf("\n") == texto.length()-1){// osea que no me tomo la ultima linea vacia 
                     texto+= " "; // para que me tome la ultima linea sino confunde con EOF y da problemas
-                } 
+                } // Parche grande como una casa 
                 String[] lineas = texto.split("\n"); 
                 renglones = new ArrayList<>();
                 renglonActual = null;
-                for (int i = 0; i < lineas.length; i++) {// Empiezo desde la segunda linea ok? es decir la linea ubicada en 1
+                for (int i = 0; i < lineas.length; i++) { 
                     Item renglon = null;
                     if(i == 0){// i = 0 - Primer Renglon
                         arregloDeNiveles[0] = "1.";
@@ -373,6 +374,12 @@ public class QsTextPanel extends JPanel {
         return i==lineas.length-1;
     }
 
+    public ArrayList<Item> getVariables(){
+        return null;
+    }
+    
+    
+    
     public ArrayList<Item> getRenglones() {
         return renglones;
     }
