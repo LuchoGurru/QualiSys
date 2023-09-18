@@ -1,8 +1,9 @@
 package ar.unsl.qualisys.componentes.nodos;
 
-import ar.unsl.qualisys.paneles.QsDadPanel;
-import ar.unsl.qualisys.paneles.QsOperatorsPanel;
-import ar.unsl.qualisys.utils.eliminarQsNodo;
+import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
+import ar.unsl.qualisys.paneles.grafo.QsOperatorsPanel;
+import ar.unsl.qualisys.paneles.grafo.comandos.cambiarOperador;
+import ar.unsl.qualisys.paneles.grafo.comandos.eliminarQsNodo;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -31,27 +32,35 @@ import javax.swing.KeyStroke;
 public class QsOperator extends QsNodo implements QsOperacion{
     
     private QsDadPanel GUIParent; // Solo se asigna en caso de que sea hijo del componente DAD (Drag and Drop).
+    private String symbol ;
+    private String nombre;
     private String padreID;
     private float resultValue;
-    JPopupMenu menuDesplegable = new JPopupMenu();
-    private String symbol ;
     private float d;
     private double r2;
     private double r3;
     private double r4;
     private double r5;
+    private JPopupMenu menuDesplegable = new JPopupMenu();
     // private ArrayList<JPanel> dominio = new ArrayList<>();; //nodo hijo// Recibe un maximo de 5 argum 
     
-    public QsOperator(JPanel parent, int id,String nombre,String symbol, float d, double r2, double r3, double r4, double r5){
+    public QsOperator(JPanel GUIparent, int id,String nombre,String symbol, float d, double r2, double r3, double r4, double r5){
         super();
         this.menuPopUp();
         this.setName("op_" + id); 
         this.padreID = "";
-        this.symbol ="C++";
-        if(parent.getClass() == QsDadPanel.class){ 
-            this.GUIParent = (QsDadPanel) parent;     // Para usar los metodos del DandD directamente
+        this.symbol = symbol;
+        this.nombre = nombre;
+        this.d = d;
+        this.r2=r2;
+        this.r3=r3;
+        this.r4=r4;
+        this.r5=r5;
+
+        if(GUIparent.getClass() == QsDadPanel.class){ 
+            this.GUIParent = (QsDadPanel) GUIparent;     // Para usar los metodos del DandD directamente
         }
-        this.setPreferredSize(new Dimension(100,100));
+        this.setPreferredSize(new Dimension(51,51));
         ClickListener clickListener = new ClickListener(this);
         this.addMouseListener(clickListener);
         DragListener dragListener = new DragListener();
@@ -62,56 +71,31 @@ public class QsOperator extends QsNodo implements QsOperacion{
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawOval(10, 10, 20, 20);
-        g.fillOval(5, 5, 10, 10); // (25,25,50,50)
+        g.drawOval(0, 0, 50, 50);
+        g.drawOval(5, 5, 40, 40); // (25,25,50,50)
         g.setFont(new Font("Serif", Font.BOLD, 12));
-        g.drawString(this.symbol, 30, 56);
-        
-        
-    }
-
-    public QsDadPanel getGUIParent() {
-        return GUIParent;
-    } 
-
-    public String getPadreID() {
-        return padreID;
-    }
-
-    public void setPadreID(String padreID) {
-        this.padreID = padreID;
-    }
-
-    public float getResultValue() {
-        return resultValue;
-    }
-
-    public void setResultValue(float resultValue) {
-        this.resultValue = resultValue;
-    }
-  /* ASII DIBUJABA EL DOMINIO 
-    public void dibujarHijos(Graphics g){
-        //Como soy un operador 
-        for(JPanel hijo : this.dominio){
-            Point origen = hijo.getLocation();
-            dibujarLineaHijo(g,origen);
+        if(this.symbol.length()==1){
+            g.drawString(this.symbol, 20, 30);
+        }else if(this.symbol.length()==2){
+            g.drawString(this.symbol, 15, 30);
+        }else{
+            g.drawString(this.symbol, 10, 30);
         }
+        
     }
-    public void dibujarLineaHijo(Graphics g, Point h){
-        Line2D linea = new Line2D.Double(h.getX(), h.getY(), this.getX(), this.getY()); 
-    }
-    */
+    //METHODS
     
     /**
      * Decide la accion a realizar en caso de que se haya hecho un soltado de click
      * @param e evento del mouse
      */
     public void determinarAccionReleased(MouseEvent e){
+        System.out.println("e.getButton() = " + e.getButton());
        if(this.getGUIParent()!= null ){ // Verdadero si esta en DandD
             Rectangle oldPosition = this.getBounds(); // Guardo la posision inicial
-            this.setBounds(this.getBounds().getLocation().x + e.getX(),
-                                 this.getBounds().getLocation().y + e.getY(),
-                                100, 100);
+            this.setBounds(this.getBounds().getLocation().x+ e.getX() -20, //para centrar el mouse 
+                                 this.getBounds().getLocation().y + e.getY() -20 , //para centrar el mouse
+                                51, 51);
             if (!GUIParent.isColision(this)) { 
                 GUIParent.repaint();
             } else {
@@ -145,19 +129,8 @@ public class QsOperator extends QsNodo implements QsOperacion{
         QsOperatorsPanel papi = (QsOperatorsPanel) this.getParent();
         Point ubiActual = this.getLocation();
         ubiActual.x += e.getPoint().x;
-        ubiActual.y += e.getPoint().y;
-        int tipoOperador; 
-        Color bg = this.getBackground();
-        if (bg == Color.RED) {
-            tipoOperador = 0;
-        } else if (bg == Color.GRAY) {
-            tipoOperador = 1;
-        } else if (bg == Color.GREEN) {
-            tipoOperador = 2;
-        } else{ // if (bg == Color.YELLOW) 
-            tipoOperador = 3;
-        }
-        papi.setPositionToDraw(ubiActual,tipoOperador);
+        ubiActual.y += e.getPoint().y; 
+        papi.dibujarOperadorEn(ubiActual,this);
     }
 
    /**
@@ -173,6 +146,8 @@ public class QsOperator extends QsNodo implements QsOperacion{
         this.GUIParent.addToDomain(this,padreLocation);
    }
 
+   
+   
     @Override
     public double calcularOperacion(double... dominio) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
@@ -243,19 +218,112 @@ public class QsOperator extends QsNodo implements QsOperacion{
         JMenuItem eliminar = new JMenuItem("Eliminar");
         JMenuItem eliminarRel = new JMenuItem("Eliminar relación");
         JMenuItem setPonderación = new JMenuItem("Editar ponderación");
+        JMenuItem cambiarOperador = new JMenuItem("Cambiar Operador");
         eliminar.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE,InputEvent.CTRL_DOWN_MASK));
         eliminar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("e = " + e);
                 new eliminarQsNodo(GUIParent).ejecutar();
             }
         });
       
+        cambiarOperador.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new cambiarOperador(GUIParent).ejecutar();
+            }
+        });
+        
+        
         menuDesplegable.add(eliminar);
         menuDesplegable.add(eliminarRel);
         menuDesplegable.add(setPonderación);
-
+        menuDesplegable.add(cambiarOperador);
+        
         this.setComponentPopupMenu(menuDesplegable);
     }
+    //GET Y SET
+
+    public QsDadPanel getGUIParent() {
+        return GUIParent;
+    }
+
+    public void setGUIParent(QsDadPanel GUIParent) {
+        this.GUIParent = GUIParent;
+    }
+
+    @Override
+    public String getPadreID() {
+        return padreID;
+    }
+
+    public void setPadreID(String padreID) {
+        this.padreID = padreID;
+    }
+
+    public float getResultValue() {
+        return resultValue;
+    }
+
+    public void setResultValue(float resultValue) {
+        this.resultValue = resultValue;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+    
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public float getD() {
+        return d;
+    }
+
+    public void setD(float d) {
+        this.d = d;
+    }
+
+    public double getR2() {
+        return r2;
+    }
+
+    public void setR2(double r2) {
+        this.r2 = r2;
+    }
+
+    public double getR3() {
+        return r3;
+    }
+
+    public void setR3(double r3) {
+        this.r3 = r3;
+    }
+
+    public double getR4() {
+        return r4;
+    }
+
+    public void setR4(double r4) {
+        this.r4 = r4;
+    }
+
+    public double getR5() {
+        return r5;
+    }
+
+    public void setR5(double r5) {
+        this.r5 = r5;
+    }
+
+    
 }

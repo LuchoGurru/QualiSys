@@ -2,10 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package ar.unsl.qualisys.paneles;
+package ar.unsl.qualisys.paneles.grafo;
 
+import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
 import ar.unsl.qualisys.componentes.QsBarraHerramientas;
-import ar.unsl.qualisys.paneles.QsOperatorsPanel;
+import ar.unsl.qualisys.paneles.grafo.QsOperatorsPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -33,11 +34,10 @@ import javax.swing.SpinnerNumberModel;
  *
  * @author luciano
  */
-public class QsGraphicPanel extends javax.swing.JPanel {
-    private QsOperatorsPanel menuOperadores;
-    private QsDadPanel DAD = new QsDadPanel();
-    //public boolean FLAG;
+public class QsGraphicPanel extends JPanel {
     private QsFrame parent;
+    private QsOperatorsPanel menuOperadores;
+    private QsDadPanel DAD;
     
     /**
      * Creates new form examples
@@ -46,13 +46,14 @@ public class QsGraphicPanel extends javax.swing.JPanel {
         this.parent=parent;
         this.setLayout(new BorderLayout());
         this.setName("GUIPanel");
-        //6this.add(new QsBarraHerramientas(this.parent,null), BorderLayout.NORTH);
+        //this.add(new QsBarraHerramientas(this.parent,null), BorderLayout.NORTH);
 
         //AGREGO LOS 2 PANELES
-        menuOperadores = new QsOperatorsPanel();
-        menuOperadores.setPreferredSize(new Dimension(100,300));
+        this.menuOperadores = new QsOperatorsPanel(this);
+        this.menuOperadores.setPreferredSize(new Dimension(150,300));
 
-        DAD.setBackground(Color.WHITE); 
+        this.DAD = new QsDadPanel(this,menuOperadores);
+        this.DAD.setBackground(Color.WHITE); 
         this.add(menuOperadores,BorderLayout.WEST);
         this.add(DAD ,BorderLayout.CENTER); 
     }
@@ -69,33 +70,21 @@ public class QsGraphicPanel extends javax.swing.JPanel {
         this.DAD.setVariables(mapaDeVariables);
     }
     
-    public void agregarOperadorANulLayout(Point punto,int tipoOperador){ 
-        
-        
-        QsOperator operador = new QsOperator(DAD,DAD.cantOperadores);
-        
+    public void agregarOperadorANulLayout(Point punto,QsOperator modelOperador){ 
+        QsOperator nuevoOperador = new QsOperator(DAD,
+                DAD.cantOperadores,
+                modelOperador.getNombre(),
+                modelOperador.getSymbol(),
+                modelOperador.getD(),
+                modelOperador.getR2(),
+                modelOperador.getR3(),
+                modelOperador.getR4(),
+                modelOperador.getR5());
         QsDadPanel.cantOperadores ++;
-        
         int margin = menuOperadores.getWidth(); 
-        
-        operador.setBounds((int)punto.getX() - margin ,(int)punto.getY(),35,35);
-        
-        switch (tipoOperador) {
-            case 0:
-                operador.setBackground(Color.WHITE);
-                break;
-            case 1:
-                operador.setBackground(Color.GRAY);
-                break;
-            case 2:
-                operador.setBackground(Color.GREEN);
-                break;
-            case 3:
-                operador.setBackground(Color.YELLOW);
-                break;
-        }
-        
-        DAD.addOperator(operador);
+        nuevoOperador.setBounds((int)punto.getX() - margin ,(int)punto.getY(),51,51);
+        nuevoOperador.setBackground(Color.white);
+        DAD.addOperator(nuevoOperador);
         DAD.repaint();
     }
 

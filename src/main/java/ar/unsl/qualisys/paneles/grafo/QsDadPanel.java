@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package ar.unsl.qualisys.paneles;
+package ar.unsl.qualisys.paneles.grafo;
 
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.componentes.nodos.QsOperator;
@@ -50,7 +50,8 @@ import javax.swing.JPopupMenu;
  * ancestral contemporanea y progenitora n't .
  * 
  * Una vez terminado esto rendiré ingles para festejar ! 
- * 
+ *  Ya tengo 25 y medio y todavía no me recibo 
+ * 17/09/23
  * 
  * 
  * 
@@ -74,6 +75,8 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     
     //private ArrayList<QualyOperator> operadores = new ArrayList<>();
     //private ArrayList<QualyVariable> variables = new ArrayList<>();
+    private QsGraphicPanel parent;
+    private QsOperatorsPanel brother;
     private Map<String, QsOperator> operadores = new HashMap<String, QsOperator>();
     
     private Map<String, QsVariable> variables = new HashMap<String, QsVariable>();
@@ -87,8 +90,22 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     // Los operadores que manejamos van a poder recibir de rango un valor y podran ser asignados como dominio de otro operador 
     public static int cantOperadores = 0;
 
-    
-    
+    /**
+     * Constructores 
+     */
+     public QsDadPanel(QsGraphicPanel parent,QsOperatorsPanel brother){    
+        this.setLayout(null);
+        this.parent = parent;
+        this.brother =brother;
+     }    
+
+    public QsGraphicPanel getParent() {
+        return parent;
+    }
+
+    public QsOperatorsPanel getBrother() {
+        return brother;
+    }
     
     public Map<String, QsOperator> getOperadores(){
         return operadores;
@@ -116,10 +133,20 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     }
 
     public void setOperadorSeleccionado(QsOperator operadorSeleccionado) {
+        if(this.operadorSeleccionado!=null)
+            this.operadorSeleccionado.setBorder(null);
         this.operadorSeleccionado = operadorSeleccionado;
         if(this.operadorSeleccionado!=null)
-            this.operadorSeleccionado.setBorder(BorderFactory.createLineBorder(Color.BLACK, 10));
+            this.operadorSeleccionado.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
     }
+    
+    /**
+     * Eliminamos todas las relaciones al nodo actual y las borramos posteriormente borramos al operador
+    
+    public void eliminarOperadorSeleccionado(){
+        
+    }
+     */
     
     /**
      * Pintado del Drag And Drop component:
@@ -170,10 +197,10 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
             for(int i=0;i< hijos.size();i++){
                 QsNodo h = hijos.get(i);
                 if(padreLocation == null){
-                    padreLocation =obtenerPadreLocation(h);
+                    padreLocation = obtenerPadreLocation(h);
                 }
                 //Pinto (x,y) to (x',y')
-                g.drawLine(h.getLocation().x,h.getLocation().y, padreLocation.x,padreLocation.y);
+                g.drawLine(h.getLocation().x,h.getLocation().y+25, padreLocation.x,padreLocation.y+25);
                 
                 System.out.println("X " + (padreLocation.x - h.getLocation().x)/2);
                 System.out.println("Y " + padreLocation.y);
@@ -183,7 +210,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                 g.drawString(""+h.getPonderacion(),h.getLocation().x + (padreLocation.x - h.getLocation().x)/2 ,
                     -5 + h.getLocation().y + (padreLocation.y - h.getLocation().y)/2) ;
                 //Flecha
-                g.fillOval(padreLocation.x-5, padreLocation.y-5, 10, 10);
+                g.fillOval(padreLocation.x-8, padreLocation.y+20, 10, 10);
             }
         }
     }
@@ -199,13 +226,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
      * Lista de Variables 
      * Lista de operadores con Dominio () Flechas  
      */
-    /**
-     * Constructores 
-     */
-     public QsDadPanel(){    
-        this.setLayout(null);
-        
-     }    
+
      /**
       * Chequea si colisiona con algun componente del panel operador o variable
       * @param colisionador
@@ -216,7 +237,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         for(int i=0;i<this.getComponents().length;i++){
             Component c = this.getComponent(i);
             if(colisionador.getBounds().intersects(c.getBounds()) && !colisionador.getName().equals(c.getName())){
-                colisionador.setBackground(Color.blue);
+                //colisionador.setBackground(Color.blue);
                 //System.out.println("COmponente lista"+i+ " asd "+  this.getComponent(i).getLocation().x + " ),(" +  this.getComponent(i).getLocation().y);
                 legal = true;
             }

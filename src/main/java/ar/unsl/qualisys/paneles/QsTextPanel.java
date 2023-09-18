@@ -1,4 +1,4 @@
-package ar.unsl.qualisys.componentes;
+package ar.unsl.qualisys.paneles;
 
 import ar.unsl.qualisys.frames.QsFrame;
 import ar.unsl.qualisys.utils.Item;

@@ -1,6 +1,6 @@
 package ar.unsl.qualisys.componentes.nodos;
 
-import ar.unsl.qualisys.paneles.QsDadPanel;
+import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Popup;
@@ -24,7 +25,7 @@ public class QsVariable extends QsNodo{
         this.GUIParent = parent;
         this.nombre=nombre;
         this.setBounds((int)x,(int)y,50,30);
-        this.setBackground(Color.PINK);
+        this.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         ClickListener clickListener = new ClickListener(this);
         this.addMouseListener(clickListener);
         this.addMouseListener(new MouseAdapter() {
@@ -51,9 +52,8 @@ public class QsVariable extends QsNodo{
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawOval(0, 0, 350, 200);
         String numeracion = this.getName().split("_")[1];
-        g.drawString(numeracion , 10, 10);
+        g.drawString(numeracion , 10, 20);
         
         
     }

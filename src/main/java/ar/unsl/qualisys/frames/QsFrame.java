@@ -1,31 +1,19 @@
 package ar.unsl.qualisys.frames;
  
-import ar.unsl.qualisys.componentes.MaterialTabbed;
-import ar.unsl.qualisys.componentes.QsBarraHerramientas;
+import ar.unsl.qualisys.componentes.QsTabPanel;
 import ar.unsl.qualisys.componentes.QsMenuSuperior;
-import ar.unsl.qualisys.componentes.QsModalPreview;
-import ar.unsl.qualisys.componentes.nodos.QsVariable;
-import ar.unsl.qualisys.paneles.QsDadPanel;
-import ar.unsl.qualisys.paneles.QsTabPanel;
-import ar.unsl.qualisys.componentes.QsTextPanel;
+import ar.unsl.qualisys.paneles.QsTextPanel;
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
-import ar.unsl.qualisys.paneles.QsGraphicPanel;
+import ar.unsl.qualisys.paneles.grafo.QsGraphicPanel;
 import ar.unsl.qualisys.utils.Item;
 import ar.unsl.qualisys.paneles.QsInstanciasPanel;
 import GUIUtils.Chart;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import GUIUtils.ModelChart;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import GUIUtils.Form_Dashboard;
-import GUIUtils.RoundPanel;
-import GUIUtils.Table;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 /**
@@ -41,7 +29,7 @@ public class QsFrame extends JFrame{
     private QsInstanciasPanel tabInstanciado;
     private JPanel tablUtilidades; // Estadisticas TODO Opcion dejar como visual como propuesta de escalabilidad;
     private int indiceActual;
-    private JTabbedPane tabbedPane = new MaterialTabbed();
+    private JTabbedPane tabbedPane = new QsTabPanel();
     
     public ArrayList<Item> g_variables;
     public ArrayList<QsNodo> g_nodos;

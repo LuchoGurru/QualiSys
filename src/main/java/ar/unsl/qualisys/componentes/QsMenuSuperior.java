@@ -4,8 +4,9 @@
  */
 package ar.unsl.qualisys.componentes;
 
+import ar.unsl.qualisys.paneles.QsTextPanel;
 import ar.unsl.qualisys.frames.QsFrame;
-import ar.unsl.qualisys.paneles.QsGraphicPanel;
+import ar.unsl.qualisys.paneles.grafo.QsGraphicPanel;
 import ar.unsl.qualisys.paneles.QsInstanciasPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -49,7 +50,8 @@ import javax.swing.text.StyleConstants;
 import javax.swing.undo.UndoManager;
 
 /**
- *
+ * Contiene el Menu Bar de arriba y 
+ * La Barra de Herramientas
  * @author luciano.gurruchaga
  */
 public class QsMenuSuperior extends JPanel {

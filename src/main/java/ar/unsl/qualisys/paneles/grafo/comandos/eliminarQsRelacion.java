@@ -2,19 +2,19 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package ar.unsl.qualisys.utils;
+package ar.unsl.qualisys.paneles.grafo.comandos;
 
-import ar.unsl.qualisys.paneles.QsDadPanel;
+import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
 
 /**
  *
  * @author luciano.gurruchaga
  */
-public class editarPesoPonderado implements IComando {
-         
+public class eliminarQsRelacion implements IComando{
+     
     QsDadPanel pizzarra;
     
-    public editarPesoPonderado(QsDadPanel pizzarra){
+    public eliminarQsRelacion(QsDadPanel pizzarra){
         this.pizzarra = pizzarra;
         
     }
@@ -27,5 +27,6 @@ public class editarPesoPonderado implements IComando {
         this.pizzarra.setOperadorSeleccionado(null);
         this.pizzarra.repaint();
     }
+    
     
 }
