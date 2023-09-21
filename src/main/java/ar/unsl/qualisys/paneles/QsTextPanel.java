@@ -375,6 +375,7 @@ public class QsTextPanel extends JPanel {
     }
 
     public ArrayList<Item> getVariables(){
+        
         return null;
     }
     

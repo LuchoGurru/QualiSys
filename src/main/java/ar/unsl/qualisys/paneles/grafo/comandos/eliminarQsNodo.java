@@ -28,11 +28,11 @@ public class eliminarQsNodo implements IComando {
         QsOperator opSelec = this.pizzarra.getOperadorSeleccionado();
         if(!opSelec.getPadreID().equals("")){
             ArrayList<QsNodo> hermanos = this.pizzarra.getRelPadreHijos().get(opSelec.getPadreID());
-            for(QsNodo bro : hermanos ){
-                if(bro.getName().equals(opSelec.getName())){
-                    hermanos.remove(bro);
-                }
-            }
+           // for(QsNodo bro : hermanos ){
+          //      if(bro.getName().equals(opSelec.getName())){
+                    hermanos.remove(opSelec); // jeje
+            //    }
+          //  }
         }
         
         String clave = opSelec.getName();
