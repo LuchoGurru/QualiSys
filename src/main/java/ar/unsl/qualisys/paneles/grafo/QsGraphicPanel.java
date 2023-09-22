@@ -4,31 +4,19 @@
  */
 package ar.unsl.qualisys.paneles.grafo;
 
-import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
-import ar.unsl.qualisys.componentes.QsBarraHerramientas;
-import ar.unsl.qualisys.paneles.grafo.QsOperatorsPanel;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import javax.swing.JPanel;
 import ar.unsl.qualisys.componentes.nodos.QsOperator;
 import ar.unsl.qualisys.componentes.nodos.QsVariable;
 import ar.unsl.qualisys.frames.QsFrame;
 import ar.unsl.qualisys.utils.Item;
-import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JMenuBar;
-import javax.swing.JSpinner;
-import javax.swing.JToolBar;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.JScrollPane;
 
 /**
  *
@@ -38,7 +26,7 @@ public class QsGraphicPanel extends JPanel {
     private QsFrame parent;
     private QsOperatorsPanel menuOperadores;
     private QsDadPanel DAD;
-    
+
     /**
      * Creates new form examples
      */
@@ -53,9 +41,13 @@ public class QsGraphicPanel extends JPanel {
         this.menuOperadores.setPreferredSize(new Dimension(150,300));
 
         this.DAD = new QsDadPanel(this,menuOperadores);
+        JScrollPane scroll = new JScrollPane(DAD);
+     //   scroll.setWheelScrollingEnabled(true);
+      //  scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+      //  scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         this.DAD.setBackground(Color.WHITE); 
         this.add(menuOperadores,BorderLayout.WEST);
-        this.add(DAD ,BorderLayout.CENTER); 
+        this.add(scroll ,BorderLayout.CENTER); 
     }
     
     public void setVariables(ArrayList<Item> renglones){

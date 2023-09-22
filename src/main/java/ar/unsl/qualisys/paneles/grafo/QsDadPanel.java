@@ -9,6 +9,7 @@ import ar.unsl.qualisys.componentes.nodos.QsOperator;
 import ar.unsl.qualisys.componentes.nodos.QsVariable;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -85,6 +86,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     
     private QsOperator operadorSeleccionado;
     JPopupMenu menuDesplegable = new JPopupMenu();
+    private Dimension area; //indicates area taken up by graphics
 
 
     // Los operadores que manejamos van a poder recibir de rango un valor y podran ser asignados como dominio de otro operador 
@@ -97,6 +99,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         this.setLayout(null);
         this.parent = parent;
         this.brother =brother;
+        this.area = new Dimension();
      }    
 
     public QsGraphicPanel getParent() {
@@ -141,14 +144,6 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     }
     
     /**
-     * Eliminamos todas las relaciones al nodo actual y las borramos posteriormente borramos al operador
-    
-    public void eliminarOperadorSeleccionado(){
-        
-    }
-     */
-    
-    /**
      * Pintado del Drag And Drop component:
      *      Parametros del constructor : 
      *          Lista de Variables,
@@ -162,28 +157,65 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     @Override
     public void paintComponent(Graphics g) {
         System.out.println("Paint: ");
+        area.width=0;
+        area.height=0;
         super.paintComponent(g);
         this.removeAll();
         pintarVariables(g);
         pintarOperadores(g);
         dibujarLineas(g);
-        // repaint();
+        this.revalidate(); //Let the scroll pane know to update itself and its scrollbars.
+
     }
     
     
     
     private void pintarVariables(Graphics g){
+        boolean changed = false;
         for(QsVariable qv: this.variables.values()){
             System.out.println("qv.getName() = " + qv.getName());
             this.add(qv);
+            // Listo, ahora a ajustar el SCROLL panel
+            //   this.scrollRectToVisible(qo.getBounds());
+            int this_width = (qv.getX() + qv.getWidth());
+            int this_height = (qv.getY() + qv.getHeight());
+            //Update client's preferred size because the area taken up by the graphics has gotten larger or smaller (if cleared).
+            if (this_width > area.width) {
+                area.width = this_width; 
+                changed=true;
+            }
+            if (this_height > area.height) {
+                area.height = this_height; 
+                changed=true;
+            }
+            if (changed) {
+                this.setPreferredSize(new Dimension(this_width, this_height));
+            }
         }
     }
     
     private void pintarOperadores(Graphics g){
         for(QsOperator qo: this.operadores.values()){
+            boolean changed = false;
             System.out.println("qo.getName() = " + qo.getName());
             this.add(qo);
-        }
+            // Listo, ahora a ajustar el SCROLL panel
+            //   this.scrollRectToVisible(qo.getBounds());
+            int this_width = (qo.getX() + qo.getWidth());
+            int this_height = (qo.getY() + qo.getHeight());
+            //Update client's preferred size because the area taken up by the graphics has gotten larger or smaller (if cleared).
+            if (this_width > area.width) {
+                area.width = this_width; 
+                changed=true;
+            }
+            if (this_height > area.height) {
+                area.height = this_height; 
+                changed=true;
+            }
+            if (changed) {
+                this.setPreferredSize(new Dimension(this_width, this_height));
+            }
+        } 
     }
     /**
      * Recorre, anidacion de arreglos.
