@@ -373,9 +373,29 @@ public class QsTextPanel extends JPanel {
         }
         return i==lineas.length-1;
     }
-
+    /**
+     * Devuelve solo los renglones que son Variables de Preferencia
+     * @return 
+     */
     public ArrayList<Item> getVariables(){
-        return null;
+        boolean primero = true;
+        Item anterior=null;
+        ArrayList<Item> rVariables= new ArrayList<>();
+        for(Item renglon : this.renglones){
+            if(primero){
+                anterior = renglon;
+                primero=false;
+                continue;
+            }
+            if(anterior.getNivel() >= renglon.getNivel()){ // Si el nivel actual es el mismo que el anterior entonces el nivel anterior es una variable .
+                rVariables.add(anterior);
+            }//else if(anterior.getNivel() < renglon.getNivel()){// Si el nivel anterior es menor al nivel actual entonces No es variable.
+            anterior = renglon;    
+            //}//else{ // Si el nivel anterior es mayor al nivel actual entonces es una variable
+            //}
+        }
+        rVariables.add(anterior);    //El ultimo nivel es una variable if or if         
+        return rVariables;
     }
     
     
