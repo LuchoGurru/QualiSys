@@ -135,8 +135,21 @@ public class QsTextPanel extends JPanel {
     }
 
     /**
-     * Aumenta la numeracion del item anterior. numeracion anterior es *.*.n
-     *
+     * Reduce la numeracion del item anterior. 
+     * numeracion anterior es *.*.n
+     * @return *.*
+    */
+    private String quitarNivel(Item it) {
+        String[] numeracionAnterior = it.getNumeration().split("\\.");
+        String numeracionDecrementada = "";
+        for (int i = 0; i < numeracionAnterior.length - 1; i++) { // MENOS UNO 
+            numeracionDecrementada += numeracionAnterior[i] + ".";
+        }
+        return numeracionDecrementada;
+    }
+    /**
+     * Aumenta la numeracion del item anterior. 
+     * numeracion anterior es *.*.n
      * @return *.*.n+1
      */
     private String aumentarNumeracion(Item it) {
@@ -153,9 +166,9 @@ public class QsTextPanel extends JPanel {
     }
 
     /**
-     * Aumenta la numeracion del item anterior. numeracion anterior es *.*.n
-     *
-     * @return *.*.n+1
+     * Aumenta la numeracion del item anterior. 
+     * numeracion anterior es *.*.n
+     * @return *.*.n.1
      */
     private String aumentarNivel(Item it) {
         //int numeracion = Integer.parseInt(numeracionAnterior[numeracionAnterior.length - 1 ]) + 1;
@@ -170,25 +183,36 @@ public class QsTextPanel extends JPanel {
         //EVENTOS DE EDICION DE TEXTO . Añado los caret Listeners
         panelDeTexto.addKeyListener(new KeyListener(){
             boolean shiftPressed = false;
+            boolean ctrlPressed = false;
             @Override
             public void keyTyped(KeyEvent ke) {  
             }
 
             @Override
             public void keyPressed(KeyEvent ke) {
-                 if (ke.getKeyCode() == KeyEvent.VK_SHIFT) {
+                if (ke.getKeyCode() == KeyEvent.VK_SHIFT) {
                     shiftPressed = true;
-                }else if (shiftPressed && ke.getKeyCode() == KeyEvent.VK_ENTER) {               
-                         if (TURN_OFF_LISTENERS == false) {
-                            TURN_OFF_LISTENERS = true; 
-                            agregarNivelANumeracion();
-                        } 
-                }else if(ke.getKeyCode() == KeyEvent.VK_ENTER){
+                } else if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
+                    ctrlPressed = true;
+                } else if (ctrlPressed && ke.getKeyCode() == KeyEvent.VK_ENTER) {
+                    int nivelAc = renglonActual.getNivel();
+                    if (nivelAc > 0) {
+                        if (TURN_OFF_LISTENERS == false) {
+                            TURN_OFF_LISTENERS = true;
+                            quitarNivelANumeracion();
+                        }
+                    }
+                } else if (shiftPressed && ke.getKeyCode() == KeyEvent.VK_ENTER) {
+                    if (TURN_OFF_LISTENERS == false) {
+                        TURN_OFF_LISTENERS = true;
+                        agregarNivelANumeracion();
+                    }
+                } else if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
                     ke.consume(); // PARA QUE NO ME TOME EL ENTER, lo hago manual
                     if (TURN_OFF_LISTENERS == false) {
-                            TURN_OFF_LISTENERS = true; 
-                            agregarNumeracionANivel();
-                        }
+                        TURN_OFF_LISTENERS = true;
+                        agregarNumeracionANivel();
+                    }
                 }
             }
 
@@ -196,7 +220,10 @@ public class QsTextPanel extends JPanel {
             public void keyReleased(KeyEvent ke) {
                 if (ke.getKeyCode() == KeyEvent.VK_SHIFT) {
                     shiftPressed = false;
-                }            
+                }
+                if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
+                    ctrlPressed = false;
+                }       
             }
             
         });
@@ -288,16 +315,14 @@ public class QsTextPanel extends JPanel {
     }
 
     private void actualizarEstructuraDeLinea(int lineaActual, String textoLineaActual) {
-        //int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto,panelDeTexto.getCaretPosition());
-        //String textoDeLinea = JTextPaneUtils.getTextoDeLineaByOffset(panelDeTexto,panelDeTexto.getCaretPosition()); // Obtengo el texto de la linea actual
-        if (isRenglonBienFormado(textoLineaActual)) {
+        /*if (isRenglonBienFormado(textoLineaActual)) {
             Item itemActualizado = armarItem(textoLineaActual, lineaActual);
             renglonActual.setCadenaDeTexto(itemActualizado.getCadenaDeTexto());
         } else {
             //escribirlo bien.
             renglonActual.setCadenaDeTexto(textoLineaActual);
         }
-        renglones.add(renglonActual.getNumeroDeLinea(), renglonActual);
+        renglones.add(renglonActual.getNumeroDeLinea(), renglonActual);*/
         TURN_OFF_LISTENERS = false;
     }
 
@@ -310,7 +335,7 @@ public class QsTextPanel extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                String[] arregloDeNiveles = new String[10]; // Permitimos una anidacion maximas de 10 niveles ... sobra para la practica 
+                String[] arregloDeNiveles = new String[100]; // Permitimos una anidacion maximas de 10 niveles ... sobra para la practica 
                 String nuevoTexto = ""; 
                 int caretPosition = panelDeTexto.getCaretPosition();                String texto = panelDeTexto.getText();
                 
@@ -381,6 +406,33 @@ public class QsTextPanel extends JPanel {
 
         });
     } 
+    
+    private void quitarNivelANumeracion() {
+        String texto = panelDeTexto.getText();
+        int caret = panelDeTexto.getCaretPosition();
+        String preCaret = texto.substring(0,caret);
+        String posCaret = texto.substring(caret);
+        String tabs = "";
+        renglonActual.setNivel(renglonActual.getNivel()-1); // LE SACO UN NIVEL
+        renglonActual.setNumeration(quitarNivel(renglonActual));
+        for(int i=0;i<renglonActual.getNivel() ;i++){ // MENOS UN NIVEL
+            tabs +="\t";
+        }
+        String agregado = "\n"+tabs+aumentarNumeracion(renglonActual) + " ";
+        int caretAumentado = caret + agregado.length();
+        System.out.println("texto = " + texto);
+        System.out.println("caret = " + caret);
+        System.out.println("caretAumentado = " + caretAumentado);
+        System.out.println("preCaret = " + preCaret);
+        System.out.println("posCaret = " + posCaret);
+        System.out.println("agregado = " + agregado);
+        System.out.println("preCaret + agregado + posCaret = " + preCaret + agregado + posCaret);
+        //this.setTextoConCaret(preCaret + agregado + posCaret, caretAumentado);
+        panelDeTexto.setText(preCaret + agregado + posCaret);
+        actualizarEstado(0,1);
+        panelDeTexto.setCaretPosition(caretAumentado);
+    }
+    
     private void agregarNumeracionANivel() {
         String texto = panelDeTexto.getText();
         int caret = panelDeTexto.getCaretPosition();
@@ -430,6 +482,7 @@ public class QsTextPanel extends JPanel {
         actualizarEstado(0,1);
         panelDeTexto.setCaretPosition(caretAumentado);
     }
+    
 
     public JTextPane getJTextPanel(){
         return this.panelDeTexto;
