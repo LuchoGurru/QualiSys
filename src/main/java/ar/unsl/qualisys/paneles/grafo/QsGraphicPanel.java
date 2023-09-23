@@ -42,6 +42,7 @@ public class QsGraphicPanel extends JPanel {
 
         this.DAD = new QsDadPanel(this,menuOperadores);
         JScrollPane scroll = new JScrollPane(DAD);
+        
      //   scroll.setWheelScrollingEnabled(true);
       //  scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
       //  scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);

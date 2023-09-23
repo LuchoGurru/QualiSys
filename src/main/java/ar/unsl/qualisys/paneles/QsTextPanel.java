@@ -23,10 +23,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
@@ -165,6 +168,38 @@ public class QsTextPanel extends JPanel {
         Document documento = panelDeTexto.getDocument();
         Set<Integer> pressedKeys = new HashSet<>();
         //EVENTOS DE EDICION DE TEXTO . Añado los caret Listeners
+        panelDeTexto.addKeyListener(new KeyListener(){
+            boolean shiftPressed = false;
+            @Override
+            public void keyTyped(KeyEvent ke) {  
+            }
+
+            @Override
+            public void keyPressed(KeyEvent ke) {
+                 if (ke.getKeyCode() == KeyEvent.VK_SHIFT) {
+                    shiftPressed = true;
+                }else if (shiftPressed && ke.getKeyCode() == KeyEvent.VK_ENTER) {               
+                         if (TURN_OFF_LISTENERS == false) {
+                            TURN_OFF_LISTENERS = true; 
+                            agregarNivelANumeracion();
+                        } 
+                }else if(ke.getKeyCode() == KeyEvent.VK_ENTER){
+                    ke.consume(); // PARA QUE NO ME TOME EL ENTER, lo hago manual
+                    if (TURN_OFF_LISTENERS == false) {
+                            TURN_OFF_LISTENERS = true; 
+                            agregarNumeracionANivel();
+                        }
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent ke) {
+                if (ke.getKeyCode() == KeyEvent.VK_SHIFT) {
+                    shiftPressed = false;
+                }            
+            }
+            
+        });
         documento.addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -194,7 +229,7 @@ public class QsTextPanel extends JPanel {
                 if (TURN_OFF_LISTENERS == false) {
                     TURN_OFF_LISTENERS = true;
                     int lineaAnterior = renglonActual.getNumeroDeLinea(); // inicialmente 0 
-                     int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto,e.getOffset());
+                    int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto,e.getOffset());
                     actualizarEstado(lineaAnterior,lineaNueva);
                 }
             }
@@ -208,7 +243,7 @@ public class QsTextPanel extends JPanel {
             //ACTUALIZA, o inicializa el itemActual by caret
             @Override
             public void caretUpdate(CaretEvent e) {
-                System.out.println("panelDeTexto.getCaretPosition() = " + panelDeTexto.getCaretPosition());
+                //System.out.println("panelDeTexto.getCaretPosition() = " + panelDeTexto.getCaretPosition());
 
                 //System.out.println(panelDeTexto.getText() + "hola");
                 System.out.println(" " + e.getDot() + "ooo" + e.getMark()); // Mark donde empieza la selecion 
@@ -277,12 +312,12 @@ public class QsTextPanel extends JPanel {
             public void run() {
                 String[] arregloDeNiveles = new String[10]; // Permitimos una anidacion maximas de 10 niveles ... sobra para la practica 
                 String nuevoTexto = ""; 
-                int caretPosition = panelDeTexto.getCaretPosition();
-                String texto = panelDeTexto.getText();
+                int caretPosition = panelDeTexto.getCaretPosition();                String texto = panelDeTexto.getText();
+                
                 //si la ultima linea es un /n, agrego espacio en blanco
-                if(texto.lastIndexOf("\n") == texto.length()-1){// osea que no me tomo la ultima linea vacia 
-                    texto+= " "; // para que me tome la ultima linea sino confunde con EOF y da problemas
-                } // Parche grande como una casa 
+                //if(texto.lastIndexOf("\n") == texto.length()-1){// osea que no me tomo la ultima linea vacia 
+                //    texto+= " "; // para que me tome la ultima linea sino confunde con EOF y da problemas
+                //} // Parche grande como una casa 
                 String[] lineas = texto.split("\n"); 
                 renglones = new ArrayList<>();
                 renglonActual = null;
@@ -319,12 +354,25 @@ public class QsTextPanel extends JPanel {
                                 aumentarNumeracion(renglonActual),
                                 lineas[i]);
                     }
+                    /*if(!renglon.getCadenaDeTexto().equals("")){ // Limpio renglones en blanco
+                    }*/
                     nuevoTexto += "\n" + renglon.constructRenglon();
                     renglonActual = renglon;
                     renglones.add(renglonActual);
+                    
                 }
+                
                 panelDeTexto.setText(nuevoTexto); // actualizo el texto
-                panelDeTexto.setCaretPosition(caretPosition);
+                System.out.println("");
+                try{
+                    panelDeTexto.setCaretPosition(caretPosition);
+                }catch(IllegalArgumentException IAE){
+                    System.out.println("KUEKUEKUE");
+                    System.out.println("caretPosition = " + caretPosition);
+                    System.out.println("panelDeTexto.getText().length() = " + panelDeTexto.getText().length());
+                    System.out.println("document.getLength() = " + panelDeTexto.getDocument().getLength());
+                }
+                
                 int pos = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto, caretPosition);
                 renglonActual = renglones.get(pos);
                 //Falta actualizar el caret
@@ -333,27 +381,54 @@ public class QsTextPanel extends JPanel {
 
         });
     } 
-    private void agregarItemANivel(ArrayList<Item> items) {
-        int linea = JTextPaneUtils.getLineNumberByCaret(panelDeTexto) - 1; // le resto uno para contar desde 0.
-        // Aumentar Nivel Actual
-        Item anterior = items.get(linea);
-        String nuevaNumeracion = aumentarNumeracion(anterior);
-        Item siguienteItem = new Item(linea, anterior.getNivel(), nuevaNumeracion, "");
-        //insertStringAtTheEnd(panelDeTexto, "\n" + siguienteItem.constructRenglon());
-        items.add(siguienteItem);
+    private void agregarNumeracionANivel() {
+        String texto = panelDeTexto.getText();
+        int caret = panelDeTexto.getCaretPosition();
+        String preCaret = texto.substring(0,caret);
+        String posCaret = texto.substring(caret);
+        String tabs = "";
+        for(int i=0;i<renglonActual.getNivel();i++){
+            tabs +="\t";
+        }
+        String agregado = "\n"+tabs+aumentarNumeracion(renglonActual) + " ";
+        int caretAumentado = caret + agregado.length();
+        System.out.println("texto = " + texto);
+        System.out.println("caret = " + caret);
+        System.out.println("caretAumentado = " + caretAumentado);
+        System.out.println("preCaret = " + preCaret);
+        System.out.println("posCaret = " + posCaret);
+        System.out.println("agregado = " + agregado);
+        System.out.println("preCaret + agregado + posCaret = " + preCaret + agregado + posCaret);
+        //this.setTextoConCaret(preCaret + agregado + posCaret, caretAumentado);
+        panelDeTexto.setText(preCaret + agregado + posCaret);
+        actualizarEstado(0,1);
+        panelDeTexto.setCaretPosition(caretAumentado);
     }
 
-    private void agregarNivelANumeracion(ArrayList<Item> items) {
-        int linea = JTextPaneUtils.getLineNumberByCaret(panelDeTexto) - 1; // le resto uno para contar desde 0.
-        //Crear anidamiento desde nivel a nuevo nivel 
-        Item anterior = items.get(linea);
-        String nuevaNumeracion = aumentarNivel(anterior);
-        int nivelAumentado = anterior.getNivel() + 1;
-    //    Item siguienteItem = new Item(linea, nivelAumentado, nuevaNumeracion, "",);
-    //    insertStringAtRow
-    //    insertStringAtTheEnd(panelDeTexto, "\n" + siguienteItem.constructRenglon());
-    //    items.add(siguienteItem);
-
+    private void agregarNivelANumeracion() {
+        System.out.println("renglonActual = " + renglonActual.getNumeroDeLinea());
+        //renglonActual.getNivel();
+        String texto = panelDeTexto.getText();
+        int caret = panelDeTexto.getCaretPosition();
+        String preCaret = texto.substring(0,caret);
+        String posCaret = texto.substring(caret);
+        String tabs = "\t";
+        for(int i=0;i<renglonActual.getNivel();i++){
+            tabs +="\t";
+        }
+        String agregado = "\n"+tabs+renglonActual.getNumeration()+"1. ";
+        int caretAumentado = caret + agregado.length();
+        System.out.println("texto = " + texto);
+        System.out.println("caret = " + caret);
+        System.out.println("caretAumentado = " + caretAumentado);
+        System.out.println("preCaret = " + preCaret);
+        System.out.println("posCaret = " + posCaret);
+        System.out.println("agregado = " + agregado);
+        System.out.println("preCaret + agregado + posCaret = " + preCaret + agregado + posCaret);
+        //this.setTextoConCaret(preCaret + agregado + posCaret, caretAumentado);
+        panelDeTexto.setText(preCaret + agregado + posCaret);
+        actualizarEstado(0,1);
+        panelDeTexto.setCaretPosition(caretAumentado);
     }
 
     public JTextPane getJTextPanel(){
@@ -365,6 +440,14 @@ public class QsTextPanel extends JPanel {
         this.panelDeTexto.setText(texto);
         actualizarEstado(0,1);//Le paso lineas distintas para que actualice todo el texto.
     }
+    
+    public void setTextoConCaret(String texto,int caret) {
+        TURN_OFF_LISTENERS = true;
+        this.panelDeTexto.setText(texto);
+        this.panelDeTexto.setCaretPosition(caret);
+        actualizarEstado(0,1);//Le paso lineas distintas para que actualice todo el texto.
+    }
+    
     public boolean isTextoBienFormado(){
         String[] lineas = this.panelDeTexto.getText().split("\n");
         int i=0;

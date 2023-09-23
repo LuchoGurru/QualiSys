@@ -76,7 +76,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     
     //private ArrayList<QualyOperator> operadores = new ArrayList<>();
     //private ArrayList<QualyVariable> variables = new ArrayList<>();
-    private QsGraphicPanel parent;
+    private QsGraphicPanel GUIpadre;
     private QsOperatorsPanel brother;
     private Map<String, QsOperator> operadores = new HashMap<String, QsOperator>();
     
@@ -97,14 +97,12 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
      */
      public QsDadPanel(QsGraphicPanel parent,QsOperatorsPanel brother){    
         this.setLayout(null);
-        this.parent = parent;
+        this.GUIpadre = parent;
         this.brother =brother;
         this.area = new Dimension();
      }    
 
-    public QsGraphicPanel getParent() {
-        return parent;
-    }
+
 
     public QsOperatorsPanel getBrother() {
         return brother;

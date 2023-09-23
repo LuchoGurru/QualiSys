@@ -94,7 +94,7 @@ public class QsOperator extends QsNodo implements QsOperacion{
         System.out.println("\ne.getButton() = " + e.getPoint()+"\n");
        if(this.getGUIParent()!= null ){ // Verdadero si esta en DandD
             Rectangle oldPosition = this.getBounds(); // Guardo la posision inicial
-            this.setBounds(this.getBounds().getLocation().x+ e.getX() -170, //para centrar el mouse y sacar el margin
+            this.setBounds(this.getBounds().getLocation().x+ e.getX() - 50, //para centrar el mouse y sacar el margin
                                  this.getBounds().getLocation().y + e.getY() -20 , //para centrar el mouse
                                 51, 51);
             if (!GUIParent.isColision(this)) { 

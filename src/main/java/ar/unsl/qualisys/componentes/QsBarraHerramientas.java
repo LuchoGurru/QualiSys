@@ -15,6 +15,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -89,6 +91,28 @@ public class QsBarraHerramientas extends JToolBar{
         centrado.setText("Centrado");
         fuente.setSelectedIndex(15);
 
+ 
+        JTextPane panelDeTexto = tabTexto.getJTextPanel();
+        panelDeTexto.addKeyListener(new KeyListener(){
+            @Override
+            public void keyTyped(KeyEvent ke) {
+                
+            }
+
+            @Override
+            public void keyPressed(KeyEvent ke) { 
+                if(ke.getKeyCode() == KeyEvent.VK_F5) {
+                    actualizar.doClick();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent ke) {
+                //hrow new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            }
+            
+        });
+        
         //onFocus Texto
         nuevo.setToolTipText("Nuevo Archivo");
         abrir.setToolTipText("Abrir Archivo");
@@ -137,7 +161,8 @@ public class QsBarraHerramientas extends JToolBar{
         actualizar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                tabTexto.setTexto(tabTexto.getJTextPanel().getText());// El setTexto llama ala ctualizar  estado
+                int caretPosition = tabTexto.getJTextPanel().getCaretPosition();
+                tabTexto.setTextoConCaret(tabTexto.getJTextPanel().getText(),caretPosition);// El setTexto llama ala ctualizar  estado
             }
         }
         );
