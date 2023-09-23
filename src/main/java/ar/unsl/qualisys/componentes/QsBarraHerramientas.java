@@ -8,6 +8,7 @@ import ar.unsl.qualisys.paneles.QsTextPanel;
 import ar.unsl.qualisys.frames.QsFrame;
 import ar.unsl.qualisys.paneles.grafo.QsGraphicPanel;
 import ar.unsl.qualisys.paneles.QsInstanciasPanel;
+import ar.unsl.qualisys.utils.Item;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GraphicsEnvironment;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
@@ -51,15 +53,15 @@ public class QsBarraHerramientas extends JToolBar{
     // Rest of the code for your JPanel
     
     
-    protected QsFrame parent;
+    protected QsFrame ventana; // Ventana Principal
     private QsTextPanel tabTexto; // panel donde se forma la estructura de variables
     private QsGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
     private QsInstanciasPanel tabInstanciado;
     
     
     
-    public QsBarraHerramientas(QsFrame parentt,QsTextPanel tabText,QsGraphicPanel tabGrafic,QsInstanciasPanel tabInstancias){//[Mostrar resultados en el panel de instancias todo junto],JPanel panelDeResultados) {
-        this.parent = parentt;
+    public QsBarraHerramientas(QsFrame ventana,QsTextPanel tabText,QsGraphicPanel tabGrafic,QsInstanciasPanel tabInstancias){//[Mostrar resultados en el panel de instancias todo junto],JPanel panelDeResultados) {
+        this.ventana = ventana;
         this.tabTexto = tabText; // panel donde se forma la estructura de variables
         this.tabGrafico = tabGrafic;
         this.tabInstanciado = tabInstancias;
@@ -230,22 +232,35 @@ public class QsBarraHerramientas extends JToolBar{
      
         
     public void mostrarPanelGrafico(int pagina){
-        parent.setTURN_OFF_LISTENERS(true);         
-        parent.getTabbedPane().setSelectedIndex(pagina);
-        parent.setIndiceActual(pagina);
-        parent.setTURN_OFF_LISTENERS(false); 
-        parent.initPanelGrafico();
+        ventana.setTURN_OFF_LISTENERS(true);         
+        ventana.getTabbedPane().setSelectedIndex(pagina);
+        ventana.setIndiceActual(pagina);
+        ventana.setTURN_OFF_LISTENERS(false); 
+        ventana.initPanelGrafico();
+    }
+    
+    /**
+     * 
+    */
+    public String getTextoVariables(){
+       ArrayList<Item> variables = this.tabTexto.getVariables();
+       String textoVar="";
+       for(Item v : variables){
+           textoVar += v.constructRenglon() + "\n";
+       }
+        return textoVar;
     }
     
     public void manejarCambioDePagina(int pagina){
         switch(pagina){
             case 1:{
                 if(tabTexto.isTextoBienFormado()){
-                    QsModalPreview  hijo = new QsModalPreview(parent,this,"Vista Previa: VARIABLES A GRAFICAR.",true);
-                    hijo.setjTextoPane1(tabTexto.getJTextPanel().getText());
-                    hijo.setVisible(true);
+                    QsVistaPreviaModal modal = new QsVistaPreviaModal(ventana,this,"Vista Previa:",true);
+                    getTextoVariables();
+                    modal.setTextoPane1(this.getTextoVariables());
+                    modal.setVisible(true);
                 }else{
-                    parent.getTabbedPane().setSelectedIndex(0);
+                    ventana.getTabbedPane().setSelectedIndex(0);
                     JOptionPane.showConfirmDialog(this, "El listado de variables no esta bien formado");
                 }
                 break;
@@ -268,19 +283,19 @@ public class QsBarraHerramientas extends JToolBar{
         } 
     }
     private void retrocederTab(){
-       parent.setTURN_OFF_LISTENERS(true);         
+       ventana.setTURN_OFF_LISTENERS(true);         
        // SET READ ONLY 
-       int anterior = parent.getIndiceActual() - 1;
+       int anterior = ventana.getIndiceActual() - 1;
        if(anterior>-1){
-           parent.getTabbedPane().setSelectedIndex(anterior);
-           parent.setIndiceActual(anterior);
+           ventana.getTabbedPane().setSelectedIndex(anterior);
+           ventana.setIndiceActual(anterior);
        }
-       parent.setTURN_OFF_LISTENERS(false);
+       ventana.setTURN_OFF_LISTENERS(false);
     }
     
     private void avanzarTab(){
-        int siguiente = parent.getIndiceActual() + 1;
-        int cantidadTabs = parent.getTabbedPane().getTabCount();
+        int siguiente = ventana.getIndiceActual() + 1;
+        int cantidadTabs = ventana.getTabbedPane().getTabCount();
         if(siguiente<cantidadTabs){
             manejarCambioDePagina(siguiente);
         }

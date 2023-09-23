@@ -6,6 +6,7 @@ package ar.unsl.qualisys.componentes;
 
 import ar.unsl.qualisys.frames.QsFrame;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -15,17 +16,19 @@ import javax.swing.JTextPane;
  *
  * @author luciano.gurruchaga
  */
-public class QsModalPreview  extends JDialog {
+public class QsVistaPreviaModal  extends JDialog {
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextPane jTextPane1;
-    private QsBarraHerramientas parent;
+    private javax.swing.JTextPane panelTexto;
+    private QsBarraHerramientas GUIpadre;
     private JDialog este;
-    public QsModalPreview(QsFrame frame, QsBarraHerramientas parent,String titulo, boolean modal) {
+    
+    public QsVistaPreviaModal(QsFrame frame, QsBarraHerramientas GUIpadre,String titulo, boolean modal) {
         super(frame,titulo, modal);
         this.setLayout(new BorderLayout());
-        this.parent = parent;
+        this.GUIpadre = GUIpadre;
         this.este = this;
         initComponents();
+        //Seteo El texto
     }
     
     private void initComponents() {
@@ -33,33 +36,33 @@ public class QsModalPreview  extends JDialog {
         JLabel jLabel1 = new JLabel();
         JButton jButton1 = new JButton();
         jButton1 = new javax.swing.JButton();
-        jLabel1.setText("Vista Previa: Estas son las variables a graficar.");
-
+        jLabel1.setText("            ESTAS SON TUS VARIABLES.");
+        jLabel1.setBackground(Color.yellow);
         jButton1.setText("Aceptar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                parent.mostrarPanelGrafico(1);
+                GUIpadre.mostrarPanelGrafico(1);
                 este.dispose();
             }
         });
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextPane1 = new javax.swing.JTextPane();
+        panelTexto = new javax.swing.JTextPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jTextPane1.setEditable(false);
-        jScrollPane1.setViewportView(jTextPane1);
-       // this.add(jLabel1,BorderLayout.NORTH);
+        panelTexto.setEditable(false);
+        jScrollPane1.setViewportView(panelTexto);
+        this.add(jLabel1,BorderLayout.NORTH);
         this.add(jScrollPane1,BorderLayout.CENTER);
         this.add(jButton1,BorderLayout.SOUTH);
-        
     }
     
-    public JTextPane getjTextPane1() {
-        return jTextPane1;
+    
+    public JTextPane getTextoPanel() {
+        return panelTexto;
     }
 
-    public void setjTextoPane1(String jTextPane1) {
-        this.jTextPane1.setText(jTextPane1);
+    public void setTextoPane1(String texto) {
+        this.panelTexto.setText(texto);
     }
 }

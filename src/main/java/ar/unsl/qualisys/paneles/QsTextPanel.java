@@ -520,7 +520,7 @@ public class QsTextPanel extends JPanel {
         for(Item renglon : this.renglones){
             if(primero){
                 anterior = renglon;
-                primero=false;
+                primero = false;
                 continue;
             }
             if(anterior.getNivel() >= renglon.getNivel()){ // Si el nivel actual es el mismo que el anterior entonces el nivel anterior es una variable .

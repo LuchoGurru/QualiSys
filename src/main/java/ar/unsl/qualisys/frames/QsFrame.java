@@ -113,8 +113,7 @@ public class QsFrame extends JFrame{
     public void initPanelGrafico(){
         if(tabTexto.isTextoBienFormado()){
             
-            
-            this.tabGrafico.setVariables(tabTexto.getRenglones()); 
+            this.tabGrafico.setVariables(tabTexto.getVariables()); 
         }
     }
 
