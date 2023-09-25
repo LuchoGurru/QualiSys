@@ -337,7 +337,8 @@ public class QsTextPanel extends JPanel {
             public void run() {
                 String[] arregloDeNiveles = new String[100]; // Permitimos una anidacion maximas de 10 niveles ... sobra para la practica 
                 String nuevoTexto = ""; 
-                int caretPosition = panelDeTexto.getCaretPosition();                String texto = panelDeTexto.getText();
+                int caretPosition = panelDeTexto.getCaretPosition();
+                String texto = panelDeTexto.getText();
                 
                 //si la ultima linea es un /n, agrego espacio en blanco
                 //if(texto.lastIndexOf("\n") == texto.length()-1){// osea que no me tomo la ultima linea vacia 

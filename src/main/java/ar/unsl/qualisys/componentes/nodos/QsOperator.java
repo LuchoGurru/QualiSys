@@ -3,7 +3,9 @@ package ar.unsl.qualisys.componentes.nodos;
 import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
 import ar.unsl.qualisys.paneles.grafo.QsOperatorsPanel;
 import ar.unsl.qualisys.paneles.grafo.comandos.cambiarOperador;
+import ar.unsl.qualisys.paneles.grafo.comandos.editarPesoPonderado;
 import ar.unsl.qualisys.paneles.grafo.comandos.eliminarQsNodo;
+import ar.unsl.qualisys.paneles.grafo.comandos.eliminarQsRelacion;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -65,7 +67,8 @@ public class QsOperator extends QsNodo implements QsOperacion{
         this.addMouseListener(clickListener);
         DragListener dragListener = new DragListener();
         this.addMouseMotionListener(dragListener);
-        
+        this.setToolTipText(this.nombre);
+
     } 
     
     @Override
@@ -94,7 +97,7 @@ public class QsOperator extends QsNodo implements QsOperacion{
         System.out.println("\ne.getButton() = " + e.getPoint()+"\n");
        if(this.getGUIParent()!= null ){ // Verdadero si esta en DandD
             Rectangle oldPosition = this.getBounds(); // Guardo la posision inicial
-            this.setBounds(this.getBounds().getLocation().x+ e.getX() - 50, //para centrar el mouse y sacar el margin
+            this.setBounds(this.getBounds().getLocation().x+ e.getX() - 20, //para centrar el mouse y sacar el margin
                                  this.getBounds().getLocation().y + e.getY() -20 , //para centrar el mouse
                                 51, 51);
             if (!GUIParent.isColision(this)) { 
@@ -191,7 +194,7 @@ public class QsOperator extends QsNodo implements QsOperacion{
         public void mousePressed(MouseEvent evt){
             //.setBorder(BorderFactory.createLineBorder(Color.BLACK, 10));
             if(GUIParent!=null)
-                GUIParent.setOperadorSeleccionado(this.qsOpInstance);
+                GUIParent.setNodoSeleccionado(this.qsOpInstance);
         }
         public void mouseReleased(MouseEvent e){
             determinarAccionReleased(e); 
@@ -225,6 +228,20 @@ public class QsOperator extends QsNodo implements QsOperacion{
             @Override
             public void actionPerformed(ActionEvent e) {
                 new eliminarQsNodo(GUIParent).ejecutar();
+            }
+        });
+        
+        eliminarRel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new eliminarQsRelacion(GUIParent).ejecutar();
+            }
+        });
+        
+       setPonderación.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new editarPesoPonderado(GUIParent).ejecutar();
             }
         });
       

@@ -7,7 +7,7 @@ package ar.unsl.qualisys.componentes;
 import ar.unsl.qualisys.paneles.QsTextPanel;
 import ar.unsl.qualisys.frames.QsFrame;
 import ar.unsl.qualisys.paneles.grafo.QsGraphicPanel;
-import ar.unsl.qualisys.paneles.QsInstanciasPanel;
+import ar.unsl.qualisys.paneles.QsEvaluacionPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GradientPaint;
@@ -60,9 +60,9 @@ public class QsMenuSuperior extends JPanel {
     private QsFrame parent;
     private QsTextPanel tabTexto; 
     private QsGraphicPanel tabGrafico; 
-    private QsInstanciasPanel tabInstanciado;
+    private QsEvaluacionPanel tabInstanciado;
     
-    public QsMenuSuperior (QsFrame parent, QsTextPanel tabTexto,QsGraphicPanel tabGrafico, QsInstanciasPanel tabInstanciado){
+    public QsMenuSuperior (QsFrame parent, QsTextPanel tabTexto,QsGraphicPanel tabGrafico, QsEvaluacionPanel tabInstanciado){
         this.setLayout(new BorderLayout());
         this.setBackground(Color.decode("#F09757"));
         barraDeMenu();

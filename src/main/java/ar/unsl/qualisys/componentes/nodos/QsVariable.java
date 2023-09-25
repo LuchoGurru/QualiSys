@@ -1,54 +1,45 @@
 package ar.unsl.qualisys.componentes.nodos;
 
 import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
+import ar.unsl.qualisys.paneles.grafo.comandos.cambiarOperador;
+import ar.unsl.qualisys.paneles.grafo.comandos.editarPesoPonderado;
+import ar.unsl.qualisys.paneles.grafo.comandos.eliminarQsNodo;
+import ar.unsl.qualisys.paneles.grafo.comandos.eliminarQsRelacion;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.Popup;
-import javax.swing.PopupFactory;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+
 public class QsVariable extends QsNodo{
     String nombre;
     String nombreGrupo;// Categoría de la variable 
     private QsDadPanel GUIParent; // Solo se asigna en caso de que sea hijo del componente DAD (Drag and Drop).
-    private Popup popup;
+    private JPopupMenu menuDesplegable = new JPopupMenu();
+
     public QsVariable (QsDadPanel parent, double x, double y,String id,String nombre){
+        this.menuPopUp();
         this.setName("var_" + id); 
-        this.setToolTipText("Variable A Evaluar");
         this.GUIParent = parent;
         this.nombre=nombre;
         this.setBounds((int)x,(int)y,50,30);
         this.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         ClickListener clickListener = new ClickListener(this);
         this.addMouseListener(clickListener);
-        this.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                if (popup != null) {
-                    popup.hide();
-                }
-                JLabel text = new JLabel("You've clicked at: " + e.getPoint());
-                popup = PopupFactory.getSharedInstance().getPopup(e.getComponent(), text, e.getXOnScreen(), e.getYOnScreen());
-                popup.show();
-            }
-            @Override
-                public void mouseExited(MouseEvent e) {
-                    popup.hide(); 
-                }
-        });
+        this.setToolTipText(this.nombre);
     }
 
     /*                                                     *
      *  -------------------- GUI WORK ---------------------* 
      *                                                     */
-
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -57,8 +48,32 @@ public class QsVariable extends QsNodo{
         
         
     }
+        public void menuPopUp(){
+        JMenuItem eliminarRel = new JMenuItem("Eliminar relación");
+        JMenuItem setPonderación = new JMenuItem("Editar ponderación");
+        
+        eliminarRel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new eliminarQsRelacion(GUIParent).ejecutar();
+            }
+        });
+        
+       setPonderación.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new editarPesoPonderado(GUIParent).ejecutar();
+            }
+        });
+      
+        
+        menuDesplegable.add(eliminarRel);
+        menuDesplegable.add(setPonderación);
+        
+        this.setComponentPopupMenu(menuDesplegable);
+    }
     
-       /**
+    /**
     * EL evento toma el punto relativo de el arrastrado del mouse.
     * Ajusto las coordenadas sumandoles la posicion del componente para enviar 
     * la posision absoluta en el panel DAndD
@@ -97,7 +112,7 @@ public class QsVariable extends QsNodo{
         public void mousePressed(MouseEvent evt){
             //.setBorder(BorderFactory.createLineBorder(Color.BLACK, 10));
             //if(GUIParent!=null)
-             //   GUIParent.setOperadorSeleccionado(this.qsVarInstance);
+               GUIParent.setNodoSeleccionado(this.qsVarInstance);
         }
         public void mouseReleased(MouseEvent e){
             accionSoltar(e); 

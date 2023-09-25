@@ -54,7 +54,7 @@ public class cambiarOperador implements IComando {
                 JOptionPane.PLAIN_MESSAGE, null, possibilities, "Numbers");  
         System.out.println("ii = " + simbolo);
         QsOperator opNuevo = pizzarra.getBrother().getOperadorBySymbol().get(simbolo);
-        QsOperator opSelec = pizzarra.getOperadorSeleccionado();
+        QsOperator opSelec = (QsOperator) pizzarra.getNodoSeleccionado();
         opSelec.setNombre(opNuevo.getNombre());
         opSelec.setSymbol(opNuevo.getSymbol());        
         opSelec.setD(opNuevo.getD());

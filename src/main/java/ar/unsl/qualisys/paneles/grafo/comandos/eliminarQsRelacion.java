@@ -4,7 +4,10 @@
  */
 package ar.unsl.qualisys.paneles.grafo.comandos;
 
+import ar.unsl.qualisys.componentes.nodos.QsNodo;
+import ar.unsl.qualisys.componentes.nodos.QsOperator;
 import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
+import java.util.ArrayList;
 
 /**
  *
@@ -20,12 +23,13 @@ public class eliminarQsRelacion implements IComando{
     }
     @Override
     public void ejecutar() {
-        System.out.println("this.pizzarra.getOperadores() = " + this.pizzarra.getOperadores().values());
-        this.pizzarra.getOperadores().get(this.pizzarra.getOperadorSeleccionado().getName());
-        this.pizzarra.getOperadores().get(this.pizzarra.getOperadorSeleccionado().getName());
-        System.out.println("this.pizzarra.getOperadores() = " + this.pizzarra.getOperadores().values());
-        this.pizzarra.setOperadorSeleccionado(null);
-        this.pizzarra.repaint();
+        QsNodo nodoSelec = this.pizzarra.getNodoSeleccionado();
+        String padre = nodoSelec.getPadreID();
+        if(!padre.equals("")){ // Si tenia padre (DEBERIA)
+            ArrayList<QsNodo> hermanos = this.pizzarra.getRelPadreHijos().get(padre);
+            hermanos.remove(nodoSelec); // jeje
+        }
+        this.pizzarra.repaint(); // Repaint 
     }
     
     

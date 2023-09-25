@@ -19,7 +19,7 @@ import java.util.HashMap;
 import javax.swing.JScrollPane;
 
 /**
- *
+ * Hacer el codigo de 
  * @author luciano
  */
 public class QsGraphicPanel extends JPanel {
@@ -75,7 +75,7 @@ public class QsGraphicPanel extends JPanel {
                 modelOperador.getR5());
         QsDadPanel.cantOperadores ++;
         int margin = menuOperadores.getWidth(); 
-        nuevoOperador.setBounds((int)punto.getX() - margin ,(int)punto.getY(),51,51);
+        nuevoOperador.setBounds((int)punto.getX() - margin -20,(int)punto.getY()-20,51,51);
         nuevoOperador.setBackground(Color.white);
         DAD.addOperator(nuevoOperador);
         DAD.repaint();

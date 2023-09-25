@@ -6,7 +6,7 @@ import ar.unsl.qualisys.paneles.QsTextPanel;
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.paneles.grafo.QsGraphicPanel;
 import ar.unsl.qualisys.utils.Item;
-import ar.unsl.qualisys.paneles.QsInstanciasPanel;
+import ar.unsl.qualisys.paneles.QsEvaluacionPanel;
 import GUIUtils.Chart;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -27,7 +27,7 @@ public class QsFrame extends JFrame{
     
     private QsTextPanel tabTexto; // panel donde se forma la estructura de variables
     private QsGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
-    private QsInstanciasPanel tabModelos;
+    private QsEvaluacionPanel tabModelos; // panel donde se asignan valores a las variables de distintos modelos LPS en particular
     private JPanel tablUtilidades; // Estadisticas TODO Opcion dejar como visual como propuesta de escalabilidad;
     private int indiceActual;
     private JTabbedPane tabbedPane = new QsTabPanel();
@@ -49,7 +49,7 @@ public class QsFrame extends JFrame{
         this.setLayout(new BorderLayout());
         tabTexto = new QsTextPanel(this);
         tabGrafico = new QsGraphicPanel(this);
-        tabModelos = new QsInstanciasPanel(this);
+        tabModelos = new QsEvaluacionPanel(this);
         this.add(new QsMenuSuperior(this,tabTexto,tabGrafico,tabModelos),BorderLayout.NORTH);  // PARA ABRIR Y CERRAR ARCHIVO
         tabbedPane.addTab("Variables de Preferencia", tabTexto);
         tabbedPane.addTab("Árbol ", tabGrafico);

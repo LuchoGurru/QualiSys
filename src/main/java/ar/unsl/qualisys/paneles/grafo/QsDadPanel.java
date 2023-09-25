@@ -84,7 +84,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     
     private Map<String, ArrayList<QsNodo>> relPadreHijos = new HashMap<String, ArrayList<QsNodo>>();
     
-    private QsOperator operadorSeleccionado;
+    private QsNodo nodoSeleccionado;
     JPopupMenu menuDesplegable = new JPopupMenu();
     private Dimension area; //indicates area taken up by graphics
 
@@ -129,16 +129,16 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         this.repaint();
     }
 
-    public QsOperator getOperadorSeleccionado() {
-        return operadorSeleccionado;
+    public QsNodo getNodoSeleccionado() {
+        return nodoSeleccionado;
     }
 
-    public void setOperadorSeleccionado(QsOperator operadorSeleccionado) {
-        if(this.operadorSeleccionado!=null)
-            this.operadorSeleccionado.setBorder(null);
-        this.operadorSeleccionado = operadorSeleccionado;
-        if(this.operadorSeleccionado!=null)
-            this.operadorSeleccionado.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+    public void setNodoSeleccionado(QsNodo nodoSeleccionado) {
+        if(this.nodoSeleccionado!=null)
+            this.nodoSeleccionado.setBorder(null);
+        this.nodoSeleccionado = nodoSeleccionado;
+        if(this.nodoSeleccionado!=null)
+            this.nodoSeleccionado.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
     }
     
     /**
@@ -282,20 +282,20 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         }
         return null;
     }
-    private boolean isVariable(JPanel var){
+    private boolean isVariable(QsNodo var){
         return var.getClass() == QsVariable.class;
     }
-    private QsVariable getVariable(JPanel var){
+    private QsVariable getVariable(QsNodo var){
         return (QsVariable) var;
     }  
-    private QsOperator getOperator(JPanel var){
+    private QsOperator getOperator(QsNodo var){
         return (QsOperator) var;
     }   
-    private boolean isGoodPonder(String s,String padre){
+    private boolean isGoodPonder(QsNodo hijo, String valor,String padre){
         boolean isGood = true;
         Float ponderValue = 0f;
         try{
-            ponderValue = Float.parseFloat(s);
+            ponderValue = Float.parseFloat(valor);
         }catch(NumberFormatException nex){
             JOptionPane.showMessageDialog(this,"Debe ingresar un valor real.");
             isGood = false;
@@ -307,27 +307,66 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         }else{
             Float ponderacionTotal = ponderValue;
             for(QsNodo n: this.relPadreHijos.get(padre)){
-                ponderacionTotal += n.getPonderacion();
-                if(ponderacionTotal > 1 ){
-                    JOptionPane.showMessageDialog(this,"La suma total de los pesos del dominio de un operador debe ser igual a 1.");
-                    isGood = false;
-                    break;
-                }
+                if(!n.getName().equals(hijo.getName())){ // No se suma asi mismo
+                    ponderacionTotal += n.getPonderacion();
+                    if(ponderacionTotal > 1 ){
+                        JOptionPane.showMessageDialog(this,"La suma total de los pesos del dominio de un operador debe ser igual a 1.");
+                        isGood = false;
+                        break;
+                    }
+                } 
             }
         }
         return isGood;
     }
-    private void setPonderValue(QsNodo hijo, QsNodo padre) {
-        String s;
+    
+    /** 
+     * @return 100/Cantidad de hijos
+     */
+    private float getPonderacionBalanceada(int cantHijos){
+        float balanceo = 1f/(float)cantHijos;
+        System.out.println("cantHijos = " + cantHijos);
+        System.out.println("balanceo = " + balanceo);
+        return balanceo;
+    }
+    
+    /**
+     * Actualiza todos las ponderaciones de los hermanos del padre
+     * @param padre 
+     */
+    private void updatePonderValue(QsNodo padre) {
+        ArrayList<QsNodo> hermanos=this.relPadreHijos.get(padre.getName());
+        
+        float balanceo = getPonderacionBalanceada(hermanos.size());
+        for(QsNodo h :hermanos){
+            h.setPonderacion(balanceo);
+        }
         // create a dialog Box
-        do {
+/*        do {
             s = JOptionPane.showInputDialog(
                     this,
                     "Selecciona el peso deseado de la relación (recuerda que la suma de los pesos tiene que ser igual a 1).",
                     1f);
         } while (!isGoodPonder(s, padre.getName()));
+*/
+       //hijo.setPonderacion(Float.valueOf(s));
+    }
+    
+        /**
+     * Actualiza todos las ponderaciones de los hermanos del padre
+     * @param padre 
+     */
+    public void setPonderValue(QsNodo hijo, String padre) {
+        // create a dialog Box
+        String valor;
+        do {
+            valor = JOptionPane.showInputDialog(
+                    this,
+                    "Selecciona el peso deseado de la relación (recuerda que la suma de los pesos tiene que ser igual a 1).",
+                    1f);
+        } while (!isGoodPonder(hijo,valor, padre));
 
-        hijo.setPonderacion(Float.valueOf(s));
+       hijo.setPonderacion(Float.valueOf(valor));
     }
     /**
      * Sí el hijo puede ser dominiio ... 
@@ -341,7 +380,6 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         QsOperator operadorPadre = (QsOperator) this.getComponentAt(padreLocation) ;
         if(canBeDomain(hijoCandidato,operadorPadre)){
 
-            this.setPonderValue(hijoCandidato,operadorPadre); 
             
             if(isVariable(hijoCandidato)){
                 QsVariable var_candidato = (QsVariable) hijoCandidato;
@@ -362,12 +400,16 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
      * @param posX
      * @param posY
      */
-    public boolean canBeDomain(JPanel hijoCandidato, QsOperator padreAdoptivo){
+    public boolean canBeDomain(QsNodo hijoCandidato, QsOperator padreAdoptivo){
         boolean allow=true;
         if(padreAdoptivo != null){//OK
+            
             if(!isVariable(hijoCandidato)){// es un operador ... 
                 QsOperator op_candidato = getOperator(hijoCandidato);
-                if(!padreAdoptivo.getPadreID().equals("")){ //operador con padre
+                if(this.relPadreHijos.get(padreAdoptivo.getName()).size() >= 5){
+                    allow=false;
+                }
+                if(allow && !padreAdoptivo.getPadreID().equals("")){ //operador con padre
                     System.out.println("operador con padre");
                     if(!noCicles(op_candidato,padreAdoptivo)){
                         System.out.println("no podes ser parte de este dominio por que formaras un ciclo");
@@ -379,8 +421,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                         // actualizarArbolGenealogico(op_candidato,op_candidato.getPadreID(),padreAdoptivo.getName());
                     }else{
                         System.out.println("!noCicles means that no hay cicles");
-                    }
-                    
+                    }    
                 }
             }
         }else{
@@ -439,19 +480,32 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                     break;
                 }
             }
+            if(!hermanosViejos.isEmpty()){
+                updatePonderValue(this.operadores.get(padreViejo));
+            }
         }  
-        //Despues
-        ArrayList<QsNodo> hermanosNuevos = this.relPadreHijos.get(padreNuevo);
-        hermanosNuevos.add(adoptado); 
+ 
+        
+        
+        if(!padreNuevo.equals("")){ // Si es una eliminacion no hay padre nuevo
+            //Despues
+            ArrayList<QsNodo> hermanosNuevos = this.relPadreHijos.get(padreNuevo);
+            hermanosNuevos.add(adoptado); 
+            this.updatePonderValue(this.operadores.get(padreNuevo)); //Actualizo los nuevos hermanos
+
+        }
     }
-    
+    public void ponderadoAutomatico(){
+        
+    }
+     
     /**
      * Árbol Bien Formado : means, a imaginary tree. In wich the  leaves are variables and the root its an operator wich no father. Or a symbolic Father.
      * Todas las hojas tienen padre y ningun hijo.
      * Todos los nodos operadores - root tienen a lo más 5 hijos y minimo 2 excepto root que tiene a lo mas 5 hijos y ningun padre.
      * Ningun nodo puede ser hijo de algun descendiente.
     */
-    public boolean isArbolBienFormado(){
+    public boolean isArbolBienFormado(){//HACER LO MISMO CON EL TEXTO
         //THere is cicles ? 
         // All variables HAve one father ? 
         // All operators are ¨2,5* domain 
@@ -475,14 +529,17 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                 }
             }
             if(bienFormado)
-                bienFormado = onlyOneRoot > 0;
+                bienFormado = onlyOneRoot > 0;//tampoco puede estar vacia
         }
         if(bienFormado){
             for(String padreID : this.relPadreHijos.keySet()){
-             //   if (this.relPadreHijos.get(padreID).size() < 2 || > 5 ) { aca tengo uqe jajaja me qcague de miedo,
-           //             tengo que agarrar todos que tengan entre el r ango pero con la raiz no o con las variables no jaja si es != var si sino no
-                    
-               // }
+                if (this.relPadreHijos.get(padreID).size() < 2 || this.relPadreHijos.get(padreID).size() > 5 ) {// aca tengo uqe jajaja me qcague de miedo,
+                     bienFormado = false;
+                }
+                
+            //   if (this.relPadreHijos.get(padreID).size() < 2 || > 5 ) { aca tengo uqe jajaja me qcague de miedo,
+            //             tengo que agarrar todos que tengan entre el r ango pero con la raiz no o con las variables no jaja si es != var si sino no        
+            // }
             }
         }
         

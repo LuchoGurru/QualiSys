@@ -16,12 +16,12 @@ import java.util.ArrayList;
  *
  * @author luciano.gurruchaga
  */
-public class QsInstanciasPanel extends javax.swing.JPanel {
+public class QsEvaluacionPanel extends javax.swing.JPanel {
     private ArrayList<QsVariable> vars;
     /**
      * Creates new form ValorInstancias
      */
-    public QsInstanciasPanel(JFrame parent) {
+    public QsEvaluacionPanel(JFrame parent) {
         initComponents();
         TableCustom.apply(jScrollPane1, TableCustom.TableType.MULTI_LINE);
         testData(jTable1);
@@ -34,6 +34,7 @@ public class QsInstanciasPanel extends javax.swing.JPanel {
 
     public void setVars(ArrayList<QsVariable> vars) {
         this.vars = vars;
+        this.repaint();
     }
     
     private void testData(JTable table) {

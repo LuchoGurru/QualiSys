@@ -7,7 +7,7 @@ package ar.unsl.qualisys.componentes;
 import ar.unsl.qualisys.paneles.QsTextPanel;
 import ar.unsl.qualisys.frames.QsFrame;
 import ar.unsl.qualisys.paneles.grafo.QsGraphicPanel;
-import ar.unsl.qualisys.paneles.QsInstanciasPanel;
+import ar.unsl.qualisys.paneles.QsEvaluacionPanel;
 import ar.unsl.qualisys.utils.Item;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -56,11 +56,11 @@ public class QsBarraHerramientas extends JToolBar{
     protected QsFrame ventana; // Ventana Principal
     private QsTextPanel tabTexto; // panel donde se forma la estructura de variables
     private QsGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
-    private QsInstanciasPanel tabInstanciado;
+    private QsEvaluacionPanel tabInstanciado;
     
     
     
-    public QsBarraHerramientas(QsFrame ventana,QsTextPanel tabText,QsGraphicPanel tabGrafic,QsInstanciasPanel tabInstancias){//[Mostrar resultados en el panel de instancias todo junto],JPanel panelDeResultados) {
+    public QsBarraHerramientas(QsFrame ventana,QsTextPanel tabText,QsGraphicPanel tabGrafic,QsEvaluacionPanel tabInstancias){//[Mostrar resultados en el panel de instancias todo junto],JPanel panelDeResultados) {
         this.ventana = ventana;
         this.tabTexto = tabText; // panel donde se forma la estructura de variables
         this.tabGrafico = tabGrafic;
@@ -229,16 +229,24 @@ public class QsBarraHerramientas extends JToolBar{
             }
         });
     } 
-     
-        
-    public void mostrarPanelGrafico(int pagina){
+    
+    
+    public void mostrarPanelGrafico(){
         ventana.setTURN_OFF_LISTENERS(true);         
-        ventana.getTabbedPane().setSelectedIndex(pagina);
-        ventana.setIndiceActual(pagina);
+        ventana.getTabbedPane().setSelectedIndex(1);
+        ventana.setIndiceActual(1);
         ventana.setTURN_OFF_LISTENERS(false); 
         ventana.initPanelGrafico();
     }
     
+    
+    public void mostrarPanelDeModeladoLSP(){
+        ventana.setTURN_OFF_LISTENERS(true);         
+        ventana.getTabbedPane().setSelectedIndex(2);
+        ventana.setIndiceActual(2);
+        ventana.setTURN_OFF_LISTENERS(false); 
+        ventana.initPanelModelos();
+    }
     /**
      * 
     */
@@ -250,6 +258,8 @@ public class QsBarraHerramientas extends JToolBar{
        }
         return textoVar;
     }
+    
+    
     
     public void manejarCambioDePagina(int pagina){
         switch(pagina){
@@ -266,9 +276,14 @@ public class QsBarraHerramientas extends JToolBar{
                 break;
             }
             case 2:{
-             //   if(controlarArbolBienFormado()){
+                if(tabGrafico.getDAD().isArbolBienFormado()){
                     // CAMBIO DE PAGINA
-             //   }break;
+                    mostrarPanelDeModeladoLSP();
+                }else{
+                    ventana.getTabbedPane().setSelectedIndex(1);//nota: hacer ponderacion automatica
+                    JOptionPane.showConfirmDialog(this, "La funcion de Ecaluacion no esta bien formada\nRevise que sus variables estan todas asignadas\nRecuerde que cada operador debe tener al menos 2 hijos \nY Solo puede haber una raiz");
+                }
+                break;
             }
             case 3:{
                 //if(controlarValoresInstantias){
