@@ -30,8 +30,8 @@ public class QsVariable extends QsNodo{
         this.setName("var_" + id); 
         this.GUIParent = parent;
         this.nombre=nombre;
-        this.setBounds((int)x,(int)y,50,30);
-        this.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        this.setBounds((int)x,(int)y,80,30);
+        //this.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         ClickListener clickListener = new ClickListener(this);
         this.addMouseListener(clickListener);
         this.setToolTipText(this.nombre);

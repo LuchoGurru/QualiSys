@@ -102,8 +102,6 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         this.area = new Dimension();
      }    
 
-
-
     public QsOperatorsPanel getBrother() {
         return brother;
     }
@@ -171,7 +169,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     private void pintarVariables(Graphics g){
         boolean changed = false;
         for(QsVariable qv: this.variables.values()){
-            System.out.println("qv.getName() = " + qv.getName());
+           // System.out.println("qv.getName() = " + qv.getName());
             this.add(qv);
             // Listo, ahora a ajustar el SCROLL panel
             //   this.scrollRectToVisible(qo.getBounds());
@@ -195,7 +193,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     private void pintarOperadores(Graphics g){
         for(QsOperator qo: this.operadores.values()){
             boolean changed = false;
-            System.out.println("qo.getName() = " + qo.getName());
+           // System.out.println("qo.getName() = " + qo.getName());
             this.add(qo);
             // Listo, ahora a ajustar el SCROLL panel
             //   this.scrollRectToVisible(qo.getBounds());
@@ -230,15 +228,18 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                     padreLocation = obtenerPadreLocation(h);
                 }
                 //Pinto (x,y) to (x',y')
-                g.drawLine(h.getLocation().x,h.getLocation().y+25, padreLocation.x,padreLocation.y+25);
-                
-                System.out.println("X " + (padreLocation.x - h.getLocation().x)/2);
-                System.out.println("Y " + padreLocation.y);
-                System.out.println("X/2 " + padreLocation.x/2);
-                System.out.println("Y/2 " + padreLocation.y/2);
-                // Dibujo peso, ponderaje de la relacion
-                g.drawString(""+h.getPonderacion(),h.getLocation().x + (padreLocation.x - h.getLocation().x)/2 ,
-                    -25 + h.getLocation().y + (padreLocation.y - h.getLocation().y)/2) ;
+                if(h.getClass() == QsVariable.class)
+                    g.drawLine(h.getLocation().x + 80,h.getLocation().y+15, padreLocation.x,padreLocation.y+25);
+                else
+                    g.drawLine(h.getLocation().x + 50,h.getLocation().y+25, padreLocation.x,padreLocation.y+25);
+//                System.out.println("X " + (padreLocation.x - h.getLocation().x)/2);
+//                System.out.println("Y " + padreLocation.y);
+//                System.out.println("X/2 " + padreLocation.x/2);
+//                System.out.println("Y/2 " + padreLocation.y/2);
+//                // Dibujo peso, ponderaje de la relacion
+                g.drawString(""+h.getPonderacion(),
+                        h.getLocation().x + (padreLocation.x - h.getLocation().x)/2 + 20 ,
+                        h.getLocation().y + (padreLocation.y - h.getLocation().y)/2 + 20) ;
                 //Flecha
                 g.fillOval(padreLocation.x-8, padreLocation.y+20, 10, 10);
             }
