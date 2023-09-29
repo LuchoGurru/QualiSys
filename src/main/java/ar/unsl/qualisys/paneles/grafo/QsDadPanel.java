@@ -238,7 +238,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                 System.out.println("Y/2 " + padreLocation.y/2);
                 // Dibujo peso, ponderaje de la relacion
                 g.drawString(""+h.getPonderacion(),h.getLocation().x + (padreLocation.x - h.getLocation().x)/2 ,
-                    -5 + h.getLocation().y + (padreLocation.y - h.getLocation().y)/2) ;
+                    -25 + h.getLocation().y + (padreLocation.y - h.getLocation().y)/2) ;
                 //Flecha
                 g.fillOval(padreLocation.x-8, padreLocation.y+20, 10, 10);
             }

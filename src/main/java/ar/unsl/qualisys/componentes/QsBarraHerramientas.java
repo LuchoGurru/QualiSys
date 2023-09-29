@@ -76,7 +76,7 @@ public class QsBarraHerramientas extends JToolBar{
         JButton rehacer = new JButton();
         JButton color = new JButton();
         JSpinner tam = new JSpinner(new SpinnerNumberModel(12, 0, 84, 2));
-        JButton centrado = new JButton();
+        //JButton centrado = new JButton();
         String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
         JComboBox fuente = new JComboBox(fontNames);
         //Config
@@ -90,7 +90,7 @@ public class QsBarraHerramientas extends JToolBar{
         actualizar.setText("F5");
         rehacer.setText("-->");
         color.setText("Color");
-        centrado.setText("Centrado");
+        //centrado.setText("Centrado");
         fuente.setSelectedIndex(15);
 
  
@@ -127,7 +127,7 @@ public class QsBarraHerramientas extends JToolBar{
         this.add(actualizar);
         this.add(rehacer);
         this.add(color);
-        this.add(centrado);
+        //this.add(centrado);
         this.add(fuente);
         this.add(tam);
         this.add(siguiente);
@@ -197,7 +197,7 @@ public class QsBarraHerramientas extends JToolBar{
         });
 
         //Stylos
-        centrado.addActionListener(new StyledEditorKit.AlignmentAction("Medio", StyleConstants.ALIGN_CENTER)); // left rigth justify
+        //centrado.addActionListener(new StyledEditorKit.AlignmentAction("Medio", StyleConstants.ALIGN_CENTER)); // left rigth justify
         color.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -281,7 +281,7 @@ public class QsBarraHerramientas extends JToolBar{
                     mostrarPanelDeModeladoLSP();
                 }else{
                     ventana.getTabbedPane().setSelectedIndex(1);//nota: hacer ponderacion automatica
-                    JOptionPane.showConfirmDialog(this, "La funcion de Ecaluacion no esta bien formada\nRevise que sus variables estan todas asignadas\nRecuerde que cada operador debe tener al menos 2 hijos \nY Solo puede haber una raiz");
+                    JOptionPane.showMessageDialog(this, "La funcion de Evaluacion no esta correcta.\n- Asigne todas las variables,-Respete el dominio[2,5] de cada operador\nY recuerde que la raíz de el árbol debe ser unica.");
                 }
                 break;
             }

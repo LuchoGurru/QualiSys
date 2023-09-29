@@ -121,7 +121,7 @@ public class QsFrame extends JFrame{
      * Llamar antes de cambiar la pestaña
      */
     public void initPanelModelos(){
-        ArrayList<QsVariable> vars = (ArrayList<QsVariable>) this.tabGrafico.getDAD().getVariables().values(); 
+        ArrayList<QsVariable> vars = new ArrayList<QsVariable>(this.tabGrafico.getDAD().getVariables().values()) ; 
         this.tabModelos.setVars(vars);
     }
 

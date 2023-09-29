@@ -65,6 +65,7 @@ public class QsMenuSuperior extends JPanel {
     public QsMenuSuperior (QsFrame parent, QsTextPanel tabTexto,QsGraphicPanel tabGrafico, QsEvaluacionPanel tabInstanciado){
         this.setLayout(new BorderLayout());
         this.setBackground(Color.decode("#F09757"));
+        this.tabTexto = tabTexto;
         barraDeMenu();
         this.add(new QsBarraHerramientas(parent,tabTexto,tabGrafico,tabInstanciado),BorderLayout.CENTER);
         this.setVisible(true);
@@ -84,27 +85,7 @@ public class QsMenuSuperior extends JPanel {
         abrirArchivo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Reaccion");
-                JFileChooser fileExplorer = new JFileChooser(); // Elector de archivos
-                FileNameExtensionFilter fileExtensions = new FileNameExtensionFilter("Archivos de calidad", "txt"); // Filtro de archivos
-                fileExplorer.setFileFilter(fileExtensions);
-
-                int selected = fileExplorer.showOpenDialog(instancia);// Archivo seleccionado
-                if (selected == fileExplorer.APPROVE_OPTION) {
-                    File fichero = fileExplorer.getSelectedFile();
-                    try (FileReader arch = new FileReader(fichero)) {
-                        String cadena = "";
-                        int valor = arch.read();
-                        while (valor != -1) {
-                            cadena = cadena + (char) valor;
-                            valor = arch.read();
-                        }  
-                        tabTexto.setTexto(cadena);
-                        arch.close();
-                    } catch (IOException ex) {
-                        System.out.println("no file");
-                    }
-                }
+                abrirArchivo();
             }
         });
 
@@ -148,5 +129,27 @@ public class QsMenuSuperior extends JPanel {
         barra.add(herramientas);
         barra.add(ayuda);
         this.add(barra,BorderLayout.NORTH);
+    }
+    private void abrirArchivo(){
+        JFileChooser fileExplorer = new JFileChooser(); // Elector de archivos
+        JMenuBar barra = new JMenuBar();
+        FileNameExtensionFilter fileExtensions = new FileNameExtensionFilter("Archivos de calidad", "txt"); // Filtro de archivos
+        fileExplorer.setFileFilter(fileExtensions);
+        int selected = fileExplorer.showOpenDialog(barra);// Archivo seleccionado
+        if (selected == fileExplorer.APPROVE_OPTION) {
+            File fichero = fileExplorer.getSelectedFile();
+            try (FileReader arch = new FileReader(fichero)) {
+                String cadena = "";
+                int valor = arch.read();
+                while (valor != -1) {
+                    cadena = cadena + (char) valor;
+                    valor = arch.read();
+                }
+                tabTexto.setTexto(cadena);
+                arch.close();
+            } catch (IOException ex) {
+                System.out.println("no file");
+            }
+        }
     }
 }

@@ -125,5 +125,15 @@ public class QsVariable extends QsNodo{
             System.out.println(evt.getPoint());
         }
     }*/
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+    
+    
     
 }

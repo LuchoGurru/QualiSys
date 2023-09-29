@@ -7,10 +7,12 @@ package ar.unsl.qualisys.componentes;
 import ar.unsl.qualisys.frames.QsFrame;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextPane;
+import javax.swing.text.StyleConstants;
 
 /**
  *
@@ -49,7 +51,8 @@ public class QsVistaPreviaModal  extends JDialog {
         panelTexto = new javax.swing.JTextPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
+      //  centrado.addActionListener(new StyledEditorKit.AlignmentAction("Medio", StyleConstants.ALIGN_CENTER)); // left rigth justify
+      //  panelTexto.setComponentOrientation(StyleConstants.setAlignment(a, HEIGHT));
         panelTexto.setEditable(false);
         jScrollPane1.setViewportView(panelTexto);
         this.add(jLabel1,BorderLayout.NORTH);

@@ -60,7 +60,7 @@ public class QsTextPanel extends JPanel {
         renglones = new ArrayList<>();
         renglonActual = new Item(0,0,"1.",""); // inicializo item  ... Cambiar por CARGAR ARCHHIVO O NUEVO ARCHIVO
         renglones.add(renglonActual);
-        
+        panelDeTexto.setText(renglonActual.constructRenglon()); // ANTES DE AGREGAR LISTENERS
         
     //     this.add(new QsBarraHerramientas(this.parent,null), BorderLayout.NORTH);
 
