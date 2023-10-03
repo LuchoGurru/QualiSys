@@ -123,6 +123,16 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     }
 
     public void setVariables(Map<String, QsVariable> variables) {
+        HashMap<String,ArrayList<QsNodo>> relPadreHijosSinVars = new HashMap<>();
+        for(String padreID : this.relPadreHijos.keySet()){
+            relPadreHijosSinVars.put(padreID, new ArrayList<>());
+                for(QsNodo h : this.relPadreHijos.get(padreID)){
+                    if(h.getClass()!=QsVariable.class){ // Operador
+                        relPadreHijosSinVars.get(padreID).add(h);
+                    }
+                }
+            }   
+        this.relPadreHijos = relPadreHijosSinVars;
         this.variables = variables;
         this.repaint();
     }
@@ -514,6 +524,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         boolean bienFormado = true; 
         for(QsVariable qv: this.variables.values()){
             if(qv.getPadreID().equals("")){
+                qv.setBackground(Color.red);
                 bienFormado = false;
                 break;
             }
@@ -524,6 +535,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                 if(qo.getPadreID().equals("")){
                     onlyOneRoot ++;
                     if(onlyOneRoot > 1){
+                        qo.setBackground(Color.red);
                         bienFormado = false;
                         break;
                     }
@@ -535,7 +547,10 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         if(bienFormado){
             for(String padreID : this.relPadreHijos.keySet()){
                 if (this.relPadreHijos.get(padreID).size() < 2 || this.relPadreHijos.get(padreID).size() > 5 ) {// aca tengo uqe jajaja me qcague de miedo,
-                     bienFormado = false;
+                    System.out.println("Mal Rango"); 
+                    System.out.println(padreID);
+                    this.operadores.get(padreID).setBackground(Color.red);
+                    bienFormado = false;
                 }
                 
             //   if (this.relPadreHijos.get(padreID).size() < 2 || > 5 ) { aca tengo uqe jajaja me qcague de miedo,

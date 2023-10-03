@@ -4,6 +4,8 @@
  */
 package ar.unsl.qualisys.componentes.nodos;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 
 /**
@@ -22,7 +24,7 @@ public class QsNodo extends JPanel {
      */
     public QsNodo(float resValue){
         this.valorResultado = resValue;
-        this.padreID = "";
+        this.padreID = ""; 
     }
     /**
      * Constructor que van a usar los operadores
@@ -60,6 +62,6 @@ public class QsNodo extends JPanel {
         this.ponderacion = ponderacion;
     }
     
-    
+ 
 }
 

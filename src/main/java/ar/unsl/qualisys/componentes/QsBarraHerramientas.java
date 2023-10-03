@@ -83,9 +83,9 @@ public class QsBarraHerramientas extends JToolBar{
         this.setFloatable(false);
         volver.setText("< Volver");
         siguiente.setText("Siguiente >");
-        abrir.setText("Open");
-        nuevo.setText("New");
-        guardar.setText("Save");
+        abrir.setText("Abrir");
+        nuevo.setText("Nuevo");
+        guardar.setText("Guardar");
         deshacer.setText("<--");
         actualizar.setText("F5");
         rehacer.setText("-->");

@@ -65,8 +65,8 @@ public class QsOperator extends QsNodo implements QsOperacion{
         this.setPreferredSize(new Dimension(51,51));
         ClickListener clickListener = new ClickListener(this);
         this.addMouseListener(clickListener);
-        DragListener dragListener = new DragListener();
-        this.addMouseMotionListener(dragListener);
+//        DragListener dragListener = new DragListener(this);
+   //     this.addMouseMotionListener(dragListener);
         this.setToolTipText(this.nombre);
 
     } 
@@ -192,21 +192,28 @@ public class QsOperator extends QsNodo implements QsOperacion{
          * @param evt 
          */
         public void mousePressed(MouseEvent evt){
-            //.setBorder(BorderFactory.createLineBorder(Color.BLACK, 10));
-            if(GUIParent!=null)
+            if(GUIParent!=null){
+                this.qsOpInstance.setBackground(Color.WHITE);
                 GUIParent.setNodoSeleccionado(this.qsOpInstance);
+            }
         }
         public void mouseReleased(MouseEvent e){
             determinarAccionReleased(e); 
         }
         
     }
-    
+    /*
     private class DragListener extends MouseMotionAdapter {
-        public void mouseDragged(MouseEvent evt){ 
-             //TODO
+        private QsOperator qsOpInstance;
+        public DragListener(QsOperator qsOpInstance){
+            this.qsOpInstance = qsOpInstance;
         }
-    }/*
+        @Override
+        public void mouseDragged(MouseEvent evt){ 
+            this.qsOpInstance.setBounds(evt.getPoint().x, evt.getPoint().y, this.qsOpInstance.getWidth(), this.qsOpInstance.getHeight());
+            this.qsOpInstance.repaint();
+        }
+    }
     private class menuDesplegableListener implements ActionListener{
         private QualyOperator qsOpInstance;
         public menuDesplegableListener(QualyOperator qsOpInstance){

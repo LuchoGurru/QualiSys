@@ -14,6 +14,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -31,6 +32,7 @@ public class QsVariable extends QsNodo{
         this.GUIParent = parent;
         this.nombre=nombre;
         this.setBounds((int)x,(int)y,80,30);
+        this.setBackground(Color.getHSBColor(238, 238, 238));
         //this.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         ClickListener clickListener = new ClickListener(this);
         this.addMouseListener(clickListener);
@@ -112,6 +114,7 @@ public class QsVariable extends QsNodo{
         public void mousePressed(MouseEvent evt){
             //.setBorder(BorderFactory.createLineBorder(Color.BLACK, 10));
             //if(GUIParent!=null)
+               this.qsVarInstance.setBackground(Color.getHSBColor(238, 238, 238));
                GUIParent.setNodoSeleccionado(this.qsVarInstance);
         }
         public void mouseReleased(MouseEvent e){
@@ -119,12 +122,8 @@ public class QsVariable extends QsNodo{
         }
         
     }
-    /*
-    private class DragListener extends MouseMotionAdapter {
-        public void mouseDragged(MouseEvent evt){ 
-            System.out.println(evt.getPoint());
-        }
-    }*/
+    
+    
 
     public String getNombre() {
         return nombre;
