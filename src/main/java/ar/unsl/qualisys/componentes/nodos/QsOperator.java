@@ -18,7 +18,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import javax.swing.JMenuItem;
@@ -33,7 +32,8 @@ import javax.swing.KeyStroke;
  */
 public class QsOperator extends QsNodo implements QsOperacion{
     
-    private QsDadPanel GUIParent; // Solo se asigna en caso de que sea hijo del componente DAD (Drag and Drop).
+    private QsDadPanel DADParent; // Solo se asigna en caso de que sea hijo del componente DAD (Drag and Drop).
+    private QsOperatorsPanel OPParent; // Solo se asigna en caso de que sea hijo del componente DAD (Drag and Drop).
     private String symbol ;
     private String nombre;
     private String padreID;
@@ -60,7 +60,9 @@ public class QsOperator extends QsNodo implements QsOperacion{
         this.r5=r5;
 
         if(GUIparent.getClass() == QsDadPanel.class){ 
-            this.GUIParent = (QsDadPanel) GUIparent;     // Para usar los metodos del DandD directamente
+            this.DADParent = (QsDadPanel) GUIparent;     // Para usar los metodos del DandD directamente
+        }else{
+            this.OPParent = (QsOperatorsPanel) GUIparent;
         }
         this.setPreferredSize(new Dimension(51,51));
         ClickListener clickListener = new ClickListener(this);
@@ -100,8 +102,8 @@ public class QsOperator extends QsNodo implements QsOperacion{
             this.setBounds(this.getBounds().getLocation().x+ e.getX() - 20, //para centrar el mouse y sacar el margin
                                  this.getBounds().getLocation().y + e.getY() -20 , //para centrar el mouse
                                 51, 51);
-            if (!GUIParent.isColision(this)) { 
-                GUIParent.repaint();
+            if (!DADParent.isColision(this)) { 
+                DADParent.repaint();
             } else {
                 this.setBounds(oldPosition); //Vuelvo a la posision Inicial
                 this.addToFatherDomain(e.getPoint());//Sí 
@@ -130,10 +132,11 @@ public class QsOperator extends QsNodo implements QsOperacion{
         Cuando el componente esta en el panel de operadores se arrastra hasta el DandD panel para crear una nueva instancia del operadore en la posicion deseada 
     */ 
     public void exportarOperadorADibujar(MouseEvent e){
+        Point scrollPosition = OPParent.getGUIpadre().getScroll().getViewport().getViewPosition();
         QsOperatorsPanel papi = (QsOperatorsPanel) this.getParent();
         Point ubiActual = this.getLocation();
-        ubiActual.x += e.getPoint().x;
-        ubiActual.y += e.getPoint().y; 
+        ubiActual.x += e.getPoint().x + scrollPosition.x;
+        ubiActual.y += e.getPoint().y + scrollPosition.y; 
         papi.dibujarOperadorEn(ubiActual,this);
     }
 
@@ -147,7 +150,7 @@ public class QsOperator extends QsNodo implements QsOperacion{
         Point padreLocation = new Point();
         padreLocation.x = this.getLocation().x + padreRelativeLocation.x;
         padreLocation.y = this.getLocation().y + padreRelativeLocation.y;
-        this.GUIParent.addToDomain(this,padreLocation);
+        this.DADParent.addToDomain(this,padreLocation);
    }
 
    
@@ -192,9 +195,9 @@ public class QsOperator extends QsNodo implements QsOperacion{
          * @param evt 
          */
         public void mousePressed(MouseEvent evt){
-            if(GUIParent!=null){
+            if(DADParent!=null){
                 this.qsOpInstance.setBackground(Color.WHITE);
-                GUIParent.setNodoSeleccionado(this.qsOpInstance);
+                DADParent.setNodoSeleccionado(this.qsOpInstance);
             }
         }
         public void mouseReleased(MouseEvent e){
@@ -234,28 +237,28 @@ public class QsOperator extends QsNodo implements QsOperacion{
         eliminar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new eliminarQsNodo(GUIParent).ejecutar();
+                new eliminarQsNodo(DADParent).ejecutar();
             }
         });
         
         eliminarRel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new eliminarQsRelacion(GUIParent).ejecutar();
+                new eliminarQsRelacion(DADParent).ejecutar();
             }
         });
         
        setPonderación.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new editarPesoPonderado(GUIParent).ejecutar();
+                new editarPesoPonderado(DADParent).ejecutar();
             }
         });
       
         cambiarOperador.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new cambiarOperador(GUIParent).ejecutar();
+                new cambiarOperador(DADParent).ejecutar();
             }
         });
         
@@ -270,11 +273,11 @@ public class QsOperator extends QsNodo implements QsOperacion{
     //GET Y SET
 
     public QsDadPanel getGUIParent() {
-        return GUIParent;
+        return DADParent;
     }
 
     public void setGUIParent(QsDadPanel GUIParent) {
-        this.GUIParent = GUIParent;
+        this.DADParent = GUIParent;
     }
 
     @Override

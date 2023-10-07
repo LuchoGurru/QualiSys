@@ -26,7 +26,7 @@ public class QsGraphicPanel extends JPanel {
     private QsFrame parent;
     private QsOperatorsPanel menuOperadores;
     private QsDadPanel DAD;
-
+    JScrollPane scroll;
     /**
      * Creates new form examples
      */
@@ -41,8 +41,8 @@ public class QsGraphicPanel extends JPanel {
         this.menuOperadores.setPreferredSize(new Dimension(150,300));
 
         this.DAD = new QsDadPanel(this,menuOperadores);
-        JScrollPane scroll = new JScrollPane(DAD);
-        
+        scroll = new JScrollPane(DAD);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
      //   scroll.setWheelScrollingEnabled(true);
       //  scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
       //  scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -57,7 +57,7 @@ public class QsGraphicPanel extends JPanel {
         HashMap mapaDeVariables = new HashMap<String, QsVariable>();
         for(Item item : renglones){
             QsVariable var = new QsVariable(DAD, 50, desplazamiento, item.getNumeration(),item.getCadenaDeTexto());
-            mapaDeVariables.put(var.getName(), var);
+            mapaDeVariables.put(var.getNombre(), var);
             desplazamiento+= 35;
         }
         this.DAD.setVariables(mapaDeVariables);
@@ -89,6 +89,16 @@ public class QsGraphicPanel extends JPanel {
         this.DAD = DAD;
     }
 
+    public JScrollPane getScroll() {
+        return scroll;
+    }
+
+    public void setScroll(JScrollPane scroll) {
+        this.scroll = scroll;
+    }
+
+    
+    
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 

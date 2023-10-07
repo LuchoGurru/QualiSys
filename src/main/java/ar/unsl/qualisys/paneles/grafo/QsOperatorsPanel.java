@@ -23,7 +23,7 @@ import javax.swing.JPanel;
  */
 public class QsOperatorsPanel extends JPanel {
     
-    private QsGraphicPanel parent;
+    private QsGraphicPanel GUIParent;
     private JPanel esta;
     private HashMap<String,QsOperator> operadorBySymbol;
     private QsOperator operador1;
@@ -141,6 +141,7 @@ public class QsOperatorsPanel extends JPanel {
         this.add(operador10); 
         this.add(operador11);
         esta = this;
+        GUIParent=parent;
     }
     
     public void dibujarOperadorEn(Point punto,QsOperator operador){
@@ -152,6 +153,9 @@ public class QsOperatorsPanel extends JPanel {
         return operadorBySymbol;
     }
  
+    public QsGraphicPanel getGUIpadre() {
+        return this.GUIParent;
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {

@@ -11,17 +11,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.geom.Line2D;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -59,23 +54,7 @@ import javax.swing.JPopupMenu;
  * @author luciano.gurruchaga
  */
 public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesArbolLSP
-    // La estructura de datos conveniente es : 
-    // Una lista por niveles ... jajaja
-    // Una lista vinculada 
-    // Un rebalse directo o funcionHash de coso, funcion ideal ... ver bibliografía, para mapear cada categoría en una lista vinculada, es decir rebalse abierto vinculado 
-    
-    /**
-     * -----IMPLEMENTACION-----
-     */ 
-    //private QualyVariable[] rebalseArray; // recibe por parametro la lista de variables sin gategorizar por el momento 
-    //Las insertaré dentro del panel a unos pixeles del borde para luego dejarlas fijas inamobibles y aplicarles solo un operador 
-    
-    /// Entonces cuando arrastre el muse released del operador y lo suelte en DAD agrego un operador nuevito a esta lista y los vamos pintanding 
-    // Despues vamos a ir agarrando y editando atributos de los operadores para ir pintando 
-    
-    
-    //private ArrayList<QualyOperator> operadores = new ArrayList<>();
-    //private ArrayList<QualyVariable> variables = new ArrayList<>();
+
     private QsGraphicPanel GUIpadre;
     private QsOperatorsPanel brother;
     private Map<String, QsOperator> operadores = new HashMap<String, QsOperator>();
@@ -84,12 +63,8 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     
     private Map<String, ArrayList<QsNodo>> relPadreHijos = new HashMap<String, ArrayList<QsNodo>>();
     
-    private QsNodo nodoSeleccionado;
-    JPopupMenu menuDesplegable = new JPopupMenu();
-    private Dimension area; //indicates area taken up by graphics
-
-
-    // Los operadores que manejamos van a poder recibir de rango un valor y podran ser asignados como dominio de otro operador 
+    private QsNodo nodoSeleccionado; 
+    private Dimension area; //indicates area taken up by graphics 
     public static int cantOperadores = 0;
 
     /**
@@ -104,6 +79,10 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
 
     public QsOperatorsPanel getBrother() {
         return brother;
+    }
+
+    public QsGraphicPanel getGUIpadre() {
+        return GUIpadre;
     }
     
     public Map<String, QsOperator> getOperadores(){
@@ -121,19 +100,34 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     public Map<String, QsVariable> getVariables() {
         return variables;
     }
-
-    public void setVariables(Map<String, QsVariable> variables) {
+    
+    /**
+     * Carga las relaciones de los operadores y reinicializa las variables
+     * @param variables 
+     */
+    public void setVariables(Map<String, QsVariable> varsNuevas) {
         HashMap<String,ArrayList<QsNodo>> relPadreHijosSinVars = new HashMap<>();
+        Map<String, QsVariable> varsViejas = this.variables;
+        this.variables = varsNuevas;
         for(String padreID : this.relPadreHijos.keySet()){
             relPadreHijosSinVars.put(padreID, new ArrayList<>());
                 for(QsNodo h : this.relPadreHijos.get(padreID)){
                     if(h.getClass()!=QsVariable.class){ // Operador
                         relPadreHijosSinVars.get(padreID).add(h);
+                    }else if (this.variables.keySet().contains(h.getName())){
+                        QsVariable varVieja = (QsVariable) h;
+                        String varID = h.getName();
+                        this.variables.get(varID).setPadreID(varVieja.getPadreID());
+                        this.variables.get(varID).setPonderacion(varVieja.getPonderacion());
+                        this.variables.get(varID).setName(varVieja.getName());
+                        this.variables.get(varID).setNombre(varVieja.getNombre());
+                       // this.variables.get(varID).setBounds(varVieja.getBounds());
+                        this.variables.get(varID).setGUIParent(varVieja.getGUIParent());
+                        relPadreHijosSinVars.get(padreID).add(this.variables.get(varID)); 
                     }
                 }
             }   
-        this.relPadreHijos = relPadreHijosSinVars;
-        this.variables = variables;
+        this.relPadreHijos = relPadreHijosSinVars; // relaciones entre operadores
         this.repaint();
     }
 
@@ -166,15 +160,13 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         area.width=0;
         area.height=0;
         super.paintComponent(g);
-        this.removeAll();
+        super.removeAll();
         pintarVariables(g);
         pintarOperadores(g);
         dibujarLineas(g);
         this.revalidate(); //Let the scroll pane know to update itself and its scrollbars.
 
     }
-    
-    
     
     private void pintarVariables(Graphics g){
         boolean changed = false;
@@ -188,15 +180,15 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
             //Update client's preferred size because the area taken up by the graphics has gotten larger or smaller (if cleared).
             if (this_width > area.width) {
                 area.width = this_width; 
-                changed=true;
+                this.setPreferredSize(new Dimension(this_width, area.height));
             }
             if (this_height > area.height) {
                 area.height = this_height; 
-                changed=true;
+                this.setPreferredSize(new Dimension(area.width, this_height));
             }
-            if (changed) {
-                this.setPreferredSize(new Dimension(this_width, this_height));
-            }
+//            if (changed) {
+//                              this.setPreferredSize(new Dimension(this_width, this_height));           
+//        }
         }
     }
     
@@ -212,14 +204,11 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
             //Update client's preferred size because the area taken up by the graphics has gotten larger or smaller (if cleared).
             if (this_width > area.width) {
                 area.width = this_width; 
-                changed=true;
+                this.setPreferredSize(new Dimension(this_width, area.height));
             }
             if (this_height > area.height) {
                 area.height = this_height; 
-                changed=true;
-            }
-            if (changed) {
-                this.setPreferredSize(new Dimension(this_width, this_height));
+                this.setPreferredSize(new Dimension(area.width, this_height));
             }
         } 
     }
@@ -242,12 +231,8 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                     g.drawLine(h.getLocation().x + 80,h.getLocation().y+15, padreLocation.x,padreLocation.y+25);
                 else
                     g.drawLine(h.getLocation().x + 50,h.getLocation().y+25, padreLocation.x,padreLocation.y+25);
-//                System.out.println("X " + (padreLocation.x - h.getLocation().x)/2);
-//                System.out.println("Y " + padreLocation.y);
-//                System.out.println("X/2 " + padreLocation.x/2);
-//                System.out.println("Y/2 " + padreLocation.y/2);
-//                // Dibujo peso, ponderaje de la relacion
-                g.drawString(""+h.getPonderacion(),
+                 // Dibujo peso, ponderaje de la relacion
+                g.drawString(""+String.format("%.2f", h.getPonderacion()),
                         h.getLocation().x + (padreLocation.x - h.getLocation().x)/2 + 20 ,
                         h.getLocation().y + (padreLocation.y - h.getLocation().y)/2 + 20) ;
                 //Flecha
@@ -258,7 +243,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
 
     private Point obtenerPadreLocation(QsNodo h){
         Point padreLocation = null;
-        padreLocation = this.operadores.get((h).getPadreID()).getLocation();   
+        padreLocation = this.operadores.get(h.getPadreID()).getLocation();   
         return padreLocation;
     }
     /**

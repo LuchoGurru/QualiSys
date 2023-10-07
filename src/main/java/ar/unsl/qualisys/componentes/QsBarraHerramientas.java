@@ -96,6 +96,8 @@ public class QsBarraHerramientas extends JToolBar{
  
         JTextPane panelDeTexto = tabTexto.getJTextPanel();
         panelDeTexto.addKeyListener(new KeyListener(){
+            boolean ctrlPressed = false;
+
             @Override
             public void keyTyped(KeyEvent ke) {
                 
@@ -105,20 +107,29 @@ public class QsBarraHerramientas extends JToolBar{
             public void keyPressed(KeyEvent ke) { 
                 if(ke.getKeyCode() == KeyEvent.VK_F5) {
                     actualizar.doClick();
+                }else if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
+                    ctrlPressed = true;
+                }else if (ctrlPressed && ke.getKeyCode() == KeyEvent.VK_Z) {
+                    deshacer.doClick();
+                }else if (ctrlPressed && ke.getKeyCode() == KeyEvent.VK_Y) {
+                    rehacer.doClick();
                 }
             }
 
             @Override
             public void keyReleased(KeyEvent ke) {
-                //hrow new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-            }
-            
+                if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
+                    ctrlPressed = false;
+                }
+            }            
         });
         
         //onFocus Texto
         nuevo.setToolTipText("Nuevo Archivo");
         abrir.setToolTipText("Abrir Archivo");
         actualizar.setToolTipText("Actualizar Texto");
+        deshacer.setToolTipText("Ctrl + Z");
+        rehacer.setToolTipText("Ctrl + Y");
         //
         this.add(volver);
         this.add(guardar);
@@ -177,7 +188,7 @@ public class QsBarraHerramientas extends JToolBar{
                 editManager.addEdit(undoableEditEvent.getEdit());
             }
         });
-
+          
         deshacer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -190,7 +201,7 @@ public class QsBarraHerramientas extends JToolBar{
         rehacer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (editManager.canRedo()) {
+                if (editManager.canRedo()){ 
                     editManager.redo();
                 }
             }
@@ -264,6 +275,7 @@ public class QsBarraHerramientas extends JToolBar{
     public void manejarCambioDePagina(int pagina){
         switch(pagina){
             case 1:{
+                tabTexto.setTextoConCaret(tabTexto.getJTextPanel().getText(),tabTexto.getJTextPanel().getCaretPosition()); // para activar el F5
                 if(tabTexto.isTextoBienFormado()){
                     QsVistaPreviaModal modal = new QsVistaPreviaModal(ventana,this,"Vista Previa:",true);
                     getTextoVariables();

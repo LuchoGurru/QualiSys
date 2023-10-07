@@ -132,7 +132,14 @@ public class QsVariable extends QsNodo{
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-    
+
+    public QsDadPanel getGUIParent() {
+        return GUIParent;
+    }
+
+    public void setGUIParent(QsDadPanel GUIParent) {
+        this.GUIParent = GUIParent;
+    }
     
     
 }
