@@ -4,8 +4,13 @@
  */
 package ar.unsl.qualisys.componentes.nodos;
 
+import java.awt.AWTException;
+import java.awt.Cursor;
+import java.awt.HeadlessException;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 /**
@@ -25,6 +30,7 @@ public class QsNodo extends JPanel {
     public QsNodo(float resValue){
         this.valorResultado = resValue;
         this.padreID = ""; 
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR)); // This one line changes the cursor.
     }
     /**
      * Constructor que van a usar los operadores
@@ -32,6 +38,7 @@ public class QsNodo extends JPanel {
     public QsNodo(){
         this.valorResultado = 0f;
         this.padreID ="";
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR)); // This one line changes the cursor.
     }
 
     public String getPadreID() {

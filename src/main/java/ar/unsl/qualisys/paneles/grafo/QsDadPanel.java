@@ -399,13 +399,12 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     public boolean canBeDomain(QsNodo hijoCandidato, QsOperator padreAdoptivo){
         boolean allow=true;
         if(padreAdoptivo != null){//OK
-            
-            if(!isVariable(hijoCandidato)){// es un operador ... 
-                QsOperator op_candidato = getOperator(hijoCandidato);
-                if(this.relPadreHijos.get(padreAdoptivo.getName()).size() >= 5){
-                    allow=false;
-                }
-                if(allow && !padreAdoptivo.getPadreID().equals("")){ //operador con padre
+            if(this.relPadreHijos.get(padreAdoptivo.getName()).size() >= 5){
+                allow=false;
+            }
+            if(allow && !isVariable(hijoCandidato)){// es un operador ... 
+                QsOperator op_candidato = getOperator(hijoCandidato); 
+                if(!padreAdoptivo.getPadreID().equals("")){ //operador con padre
                     System.out.println("operador con padre");
                     if(!noCicles(op_candidato,padreAdoptivo)){
                         System.out.println("no podes ser parte de este dominio por que formaras un ciclo");

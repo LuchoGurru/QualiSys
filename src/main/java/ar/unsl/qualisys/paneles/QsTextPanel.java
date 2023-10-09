@@ -295,6 +295,7 @@ public class QsTextPanel extends JPanel {
             //ACTUALIZA, o inicializa el itemActual by caret
             @Override
             public void caretUpdate(CaretEvent e) {
+                System.out.println("CAREEEEEEEEEEEEEEEEEEEEEEEEEET = " );
                 //System.out.println("panelDeTexto.getCaretPosition() = " + panelDeTexto.getCaretPosition());
                 System.out.println(panelDeTexto.getText() + "hola");
                 System.out.println(" " + e.getDot() + "ooo" + e.getMark()); // Mark donde empieza la selecion 
@@ -378,7 +379,7 @@ public class QsTextPanel extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                String[] arregloDeNiveles = new String[100]; // Permitimos una anidacion maximas de 10 niveles ... sobra para la practica 
+                String[] arregloDeNiveles = new String[100]; // Permitimos una anidacion maximas de 10 niveles .cien. sobra para la practica 
                 String nuevoTexto = "";
                 int caretPosition = panelDeTexto.getCaretPosition();
                 String texto = panelDeTexto.getText();

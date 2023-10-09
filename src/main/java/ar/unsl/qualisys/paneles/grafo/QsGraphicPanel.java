@@ -57,7 +57,7 @@ public class QsGraphicPanel extends JPanel {
         HashMap mapaDeVariables = new HashMap<String, QsVariable>();
         for(Item item : renglones){
             QsVariable var = new QsVariable(DAD, 50, desplazamiento, item.getNumeration(),item.getCadenaDeTexto());
-            mapaDeVariables.put(var.getNombre(), var);
+            mapaDeVariables.put(var.getName(), var);
             desplazamiento+= 35;
         }
         this.DAD.setVariables(mapaDeVariables);

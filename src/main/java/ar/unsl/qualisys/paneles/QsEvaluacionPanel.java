@@ -4,15 +4,18 @@
  */
 package ar.unsl.qualisys.paneles;
 
+import GUIUtils.CustomTableModel;
 import java.awt.Color;
 import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import GUIUtils.TableCustom;
 import ar.unsl.qualisys.componentes.nodos.QsVariable;
+import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.JScrollPane;
 
 /**
  *
@@ -21,13 +24,26 @@ import java.util.HashMap;
 public class QsEvaluacionPanel extends javax.swing.JPanel {
     private ArrayList<QsVariable> vars;
     private HashMap<String,ArrayList<Float>> instancias;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
+
+        
     /**
      * Creates new form ValorInstancias
      */
     public QsEvaluacionPanel(JFrame parent) {
         initComponents();
         this.vars = new ArrayList<>();
+        this.instancias = new HashMap<>();
+        jScrollPane1 = new JScrollPane();
+        jTable1 = new JTable(new CustomTableModel());
+        jTable1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jScrollPane1.setViewportView(jTable1);
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.addColumn("Variables :");
         TableCustom.apply(jScrollPane1, TableCustom.TableType.MULTI_LINE);
+        jPanel2.setLayout(new BorderLayout());
+        jPanel2.add(jScrollPane1,BorderLayout.CENTER);
         this.setVisible(true);
     }
 
@@ -66,6 +82,13 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     private void initData() {
         int cantVars = vars.size();
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        
+        if (model.getRowCount() > 0) { // Elimino filas
+            for (int i = model.getRowCount() - 1; i > -1; i--) {
+                model.removeRow(i);
+            }
+        }
+        
         for(QsVariable v: this.vars){
             Object[] fila = new Object[]{v.getNombre()};
             model.addRow(fila);
@@ -142,8 +165,6 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         jLabel3 = new javax.swing.JLabel();
         jButton5 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
 
         jMenuItem1.setText("jMenuItem1");
 
@@ -166,7 +187,6 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
             }
         });
 
-        jTextField1.setText("jTextField1");
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField1ActionPerformed(evt);
@@ -291,39 +311,15 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "Variables : "
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane1.setViewportView(jTable1);
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 763, Short.MAX_VALUE)
-                .addContainerGap())
+            .addGap(0, 775, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
-                .addContainerGap())
+            .addGap(0, 696, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -353,9 +349,23 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         this.instancias.put(jTextField1.getText(),new ArrayList<Float>());
         model.addColumn(jTextField1.getText());
-        model.setRowCount(model.getRowCount()+1);
+        
+        /*Object[][] data = {
+            {"Row 1, Col 1", "Row 1, Col 2"},
+            {"Row 2, Col 1", "Row 2, Col 2"},
+            {"Row 3, Col 1", "Row 3, Col 2"}
+        };
 
-        // TODO add your handling code here:
+        // Column names
+        String[] columnNames = {"Column 1", "Column 2"};
+        
+        model.setColumnIdentifiers(columnNames);
+        
+        model.setDataVector(data, columnNames);*/
+        for(int i = 0 ; i < this.vars.size();i++){
+            model.setValueAt(0f, i, model.getColumnCount()-1); // Set "New York" in the first row, third column
+            
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -393,10 +403,8 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
