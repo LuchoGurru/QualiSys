@@ -2,7 +2,7 @@ package ar.unsl.qualisys.frames;
  
 import ar.unsl.qualisys.componentes.QsTabPanel;
 import ar.unsl.qualisys.componentes.QsMenuSuperior;
-import ar.unsl.qualisys.paneles.QsTextPanel;
+import ar.unsl.qualisys.paneles.texto.QsTextPanel;
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.paneles.grafo.QsGraphicPanel;
 import ar.unsl.qualisys.utils.Item;
@@ -27,7 +27,7 @@ public class QsFrame extends JFrame{
     
     private QsTextPanel tabTexto; // panel donde se forma la estructura de variables
     private QsGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
-    private QsEvaluacionPanel tabModelos; // panel donde se asignan valores a las variables de distintos modelos LPS en particular
+    private QsEvaluacionPanel tabInstancias; // panel donde se asignan valores a las variables de distintos modelos LPS en particular
     private JPanel tablUtilidades; // Estadisticas TODO Opcion dejar como visual como propuesta de escalabilidad;
     private int indiceActual;
     private JTabbedPane tabbedPane = new QsTabPanel();
@@ -49,11 +49,11 @@ public class QsFrame extends JFrame{
         this.setLayout(new BorderLayout());
         tabTexto = new QsTextPanel(this);
         tabGrafico = new QsGraphicPanel(this);
-        tabModelos = new QsEvaluacionPanel(this);
-        this.add(new QsMenuSuperior(this,tabTexto,tabGrafico,tabModelos),BorderLayout.NORTH);  // PARA ABRIR Y CERRAR ARCHIVO
+        tabInstancias = new QsEvaluacionPanel(this);
+        this.add(new QsMenuSuperior(this,tabTexto,tabGrafico,tabInstancias),BorderLayout.NORTH);  // PARA ABRIR Y CERRAR ARCHIVO
         tabbedPane.addTab("Variables de Preferencia", tabTexto);
         tabbedPane.addTab("Árbol ", tabGrafico);
-        tabbedPane.addTab("Llenado de Instancias ", tabModelos);
+        tabbedPane.addTab("Llenado de Instancias ", tabInstancias);
         /*JPanel panel4;
         panel4 = new JPanel();
         panel4.add(createChart());
@@ -120,9 +120,15 @@ public class QsFrame extends JFrame{
     /**
      * Llamar antes de cambiar la pestaña
      */
-    public void initPanelModelos(){
-        ArrayList<QsVariable> vars = new ArrayList<QsVariable>(this.tabGrafico.getDAD().getVariables().values()) ; 
-        this.tabModelos.setVars(vars);
+    public void initPanelInstancias(){
+        //ArrayList<QsVariable> vars = new ArrayList<QsVariable>(this.tabGrafico.getDAD().getVariables().values()) ; 
+        //this.tabInstancias.setVars(vars);
+        ArrayList<QsVariable> vars = new ArrayList<QsVariable>();
+        for(Item item : tabTexto.getVariables()){
+            QsVariable var = new QsVariable(this.tabGrafico.getDAD(), 50, 0, item.getNumeration(),item.getCadenaDeTexto());
+            vars.add(var);
+        }
+        this.tabInstancias.setVars(vars);
     }
 
     /*

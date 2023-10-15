@@ -4,10 +4,13 @@
  */
 package ar.unsl.qualisys.componentes;
 
-import ar.unsl.qualisys.paneles.QsTextPanel;
+import ar.unsl.qualisys.paneles.texto.QsTextPanel;
 import ar.unsl.qualisys.frames.QsFrame;
 import ar.unsl.qualisys.paneles.grafo.QsGraphicPanel;
 import ar.unsl.qualisys.paneles.QsEvaluacionPanel;
+import ar.unsl.qualisys.paneles.texto.memento.CaretTaker;
+import ar.unsl.qualisys.paneles.texto.memento.Memento;
+import ar.unsl.qualisys.paneles.texto.memento.Originator;
 import ar.unsl.qualisys.utils.Item;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -23,6 +26,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
@@ -192,17 +197,42 @@ public class QsBarraHerramientas extends JToolBar{
         deshacer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (editManager.canUndo()) {
-                    editManager.undo();
+                CaretTaker caretaker = tabTexto.getCaretTaker();
+                Originator originator = tabTexto.getOriginator();
+                // Undo
+                Memento undoMemento = caretaker.undo();
+                if (undoMemento != null) {
+                    originator.restaurar(undoMemento);
+                    //System.out.println("Undo: " + originator.getEstado().getTexto() + " "+originator.getEstado().getPos());
+                    //Actualizo interfaz
+                    
+                   // tabTexto.getJTextPanel().setText(originator.getEstado().getTexto());
+                   // tabTexto.getJTextPanel().setCaretPosition(originator.getEstado().getPos());
+                    tabTexto.setTextoConCaret(originator.getEstado().getTexto(),originator.getEstado().getPos()+1); //ajusto pq se corre
+                    //tabTexto.getJTextPanel().setCaretPosition();
                 }
+        
+                
             }
         });
 
         rehacer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (editManager.canRedo()){ 
-                    editManager.redo();
+                CaretTaker caretaker = tabTexto.getCaretTaker();
+                Originator originator = tabTexto.getOriginator();
+                // Redo
+                Memento redoMemento = caretaker.redo();
+                if (redoMemento != null) {
+                    originator.restaurar(redoMemento);
+                    //System.out.println("Redo: " + originator.getEstado());
+                    //Actualizo interfaz
+                //    tabTexto.getJTextPanel().setText(originator.getEstado().getTexto());
+                   // tabTexto.getJTextPanel().setCaretPosition(originator.getEstado().getPos());
+                   
+                    tabTexto.setTextoConCaret(originator.getEstado().getTexto(),originator.getEstado().getPos()+1); //ajusto pq se corre
+
+                    
                 }
             }
         });
@@ -251,16 +281,16 @@ public class QsBarraHerramientas extends JToolBar{
     }
     
     
-    public void mostrarPanelDeModeladoLSP(){
+    public void mostrarPanelDeInstanciadoLSP(){
         ventana.setTURN_OFF_LISTENERS(true);         
         ventana.getTabbedPane().setSelectedIndex(2);
         ventana.setIndiceActual(2);
         ventana.setTURN_OFF_LISTENERS(false); 
-        ventana.initPanelModelos();
+        ventana.initPanelInstancias();
     }
     /**
      * 
-    */
+
     public String getTextoVariables(){
        ArrayList<Item> variables = this.tabTexto.getVariables();
        String textoVar="";
@@ -268,7 +298,7 @@ public class QsBarraHerramientas extends JToolBar{
            textoVar += v.constructRenglon() + "\n";
        }
         return textoVar;
-    }
+    }    */
     
     
     
@@ -276,24 +306,26 @@ public class QsBarraHerramientas extends JToolBar{
         switch(pagina){
             case 1:{
                 tabTexto.setTextoConCaret(tabTexto.getJTextPanel().getText(),tabTexto.getJTextPanel().getCaretPosition()); // para activar el F5
+
                 if(tabTexto.isTextoBienFormado()){
-                    QsVistaPreviaModal modal = new QsVistaPreviaModal(ventana,this,"Vista Previa:",true);
-                    getTextoVariables();
-                    modal.setTextoPane1(this.getTextoVariables());
-                    modal.setVisible(true);
+                   // QsVistaPreviaModal modal = new QsVistaPreviaModal(ventana,this,"Vista Previa:",true);
+                   // getTextoVariables();
+                   // modal.setTextoPane1(this.getTextoVariables());
+                  //  modal.setVisible(true);
+                  mostrarPanelGrafico();
                 }else{
                     ventana.getTabbedPane().setSelectedIndex(0);
-                    JOptionPane.showConfirmDialog(this, "El listado de variables no esta bien formado");
+                    JOptionPane.showMessageDialog(this, "El listado de variables no esta bien formado");
                 }
                 break;
             }
             case 2:{
                 if(tabGrafico.getDAD().isArbolBienFormado()){
                     // CAMBIO DE PAGINA
-                    mostrarPanelDeModeladoLSP();
+                    mostrarPanelDeInstanciadoLSP();
                 }else{
                     ventana.getTabbedPane().setSelectedIndex(1);//nota: hacer ponderacion automatica
-                    JOptionPane.showMessageDialog(this, "La funcion de Evaluacion no esta correcta.\n- Asigne todas las variables,-Respete el dominio[2,5] de cada operador\nY recuerde que la raíz de el árbol debe ser unica.");
+                    JOptionPane.showMessageDialog(this, "¡La funcion de Evaluacion no esta correcta!    1) Asigne todas las variables.    2) Respete la cardinalidad del dominio de cada operador [2,5].     3) Recuerde que la raíz de el árbol debe ser unica.");
                 }
                 break;
             }

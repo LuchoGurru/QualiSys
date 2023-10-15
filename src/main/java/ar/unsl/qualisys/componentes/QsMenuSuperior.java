@@ -4,7 +4,7 @@
  */
 package ar.unsl.qualisys.componentes;
 
-import ar.unsl.qualisys.paneles.QsTextPanel;
+import ar.unsl.qualisys.paneles.texto.QsTextPanel;
 import ar.unsl.qualisys.frames.QsFrame;
 import ar.unsl.qualisys.paneles.grafo.QsGraphicPanel;
 import ar.unsl.qualisys.paneles.QsEvaluacionPanel;
@@ -74,7 +74,6 @@ public class QsMenuSuperior extends JPanel {
     public void barraDeMenu(){
         //JMenus
         JMenu archivo = new JMenu("Archivo");
-        JMenu edicion = new JMenu("Edicion");
         JMenu herramientas = new JMenu("Herramientas");
         JMenu ayuda = new JMenu("Ayuda");
         QsMenuSuperior instancia = this;
@@ -107,25 +106,28 @@ public class QsMenuSuperior extends JPanel {
         JMenuItem buscarEdicion = new JMenuItem("Buscar");
         JMenuItem deshacerEdicion = new JMenuItem("Deshacer");
         JMenuItem rehacerEdicion = new JMenuItem("Rehacer");
+        JMenuItem actualizarEdicion = new JMenuItem("Actualizar");
         //atajo
         buscarEdicion.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
         deshacerEdicion.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
         //rehacerEdicion.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
 
         // Agregamos al menu edicion
-        edicion.add(buscarEdicion);
-        edicion.add(deshacerEdicion);
-        edicion.add(rehacerEdicion);
+        herramientas.add(buscarEdicion);
+        herramientas.add(deshacerEdicion);
+        herramientas.add(rehacerEdicion);
+        herramientas.add(actualizarEdicion);
 
         //JMenuItems: Ayuda
         JMenuItem listaComandos = new JMenuItem("Lista de comandos");
+        JMenuItem contactoDesarrollador = new JMenuItem("Contacto con el desarrolador");
         ayuda.add(listaComandos);
+        ayuda.add(contactoDesarrollador);
 
         //Agrego la barra al panel
         //this.add(BorderLayout.NORTH);
         //Se agregan los menus a la barra
         barra.add(archivo);
-        barra.add(edicion);
         barra.add(herramientas);
         barra.add(ayuda);
         this.add(barra,BorderLayout.NORTH);
