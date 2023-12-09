@@ -19,33 +19,51 @@ import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
+import org.json.JSONObject;
 
 public class QsVariable extends QsNodo{
-    String nombre;
+    String descripcion;
     String nombreGrupo;// Categoría de la variable 
     private QsDadPanel GUIParent; // Solo se asigna en caso de que sea hijo del componente DAD (Drag and Drop).
     private JPopupMenu menuDesplegable = new JPopupMenu();
-
-    public QsVariable (QsDadPanel parent, double x, double y,String id,String nombre){
+    private int orden;
+    
+    public QsVariable (QsDadPanel parent, double x, double y,String name,String descripcion,int orden){
         this.menuPopUp();
-        this.setName("var_" + id); 
+        this.setName(name); 
         this.GUIParent = parent;
-        this.nombre=nombre;
+        this.descripcion=descripcion;
+        this.orden=orden;
         this.setBounds((int)x,(int)y,80,30);
         this.setBackground(Color.getHSBColor(238, 238, 238));
         //this.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         ClickListener clickListener = new ClickListener(this);
         this.addMouseListener(clickListener);
-        this.setToolTipText(this.nombre);
+        this.setToolTipText(this.descripcion);
     }
 
+    public QsVariable (QsDadPanel parent, double x, double y,String name,String descripcion,int orden, float ponderacion){
+        this.menuPopUp();
+        this.setName(name); 
+        this.GUIParent = parent;
+        this.descripcion=descripcion;
+        this.orden=orden;
+        this.setBounds((int)x,(int)y,80,30);
+        this.setBackground(Color.getHSBColor(238, 238, 238));
+        this.setPonderacion(ponderacion);
+        //this.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        ClickListener clickListener = new ClickListener(this);
+        this.addMouseListener(clickListener);
+        this.setToolTipText(this.descripcion);
+    }
+    
     /*                                                     *
      *  -------------------- GUI WORK ---------------------* 
      *                                                     */
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        String numeracion = this.getName().split("_")[1];
+        String numeracion = this.getName();
         g.drawString(numeracion , 10, 20);
         
         
@@ -126,11 +144,11 @@ public class QsVariable extends QsNodo{
     
 
     public String getNombre() {
-        return nombre;
+        return descripcion;
     }
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        this.descripcion = nombre;
     }
 
     public QsDadPanel getGUIParent() {
@@ -140,6 +158,26 @@ public class QsVariable extends QsNodo{
     public void setGUIParent(QsDadPanel GUIParent) {
         this.GUIParent = GUIParent;
     }
+
+    public int getOrden() {
+        return orden;
+    }
+
+    public void setOrden(int orden) {
+        this.orden = orden;
+    }
     
+    public JSONObject toJSON(){
+        JSONObject jsonVar= new JSONObject();
+        jsonVar.put("name", this.getName()); // var_1.n.n
+        jsonVar.put("descripcion", this.descripcion);
+        jsonVar.put("x", this.getBounds().x);
+        jsonVar.put("y", this.getBounds().y);
+        jsonVar.put("orden",this.orden);
+        jsonVar.put("padreID",this.getPadreID());
+        System.out.println("this.getPonderacion() = " + this.getPonderacion());
+        jsonVar.put("ponderacion",this.getPonderacion());
+        return jsonVar;
+    }
     
 }

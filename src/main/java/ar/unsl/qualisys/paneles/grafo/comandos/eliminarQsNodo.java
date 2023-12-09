@@ -5,10 +5,8 @@
 package ar.unsl.qualisys.paneles.grafo.comandos;
 
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
-import ar.unsl.qualisys.componentes.nodos.QsOperator;
+import ar.unsl.qualisys.componentes.nodos.QsOperador;
 import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 /**
@@ -25,7 +23,7 @@ public class eliminarQsNodo implements IComando {
     }
     @Override
     public void ejecutar() {   
-        QsOperator opSelec = (QsOperator) this.pizzarra.getNodoSeleccionado();
+        QsOperador opSelec = (QsOperador) this.pizzarra.getNodoSeleccionado();
         String padreViejo = opSelec.getPadreID();
         if(!padreViejo.equals("")){ // Si tenia padre
             ArrayList<QsNodo> hermanos = this.pizzarra.getRelPadreHijos().get(padreViejo);

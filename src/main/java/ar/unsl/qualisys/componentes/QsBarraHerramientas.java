@@ -4,15 +4,16 @@
  */
 package ar.unsl.qualisys.componentes;
 
-import ar.unsl.qualisys.paneles.texto.QsTextPanel;
+import LSP.QsInstancia;
+import ar.unsl.qualisys.componentes.nodos.QsNodo;
+import ar.unsl.qualisys.componentes.nodos.QsOperador;
+import ar.unsl.qualisys.componentes.nodos.QsVariable;
 import ar.unsl.qualisys.frames.QsFrame;
-import ar.unsl.qualisys.paneles.grafo.QsGraphicPanel;
-import ar.unsl.qualisys.paneles.QsEvaluacionPanel;
-import ar.unsl.qualisys.paneles.texto.memento.CaretTaker;
-import ar.unsl.qualisys.paneles.texto.memento.Memento;
-import ar.unsl.qualisys.paneles.texto.memento.Originator;
-import ar.unsl.qualisys.utils.Item;
-import java.awt.BorderLayout;
+import ar.unsl.qualisys.paneles.*;
+import ar.unsl.qualisys.paneles.texto.*;
+import ar.unsl.qualisys.paneles.grafo.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.awt.Color;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
@@ -26,6 +27,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -49,6 +53,8 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledEditorKit;
 import javax.swing.undo.UndoManager;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  *
@@ -193,24 +199,40 @@ public class QsBarraHerramientas extends JToolBar{
                 editManager.addEdit(undoableEditEvent.getEdit());
             }
         });
-          
+        
         deshacer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                CaretTaker caretaker = tabTexto.getCaretTaker();
-                Originator originator = tabTexto.getOriginator();
-                // Undo
-                Memento undoMemento = caretaker.undo();
-                if (undoMemento != null) {
-                    originator.restaurar(undoMemento);
-                    //System.out.println("Undo: " + originator.getEstado().getTexto() + " "+originator.getEstado().getPos());
-                    //Actualizo interfaz
-                    
-                   // tabTexto.getJTextPanel().setText(originator.getEstado().getTexto());
-                   // tabTexto.getJTextPanel().setCaretPosition(originator.getEstado().getPos());
-                    tabTexto.setTextoConCaret(originator.getEstado().getTexto(),originator.getEstado().getPos()+1); //ajusto pq se corre
-                    //tabTexto.getJTextPanel().setCaretPosition();
+                int tab = ventana.getTabbedPane().getSelectedIndex(); //ventana = this.ventana;
+                if(tab == 0){
+                    ar.unsl.qualisys.paneles.texto.memento.CaretTaker caretaker = tabTexto.getCaretTaker();
+                    ar.unsl.qualisys.paneles.texto.memento.Originator originator = tabTexto.getOriginator();
+                    ar.unsl.qualisys.paneles.texto.memento.Memento undoMemento = caretaker.undo();                    // Undo
+                    if (undoMemento != null) {
+                        originator.restaurar(undoMemento);
+                        //System.out.println("Undo: " + originator.getEstado().getTexto() + " "+originator.getEstado().getPos());
+                        //Actualizo interfaz
+
+                       // tabTexto.getJTextPanel().setText(originator.getEstado().getTexto());
+                       // tabTexto.getJTextPanel().setCaretPosition(originator.getEstado().getPos());
+                        tabTexto.setTextoConCaret(originator.getEstado().getTexto(),originator.getEstado().getPos()+1); //ajusto pq se corre
+                        //tabTexto.getJTextPanel().setCaretPosition();
+                    }
+                }else if(tab == 1){
+//                    ar.unsl.qualisys.paneles.grafo.memento.CaretTaker caretaker = tabGrafico.getDAD().getCaretTaker();
+//                    ar.unsl.qualisys.paneles.grafo.memento.Originator originator = tabGrafico.getDAD().getOriginator();
+//                    ar.unsl.qualisys.paneles.grafo.memento.Memento undoMemento = caretaker.undo();
+//                    if (undoMemento != null) {
+//                        originator.restaurar(undoMemento);
+//                        tabGrafico.getDAD().setVariables(originator.getEstado().getVariables());
+//                        tabGrafico.getDAD().setOperadores(originator.getEstado().getOperadores());
+//                        tabGrafico.getDAD().setRelPadreHijos(originator.getEstado().getRelPadreHijos());
+//                         tabGrafico.getDAD().repaint();  
+//                    }
+//                    
                 }
+                
+                
         
                 
             }
@@ -219,20 +241,34 @@ public class QsBarraHerramientas extends JToolBar{
         rehacer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                CaretTaker caretaker = tabTexto.getCaretTaker();
-                Originator originator = tabTexto.getOriginator();
-                // Redo
-                Memento redoMemento = caretaker.redo();
-                if (redoMemento != null) {
-                    originator.restaurar(redoMemento);
-                    //System.out.println("Redo: " + originator.getEstado());
-                    //Actualizo interfaz
-                //    tabTexto.getJTextPanel().setText(originator.getEstado().getTexto());
-                   // tabTexto.getJTextPanel().setCaretPosition(originator.getEstado().getPos());
-                   
-                    tabTexto.setTextoConCaret(originator.getEstado().getTexto(),originator.getEstado().getPos()+1); //ajusto pq se corre
+                int tab = ventana.getTabbedPane().getSelectedIndex(); //ventana = this.ventana;
+                if(tab == 0){
+                    ar.unsl.qualisys.paneles.texto.memento.CaretTaker caretaker = tabTexto.getCaretTaker();
+                    ar.unsl.qualisys.paneles.texto.memento.Originator originator = tabTexto.getOriginator();
+                    ar.unsl.qualisys.paneles.texto.memento.Memento redoMemento = caretaker.redo();                    // Redo
+                    if (redoMemento != null) {
+                        originator.restaurar(redoMemento);
+                        //System.out.println("Redo: " + originator.getEstado());
+                        //Actualizo interfaz
+                    //    tabTexto.getJTextPanel().setText(originator.getEstado().getTexto());
+                       // tabTexto.getJTextPanel().setCaretPosition(originator.getEstado().getPos());
 
-                    
+                        tabTexto.setTextoConCaret(originator.getEstado().getTexto(),originator.getEstado().getPos()+1); //ajusto pq se corre
+
+
+                    }
+                }else if(tab == 1){
+                
+//                    ar.unsl.qualisys.paneles.grafo.memento.CaretTaker caretaker = tabGrafico.getDAD().getCaretTaker();
+//                    ar.unsl.qualisys.paneles.grafo.memento.Originator originator = tabGrafico.getDAD().getOriginator();
+//                    ar.unsl.qualisys.paneles.grafo.memento.Memento redoMemento = caretaker.redo();
+//                    if (redoMemento != null) {
+//                        originator.restaurar(redoMemento);
+//                        tabGrafico.getDAD().setVariables(originator.getEstado().getVariables());
+//                        tabGrafico.getDAD().setOperadores(originator.getEstado().getOperadores());
+//                        tabGrafico.getDAD().setRelPadreHijos(originator.getEstado().getRelPadreHijos());
+//                        tabGrafico.getDAD().repaint();  
+//                    }
                 }
             }
         });
@@ -305,8 +341,9 @@ public class QsBarraHerramientas extends JToolBar{
     public void manejarCambioDePagina(int pagina){
         switch(pagina){
             case 1:{
-                tabTexto.setTextoConCaret(tabTexto.getJTextPanel().getText(),tabTexto.getJTextPanel().getCaretPosition()); // para activar el F5
+               // tabTexto.setTextoConCaret(tabTexto.getJTextPanel().getText(),tabTexto.getJTextPanel().getCaretPosition()); // para activar el F5
 
+                
                 if(tabTexto.isTextoBienFormado()){
                    // QsVistaPreviaModal modal = new QsVistaPreviaModal(ventana,this,"Vista Previa:",true);
                    // getTextoVariables();
@@ -359,7 +396,15 @@ public class QsBarraHerramientas extends JToolBar{
             manejarCambioDePagina(siguiente);
         }
     }
+    
     private void abrirArchivo(){
+        
+        
+        /*En esta parte tenemos que leer una estructura JSON */
+        
+         
+        
+        String cadena="";
         JFileChooser fileExplorer = new JFileChooser(); // Elector de archivos
         JMenuBar barra = new JMenuBar();
         FileNameExtensionFilter fileExtensions = new FileNameExtensionFilter("Archivos de calidad", "txt"); // Filtro de archivos
@@ -368,47 +413,250 @@ public class QsBarraHerramientas extends JToolBar{
         if (selected == fileExplorer.APPROVE_OPTION) {
             File fichero = fileExplorer.getSelectedFile();
             try (FileReader arch = new FileReader(fichero)) {
-                String cadena = "";
+                cadena = "";
                 int valor = arch.read();
                 while (valor != -1) {
                     cadena = cadena + (char) valor;
                     valor = arch.read();
                 }
-                tabTexto.setTexto(cadena);
+            //    tabTexto.setTexto(cadena);
                 arch.close();
             } catch (IOException ex) {
                 System.out.println("no file");
             }
         }
-    }
-    private void guardarArchivo(){
-        /*    JFileChooser fileChooser = new JFileChooser();
-                int selected = fileChooser.showSaveDialog(barra); // componente padre
-                if (selected == fileChooser.APPROVE_OPTION) {
-                    File fichero = fileChooser.getSelectedFile();
-                    if (fichero.exists()) {
-                        int abrir = JOptionPane.showConfirmDialog(null, "El fichero ya Existe");
-                    } else {
-                        File dir = fichero.getParentFile();
-                        dir.mkdir();
-                        try {
-                            fichero.createNewFile();
-                        } catch (IOException ex) {
-                            System.out.println("No se pudo crear");
-                        }
-                    }
-                    try {
-                        FileWriter f = new FileWriter(fichero);
-                        String texto = panelDeTexto.getText();
-                        String lineas[] = texto.split("\n");
-                        for (String linea : lineas) {
-                            f.write(linea + "\n");
-                        }
-                        f.close();
-                    } catch (IOException ex) {
-                        System.out.println("No se pudo escribir el fichero");
-                    }
-                }*/
-    }
-}          
+        
+        if(!cadena.equals("")){
+            JSONObject sesion = new JSONObject(cadena);
+            this.tabTexto.setTexto(sesion.getString("texto"));
+//            String texto = this.tabTexto.getJTextPanel().getText();
+            ArrayList<QsVariable> variablesList  = this.tabGrafico.getDAD().getListaVariables();//ordenada
+            
+// Map<String, QsOperador> operadores = this.tabGrafico.getDAD().getOperadores();
+            Map<String, ArrayList<QsNodo>> relPadreHijos = this.tabGrafico.getDAD().getRelPadreHijos();
+            ArrayList<QsInstancia> instancias = this.tabInstanciado.getInstancias();
 
+            System.out.println(sesion.getString("texto"));
+
+            JSONObject nodos = sesion.getJSONObject("nodos");
+            
+            HashMap<String, QsVariable> mapaDeVariables = new HashMap();
+            JSONArray variables = nodos.getJSONArray("variables");
+            for(Object var : variables){
+                JSONObject opJson = (JSONObject) var;
+                QsVariable qsVar = new QsVariable(this.tabGrafico.getDAD(),
+                opJson.getInt("x"),
+                opJson.getInt("y"),
+                opJson.getString("name"),
+                opJson.getString("descripcion"),
+                opJson.getInt("orden"),
+                opJson.getFloat("ponderacion")
+                
+                );
+                    // FALTA EL padre ID + el Valor de la ponderacion 
+                System.out.println("-------------------------");
+              //  System.out.println(opJson.getString("padreID"));
+              //  System.out.println(opJson.getFloat("ponderacion"));
+              //  qsVar.setPadreID(opJson.getString("padreID"));
+              //  qsVar.setPonderacion(opJson.getFloat("ponderacion"));
+                mapaDeVariables.put(qsVar.getName(), qsVar);
+            }   
+             
+            
+            HashMap<String,ArrayList<QsNodo>> relPadreHijosSinVars = new HashMap<>();
+            JSONArray operadores = nodos.getJSONArray("operadores");
+            for(Object op : operadores){
+                JSONObject opJson = (JSONObject) op;
+                System.out.println(opJson.get("name"));
+                QsOperador qsOp = new QsOperador(this.tabGrafico.getDAD(),
+                    0, // name que despues lo reemplazo
+                    opJson.getString("nombre"),
+                    opJson.getString("symbol"),
+                    opJson.getFloat("d"),
+                    opJson.getDouble("r2"),
+                    opJson.getDouble("r3"),
+                    opJson.getDouble("r4"),
+                    opJson.getDouble("r5"),
+                    opJson.getFloat("ponderacion")
+                );
+                qsOp.setName(opJson.getString("name"));
+                QsDadPanel.cantOperadores ++;
+                int x = opJson.getInt("x") ;
+                int y = opJson.getInt("y") ;
+                int width = opJson.getInt("width") ;
+                int height = opJson.getInt("height");
+                qsOp.setBounds(x,y,width,height);
+                qsOp.setBackground(Color.white);
+                this.tabGrafico.getDAD().addOperator(qsOp);
+            }        
+            
+            this.tabGrafico.getDAD().repaint();
+            
+            JSONArray relaciones = nodos.getJSONArray("relaciones");
+            /*
+            //Si hay al menos una cosa, voy a empezar desde el operador _ op0
+            int cantOperadores = 0 ;
+            for(Object rel : relaciones){
+                JSONObject relJson = (JSONObject) rel;
+                String padreID = "op_"+cantOperadores;
+                JSONArray hijos = relJson.getJSONArray("hijos");
+                                        System.out.println("sdasadsadsadsadsadsad");
+
+                for( Object h : hijos ){
+                    String hijoID = "" + h;
+                    System.out.println(hijoID);
+                    if(hijoID.contains(".")){ // variable
+                        QsVariable varHija = mapaDeVariables.get(hijoID);
+                        varHija.setPadreID(padreID);
+                        relPadreHijos.get(padreID).add(varHija); 
+                    }else{
+                        QsOperador opHijo = this.tabGrafico.getDAD().getOperadores().get(hijoID);
+                        opHijo.setPadreID(padreID);
+                        relPadreHijos.get(padreID).add(opHijo); 
+                    }
+                }
+                //            var get var add a la lista de relaciones .
+                
+                
+                cantOperadores ++;
+                
+            }*/
+            
+            for(Object rel : relaciones){
+                JSONObject relJson = (JSONObject) rel;
+                String padreID = relJson.getString("padreID");
+                JSONArray hijos = relJson.getJSONArray("hijos");
+
+                for( Object h : hijos ){
+                    String hijoID = "" + h;
+                    System.out.println(hijoID);
+                    if(hijoID.contains(".")){ // variable
+                        QsVariable varHija = mapaDeVariables.get(hijoID);
+                        varHija.setPadreID(padreID);
+                        relPadreHijos.get(padreID).add(varHija); 
+                    }else{
+                        QsOperador opHijo = this.tabGrafico.getDAD().getOperadores().get(hijoID);
+                        opHijo.setPadreID(padreID);
+                        relPadreHijos.get(padreID).add(opHijo); 
+                    }
+                }
+                //            var get var add a la lista de relaciones . 
+             //   cantOperadores ++; 
+            }
+            
+            
+            
+            
+            
+        }
+        
+        
+        
+        
+    }
+    /**
+    {
+           "texto" : "
+      
+           ",
+           "nodos" : {
+               "variables":[],
+               "operadores":[],
+               "relaciones":[
+                   {"padre0":["hijoID1","hijo2","hijo3"]}
+               ]
+           },
+           "instancias" : [
+                {"nombre":[0,1,2,3,4,5,6,7,8,9]}
+            ]
+    }
+     */
+    private void guardarArchivo(){
+        
+        JSONObject sesion = new JSONObject();
+        JSONObject nodos = new JSONObject();
+        JSONArray jsonVariables = new JSONArray();
+        JSONArray jsonOperadores = new JSONArray();
+        JSONArray jsonRelaciones = new JSONArray();
+        JSONArray jsonInstancias = new JSONArray();
+        
+        String texto = this.tabTexto.getJTextPanel().getText();
+        ArrayList<QsVariable> variablesList  = this.tabGrafico.getDAD().getListaVariables();//ordenada
+        Map<String, QsOperador> operadores = this.tabGrafico.getDAD().getOperadores();
+        Map<String, ArrayList<QsNodo>> relPadreHijos = this.tabGrafico.getDAD().getRelPadreHijos();
+        ArrayList<QsInstancia> instancias = this.tabInstanciado.getInstancias();
+
+        for(QsVariable v : variablesList ){
+            System.out.println("v = " + v.getName());
+            System.out.println("v = " + v.getNombre());
+            jsonVariables.put(v.toJSON());
+        }
+        
+        ArrayList<QsOperador> operadoresList = new ArrayList<>(operadores.values());
+        
+        for(QsOperador o : operadoresList ){
+            System.out.println("v = " + o.getName());
+            System.out.println("v = " + o.getNombre());
+            jsonOperadores.put(o.toJSON());
+        }
+        
+        ArrayList<String> padresList = new ArrayList<>(relPadreHijos.keySet());
+        
+        for(String p : padresList){
+            JSONArray rel = new JSONArray();
+            for(QsNodo nodoh : relPadreHijos.get(p)){            //recorro hijos
+
+                rel.put(nodoh.getName());// Identificador de los nodos
+            }
+            JSONObject relacionPH = new JSONObject();
+            relacionPH.put("padreID",p ); // Creo el objeto relacion con el padre correspondiente
+            relacionPH.put("hijos", rel);
+            jsonRelaciones.put(relacionPH);
+        }
+        
+        for(QsInstancia i: instancias ){
+            JSONArray valoresI = new JSONArray();
+            for(Float valor : i.getValores()){            
+                valoresI.put(valor);// Armo listo de valores
+            }
+            JSONObject relacionPH = new JSONObject();
+            relacionPH.put(i.getNombre(),valoresI); // Creo el objeto instancia con el nombre correspondiente
+            jsonInstancias.put(relacionPH);
+        }
+        
+        sesion.put("texto",texto) ;
+        nodos.put("variables",jsonVariables);
+        nodos.put("operadores",jsonOperadores);
+        nodos.put("relaciones",jsonRelaciones);
+        sesion.put("nodos", nodos);
+        sesion.put("instancias", jsonInstancias);
+        
+        JFileChooser fileChooser = new JFileChooser();
+        int selected = fileChooser.showSaveDialog(this); // componente padre
+        if (selected == fileChooser.APPROVE_OPTION) {
+            File fichero = fileChooser.getSelectedFile();
+            if (fichero.exists()) {
+                int abrir = JOptionPane.showConfirmDialog(null, "El fichero ya Existe");
+            } else {
+                File dir = fichero.getParentFile();
+                dir.mkdir();
+                try {
+                    fichero.createNewFile();
+                } catch (IOException ex) {
+                    System.out.println("No se pudo crear");
+                }
+            }
+            try {
+                FileWriter f = new FileWriter(fichero);
+                String jsonString = sesion.toString();
+                String lineas[] = jsonString.split("\n");
+                for (String linea : lineas) {
+                    f.write(linea + "\n");
+                }
+                f.close();
+            } catch (IOException ex) {
+                System.out.println("No se pudo escribir el fichero");
+            }
+        }
+    }
+}

@@ -111,8 +111,7 @@ public class QsFrame extends JFrame{
      * Llamar antes de cambiar la pestaña
      */
     public void initPanelGrafico(){
-        if(tabTexto.isTextoBienFormado()){
-            
+        if(tabTexto.isTextoBienFormado()){ 
             this.tabGrafico.setVariables(tabTexto.getVariables()); 
         }
     }
@@ -125,7 +124,7 @@ public class QsFrame extends JFrame{
         //this.tabInstancias.setVars(vars);
         ArrayList<QsVariable> vars = new ArrayList<QsVariable>();
         for(Item item : tabTexto.getVariables()){
-            QsVariable var = new QsVariable(this.tabGrafico.getDAD(), 50, 0, item.getNumeration(),item.getCadenaDeTexto());
+            QsVariable var = new QsVariable(this.tabGrafico.getDAD(), 50, 0, item.getNumeration(),item.getCadenaDeTexto(),item.getNumeroDeLinea());
             vars.add(var);
         }
         this.tabInstancias.setVars(vars);

@@ -24,13 +24,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
+import org.json.JSONObject;
 
 /**
  * Esta clase forma parte de los operadores 
  * tiene un nombre un symbolo, 
  * @author luciano.gurruchaga
  */
-public class QsOperator extends QsNodo implements QsOperacion{
+public class QsOperador extends QsNodo implements QsOperacion{
     
     private QsDadPanel DADParent; // Solo se asigna en caso de que sea hijo del componente DAD (Drag and Drop).
     private QsOperatorsPanel OPParent; // Solo se asigna en caso de que sea hijo del componente DAD (Drag and Drop).
@@ -46,10 +47,10 @@ public class QsOperator extends QsNodo implements QsOperacion{
     private JPopupMenu menuDesplegable = new JPopupMenu();
     // private ArrayList<JPanel> dominio = new ArrayList<>();; //nodo hijo// Recibe un maximo de 5 argum 
     
-    public QsOperator(JPanel GUIparent, int id,String nombre,String symbol, float d, double r2, double r3, double r4, double r5){
+    public QsOperador(JPanel GUIparent, int name,String nombre,String symbol, float d, double r2, double r3, double r4, double r5){
         super();
         this.menuPopUp();
-        this.setName("op_" + id); 
+        this.setName("op_" + name); 
         this.padreID = "";
         this.symbol = symbol;
         this.nombre = nombre;
@@ -72,6 +73,33 @@ public class QsOperator extends QsNodo implements QsOperacion{
         this.setToolTipText(this.nombre);
 
     } 
+    
+    public QsOperador(JPanel GUIparent, int name,String nombre,String symbol, float d, double r2, double r3, double r4, double r5,float ponderacion){
+        super();
+        this.menuPopUp();
+        this.setName("op_" + name); 
+        this.padreID = "";
+        this.symbol = symbol;
+        this.nombre = nombre;
+        this.d = d;
+        this.r2=r2;
+        this.r3=r3;
+        this.r4=r4;
+        this.r5=r5;
+        this.setPonderacion(ponderacion);
+        if(GUIparent.getClass() == QsDadPanel.class){ 
+            this.DADParent = (QsDadPanel) GUIparent;     // Para usar los metodos del DandD directamente
+        }else{
+            this.OPParent = (QsOperatorsPanel) GUIparent;
+        }
+        this.setPreferredSize(new Dimension(51,51));
+        ClickListener clickListener = new ClickListener(this);
+        this.addMouseListener(clickListener);
+//        DragListener dragListener = new DragListener(this);
+   //     this.addMouseMotionListener(dragListener);
+        this.setToolTipText(this.nombre);
+
+    }
     
     @Override
     public void paintComponent(Graphics g) {
@@ -186,8 +214,8 @@ public class QsOperator extends QsNodo implements QsOperacion{
        return added; ctrl +8
    }     */
     private class ClickListener extends MouseAdapter {
-        private QsOperator qsOpInstance;
-        public ClickListener(QsOperator qsOpInstance){
+        private QsOperador qsOpInstance;
+        public ClickListener(QsOperador qsOpInstance){
             this.qsOpInstance = qsOpInstance;
         }
         /**
@@ -352,6 +380,24 @@ public class QsOperator extends QsNodo implements QsOperacion{
     public void setR5(double r5) {
         this.r5 = r5;
     }
-
+    
+    public JSONObject toJSON(){
+        JSONObject jsonVar= new JSONObject();
+        jsonVar.put("name", this.getName()); // var_1.n.n
+        jsonVar.put("nombre", this.nombre);
+        jsonVar.put("symbol", this.symbol);
+        jsonVar.put("d", this.d);
+        jsonVar.put("r2",this.r2);
+        jsonVar.put("r3",this.r3);
+        jsonVar.put("r4",this.r4);
+        jsonVar.put("r5",this.r5);
+        jsonVar.put("x",this.getBounds().x);
+        jsonVar.put("y",this.getBounds().y);
+        jsonVar.put("width",this.getBounds().width);
+        jsonVar.put("height",this.getBounds().height);
+        jsonVar.put("padreID",this.getPadreID());
+        jsonVar.put("ponderacion",this.getPonderacion());
+        return jsonVar;
+    }
     
 }

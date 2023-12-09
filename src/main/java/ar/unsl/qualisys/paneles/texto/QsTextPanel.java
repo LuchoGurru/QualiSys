@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
@@ -43,6 +44,7 @@ public class QsTextPanel extends JPanel {
 
     private static boolean TURN_OFF_LISTENERS = false;
 
+    private JPanel esta;
     private JTextPane panelDeTexto;
 
     private Originator originator;
@@ -51,13 +53,13 @@ public class QsTextPanel extends JPanel {
     private ArrayList<Item> renglones;
     private Item renglonActual;
     private QsFrame parent;
-
     /**
      * Constructor Panel de Texto - Menu popup
      */
     public QsTextPanel(QsFrame parent) {
         this.setLayout(new BorderLayout());
         this.parent = parent;
+        esta=this;
         panelDeTexto = new JTextPane() {
 
             @Override
@@ -74,12 +76,33 @@ public class QsTextPanel extends JPanel {
         originator = new Originator();
         caretTaker = new CaretTaker();
         cantidadPalabras = 0;
+        EstadoTexto nuevoEstado = new EstadoTexto(panelDeTexto.getText(), panelDeTexto.getCaretPosition());
+        originator.setEstado(nuevoEstado);
+        caretTaker.addMemento(originator.guardar());
         //     this.add(new QsBarraHerramientas(this.parent,null), BorderLayout.NORTH);
         textContent();
         menuPopUp();
         this.setVisible(true);
     }
+/*
+    @Override
+    protected void paintComponent(Graphics g) {
+        System.out.println("TEEEEEEEEEESISSS y BOOOOOOOOOCAAAAA ");
+       // int cantPalabrasActual = contarPalabras(panelDeTexto.getText());
+ 
+       String texto = panelDeTexto.getText();
 
+       // if (cantPalabrasActual != cantidadPalabras) {
+        //    cantidadPalabras = cantPalabrasActual;
+        
+            EstadoTexto nuevoEstado = new EstadoTexto(texto, panelDeTexto.getCaretPosition());
+            originator.setEstado(nuevoEstado);
+                           if (TURN_OFF_LISTENERS == false) {
+
+            caretTaker.addMemento(originator.guardar());
+        }
+    }
+*/
     public void menuPopUp() {
         JPopupMenu contextual = new JPopupMenu();
 
@@ -231,28 +254,43 @@ public class QsTextPanel extends JPanel {
                 } else if (ctrlPressed && ke.getKeyCode() == KeyEvent.VK_ENTER) {
                     if (TURN_OFF_LISTENERS == false) {
                         TURN_OFF_LISTENERS = true;
+                        EstadoTexto nuevoEstado = new EstadoTexto(panelDeTexto.getText(), panelDeTexto.getCaretPosition());
+                        originator.setEstado(nuevoEstado);
+                        caretTaker.addMemento(originator.guardar());
                         quitarNivelANumeracion();
                     }
                 } else if (shiftPressed && ke.getKeyCode() == KeyEvent.VK_TAB) {
                     if (TURN_OFF_LISTENERS == false) {
                         TURN_OFF_LISTENERS = true;
+                        EstadoTexto nuevoEstado = new EstadoTexto(panelDeTexto.getText(), panelDeTexto.getCaretPosition());
+                        originator.setEstado(nuevoEstado);
+                        caretTaker.addMemento(originator.guardar());
                         quitarNivelARenglon();
                     }
                 } else if (shiftPressed && ke.getKeyCode() == KeyEvent.VK_ENTER) {
                     if (TURN_OFF_LISTENERS == false) {
                         TURN_OFF_LISTENERS = true;
+                        EstadoTexto nuevoEstado = new EstadoTexto(panelDeTexto.getText(), panelDeTexto.getCaretPosition());
+                        originator.setEstado(nuevoEstado);
+                        caretTaker.addMemento(originator.guardar());
                         agregarNivelANumeracion();
                     }
                 } else if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
                     ke.consume(); // PARA QUE NO ME TOME EL ENTER, lo hago manual
                     if (TURN_OFF_LISTENERS == false) {
                         TURN_OFF_LISTENERS = true;
+                        EstadoTexto nuevoEstado = new EstadoTexto(panelDeTexto.getText(), panelDeTexto.getCaretPosition());
+                        originator.setEstado(nuevoEstado);
+                        caretTaker.addMemento(originator.guardar());
                         agregarNumeracionANivel();
                     }
                 } else if (ke.getKeyCode() == KeyEvent.VK_TAB) {
                     ke.consume(); // PARA QUE NO ME TOME EL ENTER, lo hago manual
                     if (TURN_OFF_LISTENERS == false) {
                         TURN_OFF_LISTENERS = true;
+                        EstadoTexto nuevoEstado = new EstadoTexto(panelDeTexto.getText(), panelDeTexto.getCaretPosition());
+                        originator.setEstado(nuevoEstado);
+                        caretTaker.addMemento(originator.guardar());
                         agregarNivelARenglon();
                     }
                 }
@@ -283,12 +321,12 @@ public class QsTextPanel extends JPanel {
                     String texto = panelDeTexto.getText();
                     int cantPalabrasActual = contarPalabras(panelDeTexto.getText());
 
-                    if (cantPalabrasActual != cantidadPalabras) {
-                        cantidadPalabras = cantPalabrasActual;
+                //   if (cantPalabrasActual != cantidadPalabras) {
+                    //    cantidadPalabras = cantPalabrasActual;
                         EstadoTexto nuevoEstado = new EstadoTexto(texto, panelDeTexto.getCaretPosition());
                         originator.setEstado(nuevoEstado);
                         caretTaker.addMemento(originator.guardar());
-                    }
+                   // }
                     int lineaAnterior = renglonActual.getNumeroDeLinea(); // inicialmente 0
                     int offsetResultado = e.getOffset() + e.getLength();
                     int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto, offsetResultado);
@@ -371,12 +409,12 @@ public class QsTextPanel extends JPanel {
                     String texto = panelDeTexto.getText();
                     int cantPalabrasActual = contarPalabras(panelDeTexto.getText());
 
-                    if (cantPalabrasActual != cantidadPalabras) {
-                        cantidadPalabras = cantPalabrasActual;
+                   // if (cantPalabrasActual != cantidadPalabras) {
+                   //     cantidadPalabras = cantPalabrasActual;
                         EstadoTexto nuevoEstado = new EstadoTexto(texto, panelDeTexto.getCaretPosition());
                         originator.setEstado(nuevoEstado);
                         caretTaker.addMemento(originator.guardar());
-                    }
+                 //   }
                     int lineaAnterior = renglonActual.getNumeroDeLinea(); // inicialmente 0 
                     int offsetResultado = e.getOffset() + e.getLength();
                     int lineaNueva = JTextPaneUtils.getIndexLineNumberByOffset(panelDeTexto, offsetResultado);
@@ -414,7 +452,7 @@ public class QsTextPanel extends JPanel {
     }
 
     private boolean isRenglonBienFormado(String renglon) {
-        String regex = "^\\t*(\\d+\\.)+\\s.*(\\r\\n|\\r|\\n|^$)?$"; // para la mariconeada de windol! 
+        String regex = "^\\t*(\\d+\\.)+[ ].*(\\r\\n|\\r|\\n|^$)?$"; // para la mariconeada de windol! 
         System.out.println("renglon.matches(regex) = " + renglon.matches(regex));
         return renglon.matches(regex);
     }
@@ -741,7 +779,6 @@ public class QsTextPanel extends JPanel {
 
     public void setTextoConCaret(String texto, int caret) {
         if (TURN_OFF_LISTENERS == false) {
-
             TURN_OFF_LISTENERS = true;
             this.panelDeTexto.setText(texto);
             try {
@@ -753,17 +790,18 @@ public class QsTextPanel extends JPanel {
                 System.out.println("texto.length = " + texto.length());
                 this.panelDeTexto.setCaretPosition(texto.length());
             }
-            actualizarEstructuraDeTexto();//Le paso lineas distintas para que actualice todo el texto.
+            actualizarEstructuraDeTexto();//Le paso lineas distintas para que actualice todo el texto..
+            
         }
     }
 
     public boolean isTextoBienFormado() {
         String[] lineas = this.panelDeTexto.getText().split("\n");
         int i = 0;
-        while (isRenglonBienFormado(lineas[i]) && i < lineas.length - 1) {
+        while (i <= lineas.length - 1 && isRenglonBienFormado(lineas[i])) {
             i++;
         }
-        return i == lineas.length - 1;
+        return i == lineas.length ;
     }
 
     /**
@@ -771,7 +809,22 @@ public class QsTextPanel extends JPanel {
      *
      * @return
      */
-    public ArrayList<Item> getVariables() {
+    public ArrayList<Item> getVariables() { 
+        String texto = panelDeTexto.getText();
+        String[] lineas = texto.split("\n");
+        renglones = new ArrayList<>();
+        for (int i = 0; i < lineas.length; i++) {
+            renglonActual = armarItem(lineas[i], i); // init  
+            renglones.add(renglonActual);
+        }
+        
+        
+        
+        /*
+        if (TURN_OFF_LISTENERS == false) {
+            TURN_OFF_LISTENERS = true;
+            actualizarEstructuraDeTexto();//Le paso lineas distintas para que actualice todo el texto..
+        } */
         boolean primero = true;
         Item anterior = null;
         ArrayList<Item> rVariables = new ArrayList<>();

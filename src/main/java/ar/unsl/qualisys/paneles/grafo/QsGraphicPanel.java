@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import javax.swing.JPanel;
-import ar.unsl.qualisys.componentes.nodos.QsOperator;
+import ar.unsl.qualisys.componentes.nodos.QsOperador;
 import ar.unsl.qualisys.componentes.nodos.QsVariable;
 import ar.unsl.qualisys.frames.QsFrame;
 import ar.unsl.qualisys.utils.Item;
@@ -56,15 +56,15 @@ public class QsGraphicPanel extends JPanel {
         //TODO  AGREGAR VARIABLES 
         HashMap mapaDeVariables = new HashMap<String, QsVariable>();
         for(Item item : renglones){
-            QsVariable var = new QsVariable(DAD, 50, desplazamiento, item.getNumeration(),item.getCadenaDeTexto());
+            QsVariable var = new QsVariable(DAD, 50, desplazamiento, item.getNumeration(),item.getCadenaDeTexto(),item.getNumeroDeLinea());
             mapaDeVariables.put(var.getName(), var);
             desplazamiento+= 35;
         }
         this.DAD.setVariables(mapaDeVariables);
     }
     
-    public void agregarOperadorANulLayout(Point punto,QsOperator modelOperador){ 
-        QsOperator nuevoOperador = new QsOperator(DAD,
+    public void agregarOperadorANulLayout(Point punto,QsOperador modelOperador){ 
+        QsOperador nuevoOperador = new QsOperador(DAD,
                 DAD.cantOperadores,
                 modelOperador.getNombre(),
                 modelOperador.getSymbol(),

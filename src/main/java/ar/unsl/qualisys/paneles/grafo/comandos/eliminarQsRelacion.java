@@ -5,7 +5,7 @@
 package ar.unsl.qualisys.paneles.grafo.comandos;
 
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
-import ar.unsl.qualisys.componentes.nodos.QsOperator;
+import ar.unsl.qualisys.componentes.nodos.QsOperador;
 import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
 import java.util.ArrayList;
 

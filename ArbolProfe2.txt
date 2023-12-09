@@ -1,0 +1,20 @@
+1. Tareas/Actividades
+	1.1. Simples/Atómicas
+	1.2. Compuestas/Subprocesos
+2. Puntos de Sincronización del flujo de Ejecución
+	2.1. Puntos de Decisiones 
+	2.2. Puntos de Uniones 
+	2.3. Puntos de división en Ejecución Paralela y/o Concurrente
+3. Eventos
+	3.1. Eventos de Inicio
+	3.2. Eventos Intermedios
+	3.3. Eventos Finales
+4. Participantes / Actores
+	4.1. Internos
+		4.1.1. Número de Participantes/Actores
+		4.1.2. Comunicación entre Participantes/Actores 
+	4.2. Externos
+		4.2.1. Número de Participantes/Actores
+5. Recursos 
+	5.1. Producidos en el Proceso / Generados (Internos)
+	5.2. Externos

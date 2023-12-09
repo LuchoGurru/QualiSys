@@ -13,11 +13,18 @@ import GUIUtils.TableCustom;
 import LSP.QsInstancia;
 import ar.unsl.qualisys.componentes.nodos.QsVariable;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.event.FocusAdapter;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.HashMap;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -115,6 +122,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         System.out.println("Using toTableModel");
         int cols = this.instancias.size() + 1 ; // A grego columna de variables
         Object[] columnas = new Object[cols];
+        //Columnas
         for(int i=0;i<cols;i++){
             if(i==0)
                 columnas[i] = "Variables :";
@@ -123,7 +131,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         }
         DefaultTableModel tmodel = new DefaultTableModel(
                 columnas, 0);
-        
+        //Filas
         for (int i = 0; i < this.vars.size(); i++) {
             Object[] fila = new Object[cols]; 
             for(int j=0;j<cols;j++){
@@ -135,8 +143,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
              }
             tmodel.addRow(fila);           
         }
-        
-        
+         
        
         return tmodel;
     }
@@ -155,44 +162,144 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     }
     
     private void crearInstancia(String nombre){
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.addColumn(nombre);
         QsInstancia nuevaI = new QsInstancia(nombre, new ArrayList<>());
         for(int i = 0 ; i < this.vars.size();i++){
             nuevaI.getValores().add(0f);
-            model.setValueAt(0f, i, model.getColumnCount()-1); // Set "New York" in the first row, third column
+        //    model.setValueAt(0f, i, model.getColumnCount()-1); // Set "New York" in the first row, third column
         }
         this.instancias.add(nuevaI);
+        int cols = this.instancias.size() + 1 ; // A grego columna de variables
+        Object[] columnas = new Object[cols];
+        
+        for(int i=0;i<cols;i++){
+            if(i==0)
+                columnas[i] = "Variables :";
+            else
+                columnas[i] = this.instancias.get(i-1).getNombre();
+        }        
+        
+        DefaultTableModel tmodel = new DefaultTableModel(
+                columnas, 0);
+        //Filas
+        for (int i = 0; i < this.vars.size(); i++) {
+            Object[] fila = new Object[cols]; 
+            for(int j=0;j<cols;j++){
+                 if(j==0){
+                     fila[j] = this.vars.get(i).getNombre();
+                 }else{
+                     fila[j] = this.instancias.get(j-1).getValores().get(i);
+                 }    
+             }
+            tmodel.addRow(fila);           
+        }
+       
+        jTable1.setModel(tmodel);
+        for (int columnIndex = 1; columnIndex < jTable1.getColumnCount(); columnIndex++) {
+            jTable1.getColumnModel().getColumn(columnIndex).setCellEditor(new CustomCellEditor(new JTextField()));
+        }
+        
+        //DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        //model.addColumn(nombre);
+        //for(int i = 0 ; i < this.vars.size();i++){
+         //   nuevaI.getValores().add(0f);
+           // model.setValueAt(0f, i, model.getColumnCount()-1); // Set "New York" in the first row, third column
+       // }
+       // this.instancias.add(nuevaI);
     }
     private void eliminarInstancia(){
         if(instanciaSeleccionada > 0 ){
-            TableColumnModel columnasModel = jTable1.getColumnModel();
-              int[] selectedColumns = jTable1.getSelectedColumns();
-            for (int col : selectedColumns){ 
-                TableColumn column = columnasModel.getColumn(col);
-                columnasModel.removeColumn(column);
-                jTable1.removeColumn(column);
+        this.instancias.remove(instanciaSeleccionada -1 );
+        int cols = this.instancias.size() + 1 ; // A grego columna de variables
+        Object[] columnas = new Object[cols];
+        
+        for(int i=0;i<cols;i++){
+            if(i==0)
+                columnas[i] = "Variables :";
+            else
+                columnas[i] = this.instancias.get(i-1).getNombre();
+        }        
+        
+        DefaultTableModel tmodel = new DefaultTableModel(
+                columnas, 0);
+        //Filas
+        for (int i = 0; i < this.vars.size(); i++) {
+            Object[] fila = new Object[cols]; 
+            for(int j=0;j<cols;j++){
+                 if(j==0){
+                     fila[j] = this.vars.get(i).getNombre();
+                 }else{
+                     fila[j] = this.instancias.get(j-1).getValores().get(i);
+                 }    
+             }
+            tmodel.addRow(fila);           
+        }
+        jTable1.setModel(tmodel);
+    
+            
+            
+            
+            
+            
+//            TableColumnModel columnasModel = jTable1.getColumnModel();
+//              int[] selectedColumns = jTable1.getSelectedColumns();
+//            for (int col : selectedColumns){ 
+//                TableColumn column = columnasModel.getColumn(col);
+//                columnasModel.removeColumn(column);
+//                jTable1.removeColumn(column);
 
                 // Realiza operaciones en la columna seleccionada, por ejemplo:
                 // column.setMinWidth(50); // Establece el ancho mínimo de la columna
                 // column.setMaxWidth(200); // Establece el ancho máximo de la columna
-                }
+                //}
         }else{
             JOptionPane.showMessageDialog(this, "Seleccione una instancia de la tabla.");
         }
     }
-        private void modificarInstancia(String nuevoNombre){
+        private void modificarInstancia(String nombre){
         if(instanciaSeleccionada > 0 ){
-            TableColumnModel columnasModel = jTable1.getColumnModel();
-            int[] selectedColumns = jTable1.getSelectedColumns();
-            for (int col : selectedColumns){ 
-                TableColumn column = columnasModel.getColumn(col);
-                column.setHeaderValue(nuevoNombre);
+        this.instancias.get(instanciaSeleccionada -1 ).setNombre(nombre);
+        int cols = this.instancias.size() + 1 ; // A grego columna de variables
+        Object[] columnas = new Object[cols];
+        
+        for(int i=0;i<cols;i++){
+            if(i==0)
+                columnas[i] = "Variables :";
+            else
+                columnas[i] = this.instancias.get(i-1).getNombre();
+        }        
+        
+        DefaultTableModel tmodel = new DefaultTableModel(
+                columnas, 0);
+        //Filas
+        for (int i = 0; i < this.vars.size(); i++) {
+            Object[] fila = new Object[cols]; 
+            for(int j=0;j<cols;j++){
+                 if(j==0){
+                     fila[j] = this.vars.get(i).getNombre();
+                 }else{
+                     fila[j] = this.instancias.get(j-1).getValores().get(i);
+                 }    
+             }
+            tmodel.addRow(fila);           
+        }
+        jTable1.setModel(tmodel);
+    
+            
+            
+            
+            
+            
+//            TableColumnModel columnasModel = jTable1.getColumnModel();
+//              int[] selectedColumns = jTable1.getSelectedColumns();
+//            for (int col : selectedColumns){ 
+//                TableColumn column = columnasModel.getColumn(col);
+//                columnasModel.removeColumn(column);
+//                jTable1.removeColumn(column);
+
                 // Realiza operaciones en la columna seleccionada, por ejemplo:
                 // column.setMinWidth(50); // Establece el ancho mínimo de la columna
                 // column.setMaxWidth(200); // Establece el ancho máximo de la columna
-                }
-            jTable1.getTableHeader().repaint();
+                //}
         }else{
             JOptionPane.showMessageDialog(this, "Seleccione una instancia de la tabla.");
         }
@@ -255,6 +362,14 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         model.addRow(new Object[]{42, "Singaporean Hokkien Fried Mee", "Seafood", 19, 39});
         model.addRow(new Object[]{43, "Ipoh Coffee", "Seafood", 19, 39});
         */
+    }
+
+    public ArrayList<QsInstancia> getInstancias() {
+        return instancias;
+    }
+
+    public void setInstancias(ArrayList<QsInstancia> instancias) {
+        this.instancias = instancias;
     }
 
     /**
@@ -432,6 +547,74 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         modificarInstancia(jTextField1.getText());
     }//GEN-LAST:event_jButtonModifActionPerformed
 
+public class CustomCellEditor extends DefaultCellEditor {
+    
+    private boolean isValid = true;
+        public CustomCellEditor(JTextField textField) {
+        super(textField);
+    }
+
+    @Override
+    public boolean stopCellEditing() {
+        // Cuando se detiene la edición, verifica si el valor es válido.
+        String value = (String) getCellEditorValue();
+        isValid = isValidValue(value);
+
+        if (!isValid) {
+             JOptionPane.showMessageDialog(null,"Debe ingresar un valor real.");
+            // La celda no es válida, no permitas que se detenga la edición.
+            return false;
+        }
+        return super.stopCellEditing();
+    } 
+    @Override
+    public boolean shouldSelectCell(EventObject anEvent) {
+        if (!isValid) {
+            
+            // No permitas la selección de la celda si no es válida.
+            return false;
+        }
+        return super.shouldSelectCell(anEvent);
+    }
+
+    @Override
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        isValid = true; // Restablece la validación al editar una nueva celda.
+        return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+    } 
+    private boolean isValidValue(String value) {
+        try {
+            float resultado = Float.parseFloat(value); // Esto generará una excepción ArithmeticException
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true; // Cambia esto con tu validación real.
+    }  /*  public CustomCellEditor(JTextField textField) {
+        super(textField); 
+        // Agrega un CellEditorListener para manejar eventos de edición.
+        addCellEditorListener(new CellEditorListener() {
+            @Override
+            public void editingStopped(ChangeEvent e) {
+                // Se llama cuando la edición se detiene.
+                // Puedes realizar la validación aquí y tomar medidas apropiadas.
+                String editedValue = (String) getCellEditorValue();
+                isValid = isValidValue(editedValue);
+                System.out.println("editedValue = " + editedValue);
+                // Realiza la validación y toma medidas según sea necesario.
+                if (!isValid) {
+                  //  JOptionPane.showMessageDialog(null,"Debe ingresar un valor real.");
+                    // Valor no válido, puedes mostrar un mensaje de error o realizar otra acción.
+                }
+            }
+
+            @Override
+            public void editingCanceled(ChangeEvent e) {
+                // Se llama cuando se cancela la edición.
+            }
+        });
+    }*/
+
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
