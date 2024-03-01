@@ -12,9 +12,9 @@ import java.util.ArrayList;
  */
 public class QsInstancia {
     String nombre;
-    ArrayList<Float> valores;
+    ArrayList<Double> valores;
 
-    public QsInstancia(String nombre, ArrayList<Float> valores) {
+    public QsInstancia(String nombre, ArrayList<Double> valores) {
         this.nombre = nombre;
         this.valores = valores;
     }
@@ -27,11 +27,11 @@ public class QsInstancia {
         this.nombre = nombre;
     }
 
-    public ArrayList<Float> getValores() {
+    public ArrayList<Double> getValores() {
         return valores;
     }
 
-    public void setValores(ArrayList<Float> valores) {
+    public void setValores(ArrayList<Double> valores) {
         this.valores = valores;
     }
     

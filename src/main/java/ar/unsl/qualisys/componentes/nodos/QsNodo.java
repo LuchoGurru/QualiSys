@@ -20,14 +20,14 @@ import javax.swing.JPanel;
 public class QsNodo extends JPanel {
     //2664554567
     private String padreID;
-    private float valorResultado; 
+    private double valorResultado; 
     private float ponderacion;
 
     /**
      * Constructor que van a usar las variables/que para el caso son constantes por eso no hay "set"
      * @param resValue 
      */
-    public QsNodo(float resValue){
+    public QsNodo(double resValue){
         this.valorResultado = resValue;
         this.padreID = ""; 
         this.setCursor(new Cursor(Cursor.HAND_CURSOR)); // This one line changes the cursor.
@@ -36,7 +36,7 @@ public class QsNodo extends JPanel {
      * Constructor que van a usar los operadores
      */
     public QsNodo(){
-        this.valorResultado = 0f;
+        this.valorResultado = -1d;
         this.padreID ="";
         this.setCursor(new Cursor(Cursor.HAND_CURSOR)); // This one line changes the cursor.
     }
@@ -49,15 +49,15 @@ public class QsNodo extends JPanel {
         this.padreID = padreID;
     }
 
-    public float getResValue() {
+    public double getResValue() {
         return valorResultado;
     }
 
-    public float getValorResultado() {
+    public double getValorResultado() {
         return valorResultado;
     }
 
-    public void setValorResultado(float valorResultado) {
+    public void setValorResultado(double valorResultado) {
         this.valorResultado = valorResultado;
     }
 

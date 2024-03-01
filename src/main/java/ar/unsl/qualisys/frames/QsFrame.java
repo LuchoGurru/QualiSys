@@ -13,8 +13,10 @@ import java.awt.Color;
 import javax.swing.*;
 
 import GUIUtils.ModelChart;
+import ar.unsl.qualisys.componentes.nodos.QsOperador;
 import ar.unsl.qualisys.componentes.nodos.QsVariable;
 import java.util.ArrayList;
+import java.util.Map;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 /**
@@ -127,7 +129,13 @@ public class QsFrame extends JFrame{
             QsVariable var = new QsVariable(this.tabGrafico.getDAD(), 50, 0, item.getNumeration(),item.getCadenaDeTexto(),item.getNumeroDeLinea());
             vars.add(var);
         }
-        this.tabInstancias.setVars(vars);
+        Map<String, ArrayList<QsNodo>>  relPadreHijos = this.tabGrafico.getDAD().getRelPadreHijos();
+        Map<String, QsOperador> opers = this.tabGrafico.getDAD().getOperadores();
+        Map<String, QsVariable> variablesMap = this.tabGrafico.getDAD().getVariables();
+        this.tabInstancias.setRelPadreHijos(relPadreHijos);
+        this.tabInstancias.setOperadores(opers);
+        this.tabInstancias.setVars(vars); // Asigno lista de variables ordenadas para muestra por pantalla
+        this.tabInstancias.setVariablesMap(variablesMap);
     }
 
     /*

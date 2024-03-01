@@ -616,7 +616,7 @@ public class QsBarraHerramientas extends JToolBar{
         
         for(QsInstancia i: instancias ){
             JSONArray valoresI = new JSONArray();
-            for(Float valor : i.getValores()){            
+            for(Double valor : i.getValores()){            
                 valoresI.put(valor);// Armo listo de valores
             }
             JSONObject relacionPH = new JSONObject();

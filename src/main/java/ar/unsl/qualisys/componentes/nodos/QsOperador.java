@@ -38,16 +38,21 @@ public class QsOperador extends QsNodo implements QsOperacion{
     private String symbol ;
     private String nombre;
     private String padreID;
-    private float resultValue;
-    private float d;
+    private double resultValue;
+    private double d;
     private double r2;
     private double r3;
     private double r4;
     private double r5;
     private JPopupMenu menuDesplegable = new JPopupMenu();
-    // private ArrayList<JPanel> dominio = new ArrayList<>();; //nodo hijo// Recibe un maximo de 5 argum 
     
-    public QsOperador(JPanel GUIparent, int name,String nombre,String symbol, float d, double r2, double r3, double r4, double r5){
+    //--- LSP  
+    private static double xmin=0;
+    private static double xmax=0;
+    
+    
+    
+    public QsOperador(JPanel GUIparent, int name,String nombre,String symbol, double d, double r2, double r3, double r4, double r5){
         super();
         this.menuPopUp();
         this.setName("op_" + name); 
@@ -107,6 +112,7 @@ public class QsOperador extends QsNodo implements QsOperacion{
         g.drawOval(0, 0, 50, 50);
         g.drawOval(5, 5, 40, 40); // (25,25,50,50)
         g.setFont(new Font("Serif", Font.BOLD, 12));
+        
         if(this.symbol.length()==1){
             g.drawString(this.symbol, 20, 30);
         }else if(this.symbol.length()==2){
@@ -181,21 +187,119 @@ public class QsOperador extends QsNodo implements QsOperacion{
         this.DADParent.addToDomain(this,padreLocation);
    }
 
+   // -------------------PARTE LSP------------------ 
    
-   
+    /**
+     * Asigna xmin = valor 'x[i] menor' y xmax = 'x[i] mayor' 
+     * @param n
+     * @param x 
+     */
+    public static void minmax (int n, double x[]){ //, double xmin, double xmax){
+      xmin = x[0];
+      xmax = xmin;
+      for(int i=1; i<n; i++)
+	 if (x[i] < xmin)
+	     xmin = x[i];
+	 else
+	     if (x[i] > xmax) xmax = x[i];
+    }
+    
+    public static double plog(double t){
+      return t * ( 1. - t * ( 0.5 - t / 3. ) );
+    }
+    /** 
+     *--------- WEIGHTED POWER MEAN FUNCTION-----------------------|
+     *                                                             |
+     *    Xmean = [W[0]*x[0]**r + ... + W[n-1]*x[n-1]**r] ** (1/r) |
+     *    x[0 .. n-1] = input values (preferences)                 |
+     *    W[0 .. n-1] = positive weights; W[0]+...+W[n-1] = 1      |
+     *    r           = exponent (any real value)                  |
+     *-------------------------------------------------------------|
+     * 
+     * @param n cardinalidad del dominio
+     * @param W ponderaciones de cada entrada e n
+     * @param r el valor posta
+     * @param x el valor de las variables
+     * @return 
+     */
     @Override
-    public double calcularOperacion(double... dominio) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public double wpmFunction (int n, double W[], double r, double x[]){
+      double rmin = 1.E-16, rmax = 1.E+16, small = 1.E-9;
+      double xminlog, xmaxlog, h, xmean;
+      int i;
+
+      minmax (n, x);  //, xmin, xmax );
+
+      if ( r < -rmax )
+	 xmean = xmin;
+      else if (r < -rmin)
+      {
+	 xmean = 0.;
+	 if ( xmin > 0. )
+	 {
+	    xminlog = Math.log(xmin);
+            for(i=0; i<n; i++)
+            {
+               h = r * ( Math.log(x[i]) - xminlog ); // Multiplica el r * logaritmo de el valor actual - logaritmo del valor menor
+               xmean += W[i] * (1. + Math.exp(h)) * Math.tanh(h/2.); // actualiza xmean pesado con W[i] y multiplicado por exp .h y tanh.h ... 
+            }
+            if ( Math.abs(xmean) > small) //Decide si hacer log o plog .. no se que hace el plog
+               xmean = Math.exp( xminlog + Math.log(1. + xmean)/r );
+            else
+               xmean = Math.exp( xminlog + plog(xmean)/r );
+         }
+      }
+      else if (r <= rmin)
+      {
+         xmean = 0.;
+         if ( xmin > 0. )
+         {
+            for(i=0; i<n; i++) 
+                xmean += W[i]*Math.log(x[i]); //saca una media mas poronga
+            xmean = Math.exp(xmean);
+         }
+      }
+      else if (r <= rmax)
+      {
+         xmean = 0.;
+         if ( xmax > 0. )
+         {
+            xmaxlog = Math.log(xmax);
+            for(i=0; i<n; i++)
+               if (x[i] > 0.)
+               {
+                  h = r * ( Math.log(x[i]) - xmaxlog );
+                  xmean += W[i] * (1. + Math.exp(h)) * Math.tanh(h/2.); //ajustaria el limite con el h
+	       }
+               else xmean -= W[i];
+
+            if ( Math.abs(xmean) > small)  // segun el limite si no es muy pequeño usalog o plog ... 
+               xmean = Math.exp( xmaxlog + Math.log(1. + xmean)/r );
+            else
+               xmean = Math.exp( xmaxlog + plog(xmean)/r );
+         }
+      }
+      else             //     r > Rmax
+         xmean = xmax; 
+      return xmean;
     }
 
     @Override
-    public double functionEvaluation() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public double calcularOperacion(ArrayList<Double> dominio) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public double wpmFunction(ArrayList<QsNodo> dominio) {
+        //throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        int n = dominio.size();
+        double[] x = new double[n];
+        double[] w = new double[n];
+        double r = this.getR(n);
+        
+        for(int i=0; i<n;i++){
+            x[i]=dominio.get(i).getValorResultado(); // Cambiar por double
+            w[i]=dominio.get(i).getPonderacion();
+        }
+        
+        double result = wpmFunction(n,w,r,x);
+        System.out.println("result = " + result);
+        return result;
     }
 
 
@@ -317,7 +421,7 @@ public class QsOperador extends QsNodo implements QsOperacion{
         this.padreID = padreID;
     }
 
-    public float getResultValue() {
+    public double getResultValue() {
         return resultValue;
     }
 
@@ -340,12 +444,29 @@ public class QsOperador extends QsNodo implements QsOperacion{
     public void setSymbol(String symbol) {
         this.symbol = symbol;
     }
-
-    public float getD() {
+    /**
+     * n= cardinalidad del dominio
+    */
+    public double getR(int n){
+        switch(n){
+            case 2:
+                return r2;
+            case 3: 
+                return r3;
+            case 4:
+                return r4;
+            case 5:
+                return r5;
+            default:
+                return 0d;
+        }
+    }
+    
+    public double getD() {
         return d;
     }
 
-    public void setD(float d) {
+    public void setD(double d) {
         this.d = d;
     }
 

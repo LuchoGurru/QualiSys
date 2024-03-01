@@ -11,6 +11,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import GUIUtils.TableCustom;
 import LSP.QsInstancia;
+import ar.unsl.qualisys.componentes.nodos.QsNodo;
+import ar.unsl.qualisys.componentes.nodos.QsOperador;
 import ar.unsl.qualisys.componentes.nodos.QsVariable;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -19,6 +21,9 @@ import java.awt.event.FocusAdapter;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -35,9 +40,11 @@ import javax.swing.table.TableModel;
  */
 public class QsEvaluacionPanel extends javax.swing.JPanel {
     private ArrayList<QsVariable> vars;
+    private Map<String, QsVariable> variablesMap;
     private ArrayList<QsInstancia> instancias;
-   //private HashMap<String,ArrayList<Float>> instancias;
-    
+    private Map<String, QsOperador> operadores = new HashMap<String, QsOperador>();
+    private Map<String, ArrayList<QsNodo>> relPadreHijos = new HashMap<String, ArrayList<QsNodo>>();
+
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -117,7 +124,30 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         this.repaint();
     }
 
+    public Map<String, QsVariable> getVariablesMap() {
+        return variablesMap;
+    }
 
+    public void setVariablesMap(Map<String, QsVariable> variablesMap) {
+        this.variablesMap = variablesMap;
+    }
+    
+    public Map<String, QsOperador> getOperadores() {
+        return operadores;
+    }
+
+    public void setOperadores(Map<String, QsOperador> operadores) {
+        this.operadores = operadores;
+    }
+    
+    public Map<String, ArrayList<QsNodo>> getRelPadreHijos() {
+        return relPadreHijos;
+    }
+
+    public void setRelPadreHijos(Map<String, ArrayList<QsNodo>> relPadreHijos) {
+        this.relPadreHijos = relPadreHijos;
+    }
+    
     public TableModel toTableModel() {
         System.out.println("Using toTableModel");
         int cols = this.instancias.size() + 1 ; // A grego columna de variables
@@ -147,16 +177,30 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
        
         return tmodel;
     }
+    /**
+     * Asigna la instancia a las variables a evaluar, en toria si sigue vigente la referencia ya estaria resuelto
+     */
+    public void asignarInstancia(int instancia){
+        ArrayList<Double> valores =  this.instancias.get(instancia).getValores();
+        
+        for(int i = 0 ; i < valores.size() ; i++){
+            QsVariable qsv = this.vars.get(i);
+            String nameID = qsv.getName();
+            this.variablesMap.get(nameID).setValorResultado(valores.get(i));
+        }
     
     
+    }
     
-    /*{
-    Control de celda on focus lost que no se pierda si esta mal el valor, o reemplazar por cero 
-            
-     }*/
-    public void agregarValor(Float flo, int instancia,int variable){
-
-     
+    /*
+    
+    {
+        Control de celda on focus lost que no se pierda si esta mal el valor, o reemplazar por cero 
+    }
+    
+    */
+    public void agregarValor(Double dou, int instancia,int variable){
+        this.instancias.get(instancia -1 ).getValores().set(variable, dou); // -1 para respetar el arreglo por la columna q sobra al principio
         
         
     }
@@ -164,7 +208,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     private void crearInstancia(String nombre){
         QsInstancia nuevaI = new QsInstancia(nombre, new ArrayList<>());
         for(int i = 0 ; i < this.vars.size();i++){
-            nuevaI.getValores().add(0f);
+            nuevaI.getValores().add(0d);
         //    model.setValueAt(0f, i, model.getColumnCount()-1); // Set "New York" in the first row, third column
         }
         this.instancias.add(nuevaI);
@@ -528,7 +572,51 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+
+    //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa
+    //recorro operadores osea relPadreHijos ... 
+    //Sí mi dominio tiene valor /resultado por completo en caso de que no sean solo variables ... 
+    //puedo evluar con el wpm y guardarlo en el mismo nodo ... 
+    //despues hay que hacer esto por aca instancia ... falta un loopfor
+        for (int i = 0; i < this.instancias.size(); i++) {
+            boolean evaluar = true;
+            //this.relPadreHijos = null;
+            asignarInstancia(i);
+            ArrayList<String> ops = new ArrayList<>(this.relPadreHijos.keySet()); // copiade operadores a evaluar
+            // en teoria las variables ya estan setteadas por referencias en el mapa este ,,, pero hay que ver
+            while (ops.size() > 0) {
+                System.out.println("infinite loop"+ops.size());
+                int tam = ops.size();
+                for (int j = 0; j < tam; j++) {
+                    QsOperador candidato = this.operadores.get(ops.get(j));
+                    System.out.println("candidato : "+candidato.getName() + candidato.getSymbol());
+                    ArrayList<QsNodo> hijos = this.relPadreHijos.get(candidato.getName());
+                    evaluar = true;
+                    for (QsNodo h : hijos) { // Checkear dominio valido
+                        if (h.getValorResultado() < 0d) {
+                            evaluar = false;
+                            break;
+                        }
+
+                    }
+                    // Si el dominio del operador es apto para evaluarse, se evalua y se elimina de la lista 
+                    if (evaluar) {
+                        double resultadoFuncion = candidato.wpmFunction(hijos);
+                        candidato.setValorResultado(resultadoFuncion);
+                        // this.operadores.get(i).calcularOperacion(dominio); si el candidato es una referencia no haria falta hacerlo de esta manera
+                        ops.remove(j);// borro el operador ya calculado
+                        //SI la lista se vacio significa que candidato es el Resultado final
+                        if (ops.size() == 0) {
+                            //Mostrar resultado
+                            System.out.println("ops resultado = " + candidato.getValorResultado());
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
@@ -550,6 +638,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
 public class CustomCellEditor extends DefaultCellEditor {
     
     private boolean isValid = true;
+    private int rowSelected=-1;
         public CustomCellEditor(JTextField textField) {
         super(textField);
     }
@@ -565,6 +654,7 @@ public class CustomCellEditor extends DefaultCellEditor {
             // La celda no es válida, no permitas que se detenga la edición.
             return false;
         }
+        agregarValor(Double.valueOf(value), instanciaSeleccionada, rowSelected);
         return super.stopCellEditing();
     } 
     @Override
@@ -580,40 +670,20 @@ public class CustomCellEditor extends DefaultCellEditor {
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         isValid = true; // Restablece la validación al editar una nueva celda.
+        rowSelected=row;
+       // if(instanciaSeleccionada==column){
+       //     System.out.println("yout rock");
+        //}
         return super.getTableCellEditorComponent(table, value, isSelected, row, column);
     } 
     private boolean isValidValue(String value) {
         try {
-            float resultado = Float.parseFloat(value); // Esto generará una excepción ArithmeticException
+            double resultado = Double.parseDouble(value); // Esto generará una excepción ArithmeticException
         } catch (NumberFormatException e) {
             return false;
         }
         return true; // Cambia esto con tu validación real.
-    }  /*  public CustomCellEditor(JTextField textField) {
-        super(textField); 
-        // Agrega un CellEditorListener para manejar eventos de edición.
-        addCellEditorListener(new CellEditorListener() {
-            @Override
-            public void editingStopped(ChangeEvent e) {
-                // Se llama cuando la edición se detiene.
-                // Puedes realizar la validación aquí y tomar medidas apropiadas.
-                String editedValue = (String) getCellEditorValue();
-                isValid = isValidValue(editedValue);
-                System.out.println("editedValue = " + editedValue);
-                // Realiza la validación y toma medidas según sea necesario.
-                if (!isValid) {
-                  //  JOptionPane.showMessageDialog(null,"Debe ingresar un valor real.");
-                    // Valor no válido, puedes mostrar un mensaje de error o realizar otra acción.
-                }
-            }
-
-            @Override
-            public void editingCanceled(ChangeEvent e) {
-                // Se llama cuando se cancela la edición.
-            }
-        });
-    }*/
-
+    }  
 }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

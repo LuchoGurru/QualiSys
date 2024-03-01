@@ -11,7 +11,9 @@ import java.util.ArrayList;
  * @author luciano.gurruchaga
  */
 public interface QsOperacion {
-    public double calcularOperacion(ArrayList<Double> dominio);
-    public double calcularOperacion(double... dominio);
-    public double functionEvaluation();
+//        public double calcularOperacion(ArrayList<Double> dominio);
+//        public double calcularOperacion(double... dominio);
+//        public double functionEvaluation();
+    public double wpmFunction (int n, double W[], double r, double x[]);
+    public double wpmFunction (ArrayList<QsNodo> dominio);
 }
