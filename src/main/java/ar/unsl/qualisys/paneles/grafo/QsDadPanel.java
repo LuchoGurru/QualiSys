@@ -162,7 +162,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                         this.variables.get(varID).setPadreID(varVieja.getPadreID());
                         this.variables.get(varID).setPonderacion(varVieja.getPonderacion());
                         this.variables.get(varID).setName(varVieja.getName());
-                        this.variables.get(varID).setNombre(varVieja.getNombre());
+                        this.variables.get(varID).setDescripcion(varVieja.getDescripcion());
                        // this.variables.get(varID).setBounds(varVieja.getBounds());
                         this.variables.get(varID).setGUIParent(varVieja.getGUIParent());
                         relPadreHijosSinVars.get(padreID).add(this.variables.get(varID)); 
@@ -335,9 +335,9 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     }   
     private boolean isGoodPonder(QsNodo hijo, String valor,String padre){
         boolean isGood = true;
-        Float ponderValue = 0f;
+        Double ponderValue = 0d;
         try{
-            ponderValue = Float.parseFloat(valor);
+            ponderValue = Double.parseDouble(valor);
         }catch(NumberFormatException nex){
             JOptionPane.showMessageDialog(this,"Debe ingresar un valor real.");
             isGood = false;
@@ -347,7 +347,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
             JOptionPane.showMessageDialog(this,"Debe ingresar un valor <= 1.");
             isGood = false;
         }else{
-            Float ponderacionTotal = ponderValue;
+            Double ponderacionTotal = ponderValue;
             for(QsNodo n: this.relPadreHijos.get(padre)){
                 if(!n.getName().equals(hijo.getName())){ // No se suma asi mismo
                     ponderacionTotal += n.getPonderacion();
@@ -379,7 +379,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     private void updatePonderValue(QsNodo padre) {
         ArrayList<QsNodo> hermanos=this.relPadreHijos.get(padre.getName());
         
-        float balanceo = getPonderacionBalanceada(hermanos.size());
+        double balanceo = getPonderacionBalanceada(hermanos.size());
         for(QsNodo h :hermanos){
             h.setPonderacion(balanceo);
         }
@@ -408,7 +408,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                     1f);
         } while (!isGoodPonder(hijo,valor, padre));
 
-       hijo.setPonderacion(Float.valueOf(valor));
+       hijo.setPonderacion(Double.valueOf(valor));
     }
     /**
      * Sí el hijo puede ser dominiio ... 

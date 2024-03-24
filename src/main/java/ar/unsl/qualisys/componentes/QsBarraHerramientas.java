@@ -588,7 +588,7 @@ public class QsBarraHerramientas extends JToolBar{
 
         for(QsVariable v : variablesList ){
             System.out.println("v = " + v.getName());
-            System.out.println("v = " + v.getNombre());
+            System.out.println("v = " + v.getDescripcion());
             jsonVariables.put(v.toJSON());
         }
         

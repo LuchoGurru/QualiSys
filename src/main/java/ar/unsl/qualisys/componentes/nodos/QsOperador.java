@@ -38,14 +38,13 @@ public class QsOperador extends QsNodo implements QsOperacion{
     private String symbol ;
     private String nombre;
     private String padreID;
-    private double resultValue;
     private double d;
     private double r2;
     private double r3;
     private double r4;
     private double r5;
-    private JPopupMenu menuDesplegable = new JPopupMenu();
-    
+    private JPopupMenu menuDesplegable;
+    private boolean editable;
     //--- LSP  
     private static double xmin=0;
     private static double xmax=0;
@@ -54,6 +53,7 @@ public class QsOperador extends QsNodo implements QsOperacion{
     
     public QsOperador(JPanel GUIparent, int name,String nombre,String symbol, double d, double r2, double r3, double r4, double r5){
         super();
+        this.editable = true;
         this.menuPopUp();
         this.setName("op_" + name); 
         this.padreID = "";
@@ -79,8 +79,9 @@ public class QsOperador extends QsNodo implements QsOperacion{
 
     } 
     
-    public QsOperador(JPanel GUIparent, int name,String nombre,String symbol, float d, double r2, double r3, double r4, double r5,float ponderacion){
+    public QsOperador(JPanel GUIparent, int name,String nombre,String symbol, float d, double r2, double r3, double r4, double r5,double ponderacion){
         super();
+        this.editable = true;
         this.menuPopUp();
         this.setName("op_" + name); 
         this.padreID = "";
@@ -119,8 +120,7 @@ public class QsOperador extends QsNodo implements QsOperacion{
             g.drawString(this.symbol, 15, 30);
         }else{
             g.drawString(this.symbol, 10, 30);
-        }
-        
+        }  
     }
     //METHODS
     
@@ -293,7 +293,7 @@ public class QsOperador extends QsNodo implements QsOperacion{
         double r = this.getR(n);
         
         for(int i=0; i<n;i++){
-            x[i]=dominio.get(i).getValorResultado(); // Cambiar por double
+            x[i]=dominio.get(i).getValorResultado(); 
             w[i]=dominio.get(i).getPonderacion();
         }
         
@@ -317,23 +317,32 @@ public class QsOperador extends QsNodo implements QsOperacion{
        }
        return added; ctrl +8
    }     */
+    public void setEditable(boolean editable){
+        if(!editable)
+            this.setComponentPopupMenu(null);
+        else
+            this.menuPopUp();
+        this.editable = editable;
+    }
     private class ClickListener extends MouseAdapter {
         private QsOperador qsOpInstance;
         public ClickListener(QsOperador qsOpInstance){
             this.qsOpInstance = qsOpInstance;
         }
+        
         /**
          * El Click despliega el menu item
          * @param evt 
          */
         public void mousePressed(MouseEvent evt){
-            if(DADParent!=null){
+            if(editable && DADParent!=null){
                 this.qsOpInstance.setBackground(Color.WHITE);
                 DADParent.setNodoSeleccionado(this.qsOpInstance);
             }
         }
         public void mouseReleased(MouseEvent e){
-            determinarAccionReleased(e); 
+            if(editable) 
+                determinarAccionReleased(e); 
         }
         
     }
@@ -361,6 +370,7 @@ public class QsOperador extends QsNodo implements QsOperacion{
         
     }*/
     public void menuPopUp(){
+        menuDesplegable = new JPopupMenu();
         JMenuItem eliminar = new JMenuItem("Eliminar");
         JMenuItem eliminarRel = new JMenuItem("Eliminar relación");
         JMenuItem setPonderación = new JMenuItem("Editar ponderación");
@@ -419,14 +429,6 @@ public class QsOperador extends QsNodo implements QsOperacion{
 
     public void setPadreID(String padreID) {
         this.padreID = padreID;
-    }
-
-    public double getResultValue() {
-        return resultValue;
-    }
-
-    public void setResultValue(float resultValue) {
-        this.resultValue = resultValue;
     }
 
     public String getNombre() {

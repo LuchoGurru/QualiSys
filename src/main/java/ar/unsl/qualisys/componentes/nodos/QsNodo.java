@@ -21,7 +21,7 @@ public class QsNodo extends JPanel {
     //2664554567
     private String padreID;
     private double valorResultado; 
-    private float ponderacion;
+    private double ponderacion;
 
     /**
      * Constructor que van a usar las variables/que para el caso son constantes por eso no hay "set"
@@ -61,11 +61,11 @@ public class QsNodo extends JPanel {
         this.valorResultado = valorResultado;
     }
 
-    public float getPonderacion() {
+    public double getPonderacion() {
         return ponderacion;
     }
 
-    public void setPonderacion(float ponderacion) {
+    public void setPonderacion(double ponderacion) {
         this.ponderacion = ponderacion;
     }
     

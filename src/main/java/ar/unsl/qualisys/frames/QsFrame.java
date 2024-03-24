@@ -51,11 +51,20 @@ public class QsFrame extends JFrame{
         this.setLayout(new BorderLayout());
         tabTexto = new QsTextPanel(this);
         tabGrafico = new QsGraphicPanel(this);
+        
+        
+        
         tabInstancias = new QsEvaluacionPanel(this);
+        
+        
+        
         this.add(new QsMenuSuperior(this,tabTexto,tabGrafico,tabInstancias),BorderLayout.NORTH);  // PARA ABRIR Y CERRAR ARCHIVO
         tabbedPane.addTab("Variables de Preferencia", tabTexto);
         tabbedPane.addTab("Árbol ", tabGrafico);
-        tabbedPane.addTab("Llenado de Instancias ", tabInstancias);
+        
+        JScrollPane scrollPane = new JScrollPane(tabInstancias);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(25); 
+        tabbedPane.addTab("Llenado de Instancias ", scrollPane);
         /*JPanel panel4;
         panel4 = new JPanel();
         panel4.add(createChart());
@@ -136,6 +145,7 @@ public class QsFrame extends JFrame{
         this.tabInstancias.setOperadores(opers);
         this.tabInstancias.setVars(vars); // Asigno lista de variables ordenadas para muestra por pantalla
         this.tabInstancias.setVariablesMap(variablesMap);
+        this.tabInstancias.setDAD(this.tabGrafico.getDAD());
     }
 
     /*

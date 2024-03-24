@@ -25,12 +25,15 @@ public class QsVariable extends QsNodo{
     String descripcion;
     String nombreGrupo;// Categoría de la variable 
     private QsDadPanel GUIParent; // Solo se asigna en caso de que sea hijo del componente DAD (Drag and Drop).
-    private JPopupMenu menuDesplegable = new JPopupMenu();
+    private JPopupMenu menuDesplegable;
     private int orden;
-    
+    private boolean editable;
+
     public QsVariable (QsDadPanel parent, double x, double y,String name,String descripcion,int orden){
+        super();
         this.menuPopUp();
         this.setName(name); 
+        this.editable = true;
         this.GUIParent = parent;
         this.descripcion=descripcion;
         this.orden=orden;
@@ -42,9 +45,10 @@ public class QsVariable extends QsNodo{
         this.setToolTipText(this.descripcion);
     }
 
-    public QsVariable (QsDadPanel parent, double x, double y,String name,String descripcion,int orden, float ponderacion){
-        this.menuPopUp();
+    public QsVariable (QsDadPanel parent, double x, double y,String name,String descripcion,int orden, double ponderacion){
+        super();
         this.setName(name); 
+        this.editable= true;
         this.GUIParent = parent;
         this.descripcion=descripcion;
         this.orden=orden;
@@ -64,11 +68,11 @@ public class QsVariable extends QsNodo{
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         String numeracion = this.getName();
-        g.drawString(numeracion , 10, 20);
-        
-        
+        g.drawString(numeracion , 10, 20); 
+
     }
-        public void menuPopUp(){
+    public void menuPopUp(){
+        menuDesplegable = new JPopupMenu();
         JMenuItem eliminarRel = new JMenuItem("Eliminar relación");
         JMenuItem setPonderación = new JMenuItem("Editar ponderación");
         
@@ -119,37 +123,47 @@ public class QsVariable extends QsNodo{
         } 
 
    }
-
+    public void setEditable(boolean editable){
+        if(!editable)
+            this.setComponentPopupMenu(null);
+        else
+            this.menuPopUp();
+        this.editable = editable;
+    }
     private class ClickListener extends MouseAdapter {
         private QsVariable qsVarInstance;
+        
         public ClickListener(QsVariable qsVarInstance){
             this.qsVarInstance = qsVarInstance;
         }
+        
+        
         /**
          * El Click despliega el menu item
          * @param evt 
          */
         public void mousePressed(MouseEvent evt){
             //.setBorder(BorderFactory.createLineBorder(Color.BLACK, 10));
-            //if(GUIParent!=null)
+            if(editable){
                this.qsVarInstance.setBackground(Color.getHSBColor(238, 238, 238));
                GUIParent.setNodoSeleccionado(this.qsVarInstance);
+            }   
         }
         public void mouseReleased(MouseEvent e){
-            accionSoltar(e); 
+            if(editable)
+                accionSoltar(e); 
         }
         
     }
-    
-    
 
-    public String getNombre() {
+    public String getDescripcion() {
         return descripcion;
     }
 
-    public void setNombre(String nombre) {
-        this.descripcion = nombre;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
+
 
     public QsDadPanel getGUIParent() {
         return GUIParent;
