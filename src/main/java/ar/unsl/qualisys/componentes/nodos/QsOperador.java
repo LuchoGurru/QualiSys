@@ -137,7 +137,7 @@ public class QsOperador extends QsNodo implements QsOperacion{
                                  this.getBounds().getLocation().y + e.getY() -20 , //para centrar el mouse
                                 51, 51);
             if (!DADParent.isColision(this)) { 
-                DADParent.repaint();
+                DADParent.repaint(); // actualizo la posicion de this en el panel.
             } else {
                 this.setBounds(oldPosition); //Vuelvo a la posision Inicial
                 this.addToFatherDomain(e.getPoint());//Sí 
@@ -336,7 +336,7 @@ public class QsOperador extends QsNodo implements QsOperacion{
          */
         public void mousePressed(MouseEvent evt){
             if(editable && DADParent!=null){
-                this.qsOpInstance.setBackground(Color.WHITE);
+                //this.qsOpInstance.setBackground(Color.decode("#A3A380"));
                 DADParent.setNodoSeleccionado(this.qsOpInstance);
             }
         }

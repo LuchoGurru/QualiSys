@@ -15,6 +15,8 @@ import ar.unsl.qualisys.paneles.grafo.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,9 +34,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
@@ -70,39 +75,47 @@ public class QsBarraHerramientas extends JToolBar{
     private QsEvaluacionPanel tabInstanciado;
     
     
-    
+    public void stylingComponent(JComponent b){
+        b.setBackground(Color.decode("#D6CE93"));
+        b.setForeground(Color.decode("#BB8588"));
+        b.setBorder(BorderFactory.createLineBorder(Color.decode("#A3A380"),0,true));
+        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    }
     public QsBarraHerramientas(QsFrame ventana,QsTextPanel tabText,QsGraphicPanel tabGrafic,QsEvaluacionPanel tabInstancias){//[Mostrar resultados en el panel de instancias todo junto],JPanel panelDeResultados) {
+        this.setBackground(Color.decode("#D6CE93")); 
+        //this.setForeground(Color.decode("#EFEBCE"));
         this.ventana = ventana;
         this.tabTexto = tabText; // panel donde se forma la estructura de variables
         this.tabGrafico = tabGrafic;
         this.tabInstanciado = tabInstancias;
-      //  JToolBar menuHerramientas = new JToolBar();
-        JButton volver = new JButton();
-        JButton siguiente = new JButton();
-        JButton nuevo = new JButton();
-        JButton abrir = new JButton();
-        JButton guardar = new JButton();
-        JButton deshacer = new JButton();
-        JButton actualizar = new JButton(); // Haacer boton actualizar 
-        JButton rehacer = new JButton();
-        JButton color = new JButton();
+      //JToolBar menuHerramientas = new JToolBar();
+        JButton volver = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/back-30.png"));
+        stylingComponent(volver);
+        JButton siguiente = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/forward-30.png"));
+        stylingComponent(siguiente);
+        JButton nuevo = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/new-file-30.png"));
+        stylingComponent(nuevo);
+        JButton abrir = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/open-file-30.png"));
+        stylingComponent(abrir);
+        JButton guardar = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/save-30.png"));
+        stylingComponent(guardar);
+        JButton deshacer = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/undo-30.png"));
+        stylingComponent(deshacer);
+        JButton actualizar = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/update-30.png"));
+        stylingComponent(actualizar);
+        JButton rehacer = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/redo-30.png"));
+        stylingComponent(rehacer);
+        JButton color = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/color-30.png"));
+        stylingComponent(color);
         JSpinner tam = new JSpinner(new SpinnerNumberModel(12, 0, 84, 2));
+        stylingComponent(tam); 
         //JButton centrado = new JButton();
         String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
         JComboBox fuente = new JComboBox(fontNames);
-        //Config
-        this.setFloatable(false);
-        volver.setText("< Volver");
-        siguiente.setText("Siguiente >");
-        abrir.setText("Abrir");
-        nuevo.setText("Nuevo");
-        guardar.setText("Guardar");
-        deshacer.setText("<--");
-        actualizar.setText("F5");
-        rehacer.setText("-->");
-        color.setText("Color");
-        //centrado.setText("Centrado");
+        stylingComponent(fuente); 
         fuente.setSelectedIndex(15);
+
+        this.setFloatable(false);
 
  
         JTextPane panelDeTexto = tabTexto.getJTextPanel();
@@ -143,6 +156,7 @@ public class QsBarraHerramientas extends JToolBar{
         rehacer.setToolTipText("Ctrl + Y");
         //
         this.add(volver);
+        this.add(nuevo);
         this.add(guardar);
         this.add(abrir);
         this.add(deshacer);
@@ -153,6 +167,7 @@ public class QsBarraHerramientas extends JToolBar{
         this.add(fuente);
         this.add(tam);
         this.add(siguiente);
+        this.setBorder(BorderFactory.createLineBorder(Color.decode("#A3A380"),2,true));
         volver.addActionListener(new ActionListener() {            
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -334,7 +349,8 @@ public class QsBarraHerramientas extends JToolBar{
            textoVar += v.constructRenglon() + "\n";
        }
         return textoVar;
-    }    */
+    }
+    */
     
     
     
@@ -450,7 +466,7 @@ public class QsBarraHerramientas extends JToolBar{
                 opJson.getString("name"),
                 opJson.getString("descripcion"),
                 opJson.getInt("orden"),
-                opJson.getFloat("ponderacion")
+                opJson.getDouble("ponderacion")
                 
                 );
                     // FALTA EL padre ID + el Valor de la ponderacion 
@@ -462,7 +478,7 @@ public class QsBarraHerramientas extends JToolBar{
                 mapaDeVariables.put(qsVar.getName(), qsVar);
             }   
              
-            
+             
             HashMap<String,ArrayList<QsNodo>> relPadreHijosSinVars = new HashMap<>();
             JSONArray operadores = nodos.getJSONArray("operadores");
             for(Object op : operadores){
@@ -477,7 +493,7 @@ public class QsBarraHerramientas extends JToolBar{
                     opJson.getDouble("r3"),
                     opJson.getDouble("r4"),
                     opJson.getDouble("r5"),
-                    opJson.getFloat("ponderacion")
+                    opJson.getDouble("ponderacion")
                 );
                 qsOp.setName(opJson.getString("name"));
                 QsDadPanel.cantOperadores ++;
@@ -544,14 +560,7 @@ public class QsBarraHerramientas extends JToolBar{
              //   cantOperadores ++; 
             }
             
-            
-            
-            
-            
         }
-        
-        
-        
         
     }
     /**

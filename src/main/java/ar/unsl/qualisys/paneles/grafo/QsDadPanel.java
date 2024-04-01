@@ -85,6 +85,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         this.area = new Dimension();
         this.originator = new Originator();
         this.caretTaker = new CaretTaker();
+        this.setBackground(Color.decode("#FFFFFF"));
      }    
 
     public QsOperatorsPanel getBrother() {
@@ -305,16 +306,23 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
       * @return 
       */
     public boolean isColision(QsNodo colisionador){
-        boolean legal = false;
+        boolean colision = false;
         for(int i=0;i<this.getComponents().length;i++){
             Component c = this.getComponent(i);
+            System.out.println("Componente c is Nodo ?" + (c instanceof QsNodo));
+            System.out.println("Componente null is Integer ?" + (null instanceof Integer));
+            System.out.println("Componente c is DaD ?" + (c instanceof QsDadPanel));
             if(colisionador.getBounds().intersects(c.getBounds()) && !colisionador.getName().equals(c.getName())){
-                //colisionador.setBackground(Color.blue);
                 //System.out.println("COmponente lista"+i+ " asd "+  this.getComponent(i).getLocation().x + " ),(" +  this.getComponent(i).getLocation().y);
-                legal = true;
+                System.out.println("colision = true");
+                colision = true;
+                break;
+            }else{
+                                System.out.println("colision =false");
+
             }
         }
-        return legal;
+        return colision;
     }
     
     public QsOperador getOperatorByLocation(Point loc){
@@ -419,21 +427,29 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
      * @param padreLocation 
      */
     public void addToDomain(QsNodo hijoCandidato, Point  padreLocation){
-        QsOperador operadorPadre = (QsOperador) this.getComponentAt(padreLocation) ;
-        if(canBeDomain(hijoCandidato,operadorPadre)){
-
-            
-            if(isVariable(hijoCandidato)){
-                QsVariable var_candidato = (QsVariable) hijoCandidato;
-                actualizarArbolGenealogico(var_candidato,var_candidato.getPadreID(),operadorPadre.getName());
-                var_candidato.setPadreID(operadorPadre.getName());//SETTEO PADRE ADOPTIVO
-            }else{
-                QsOperador op_candidato =(QsOperador) hijoCandidato;
-                actualizarArbolGenealogico(op_candidato,op_candidato.getPadreID(),operadorPadre.getName());
-                op_candidato.setPadreID(operadorPadre.getName());//SETTEO PADRE ADOPTIVO
+        try{
+            QsOperador operadorPadre = (QsOperador) this.getComponentAt(padreLocation) ; 
+            System.out.println("canBeDomain?");
+            if(canBeDomain(hijoCandidato,operadorPadre)){
+                if(isVariable(hijoCandidato)){
+                    QsVariable var_candidato = (QsVariable) hijoCandidato;
+                    actualizarArbolGenealogico(var_candidato,var_candidato.getPadreID(),operadorPadre.getName());
+                    var_candidato.setPadreID(operadorPadre.getName());//SETTEO PADRE ADOPTIVO
+                }else{
+                    QsOperador op_candidato =(QsOperador) hijoCandidato;
+                    actualizarArbolGenealogico(op_candidato,op_candidato.getPadreID(),operadorPadre.getName());
+                    op_candidato.setPadreID(operadorPadre.getName());//SETTEO PADRE ADOPTIVO
+                }
+                this.repaint();
             }
+
+        }catch(ClassCastException ce){
+            System.out.println("ERROR  = DAD.addToDomain no es un operador. " + padreLocation );
+            System.out.println(ce.getMessage()); 
             this.repaint();
         }
+        
+        
         
     }
     /**
@@ -447,11 +463,16 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         if(padreAdoptivo != null){//OK
             if(this.relPadreHijos.get(padreAdoptivo.getName()).size() >= 5){
                 allow=false;
+                System.out.println("el dominio ya esta lleno");
+            }
+            if(allow && hijoCandidato.getName().equals(padreAdoptivo.getName())){
+                System.out.println("No podes formar parte de tu dominio");
+                allow = false;
             }
             if(allow && !isVariable(hijoCandidato)){// es un operador ... 
                 QsOperador op_candidato = getOperator(hijoCandidato); 
-                if(!padreAdoptivo.getPadreID().equals("")){ //operador con padre
-                    System.out.println("operador con padre");
+                if(!padreAdoptivo.getPadreID().equals("")){ //... operador con padre
+                    System.out.println("controlando ciclos... operador adoptivo tiene padre");
                     if(!noCicles(op_candidato,padreAdoptivo)){
                         System.out.println("no podes ser parte de este dominio por que formaras un ciclo");
                         allow = false;
@@ -495,7 +516,8 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         }
     }     */
 
-    
+    //ERROR : un abuelo que se tenia como su propio abuelo, entonces, este chabon, 
+    //        tenia infinitos abuelos que no eran él!!! 
     public boolean noCicles(QsOperador hijoCandidato, QsOperador padreCandidato){
         boolean adopto=true;     
         String abuelo = padreCandidato.getPadreID();
@@ -510,6 +532,8 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         }
         return adopto;
     }
+    
+    
     /**
      * Actualizo la estructura primero tengo que borrar el hijo del dominio 
      * y agregarlo al nuevo dominio 

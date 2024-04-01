@@ -64,21 +64,24 @@ public class QsMenuSuperior extends JPanel {
     
     public QsMenuSuperior (QsFrame parent, QsTextPanel tabTexto,QsGraphicPanel tabGrafico, QsEvaluacionPanel tabInstanciado){
         this.setLayout(new BorderLayout());
-        this.setBackground(Color.decode("#F09757"));
         this.tabTexto = tabTexto;
         barraDeMenu();
+        this.add(barra,BorderLayout.NORTH);
         this.add(new QsBarraHerramientas(parent,tabTexto,tabGrafico,tabInstanciado),BorderLayout.CENTER);
         this.setVisible(true);
   
-    }
+    }        
+
     public void barraDeMenu(){
+        barra.setBackground(Color.decode("#D6CE93"));
         //JMenus
         JMenu archivo = new JMenu("Archivo");
+        //archivo.setForeground(Color.decode("#EFEBCE"));
         JMenu herramientas = new JMenu("Herramientas");
+        //herramientas.setForeground(Color.decode("#EFEBCE"));
         JMenu ayuda = new JMenu("Ayuda");
-        QsMenuSuperior instancia = this;
-
-
+        //ayuda.setForeground(Color.decode("#EFEBCE"));
+        
         //JMenuItems: Archivo
         JMenuItem abrirArchivo = new JMenuItem("Abrir");
         abrirArchivo.addActionListener(new ActionListener() {
@@ -130,7 +133,6 @@ public class QsMenuSuperior extends JPanel {
         barra.add(archivo);
         barra.add(herramientas);
         barra.add(ayuda);
-        this.add(barra,BorderLayout.NORTH);
     }
     private void abrirArchivo(){
         JFileChooser fileExplorer = new JFileChooser(); // Elector de archivos

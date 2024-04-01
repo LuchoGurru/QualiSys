@@ -46,7 +46,7 @@ public class QsGraphicPanel extends JPanel {
      //   scroll.setWheelScrollingEnabled(true);
       //  scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
       //  scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        this.DAD.setBackground(Color.WHITE); 
+        //this.DAD.setBackground(Color.WHITE); 
         this.add(menuOperadores,BorderLayout.WEST);
         this.add(scroll ,BorderLayout.CENTER); 
     }

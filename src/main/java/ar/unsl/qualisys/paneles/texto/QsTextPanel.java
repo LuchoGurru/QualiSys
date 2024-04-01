@@ -58,6 +58,7 @@ public class QsTextPanel extends JPanel {
      */
     public QsTextPanel(QsFrame parent) {
         this.setLayout(new BorderLayout());
+        
         this.parent = parent;
         esta=this;
         panelDeTexto = new JTextPane() {
@@ -69,6 +70,7 @@ public class QsTextPanel extends JPanel {
             }
 
         };
+        panelDeTexto.setBackground(Color.decode("#EFEBCE"));
         renglones = new ArrayList<>();
         renglonActual = new Item(0, 0, "1.", ""); // inicializo item  ... Cambiar por CARGAR ARCHHIVO O NUEVO ARCHIVO
         renglones.add(renglonActual);

@@ -32,7 +32,7 @@ public class QsFrame extends JFrame{
     private QsEvaluacionPanel tabInstancias; // panel donde se asignan valores a las variables de distintos modelos LPS en particular
     private JPanel tablUtilidades; // Estadisticas TODO Opcion dejar como visual como propuesta de escalabilidad;
     private int indiceActual;
-    private JTabbedPane tabbedPane = new QsTabPanel();
+    private JTabbedPane tabbedPane;
     
     public ArrayList<Item> g_variables;
     public ArrayList<QsNodo> g_nodos;
@@ -49,14 +49,11 @@ public class QsFrame extends JFrame{
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLayout(new BorderLayout());
+        tabbedPane = new QsTabPanel();
         tabTexto = new QsTextPanel(this);
         tabGrafico = new QsGraphicPanel(this);
-        
-        
-        
         tabInstancias = new QsEvaluacionPanel(this);
-        
-        
+        //this.setBackground(Color.decode("#A3A380"));
         
         this.add(new QsMenuSuperior(this,tabTexto,tabGrafico,tabInstancias),BorderLayout.NORTH);  // PARA ABRIR Y CERRAR ARCHIVO
         tabbedPane.addTab("Variables de Preferencia", tabTexto);
@@ -64,7 +61,7 @@ public class QsFrame extends JFrame{
         
         JScrollPane scrollPane = new JScrollPane(tabInstancias);
         scrollPane.getVerticalScrollBar().setUnitIncrement(25); 
-        tabbedPane.addTab("Llenado de Instancias ", scrollPane);
+        tabbedPane.addTab("Instanciado", scrollPane);
         /*JPanel panel4;
         panel4 = new JPanel();
         panel4.add(createChart());

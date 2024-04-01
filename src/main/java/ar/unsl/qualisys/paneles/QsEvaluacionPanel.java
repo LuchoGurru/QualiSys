@@ -16,11 +16,14 @@ import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.componentes.nodos.QsOperador;
 import ar.unsl.qualisys.componentes.nodos.QsVariable;
 import ar.unsl.qualisys.componentes.tabla.*;
+import ar.unsl.qualisys.frames.QsFrame;
 import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -32,7 +35,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -58,34 +63,48 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     ArrayList<String> orderOper = null;
         
     
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTableInstancias;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTableResultados;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTable jTableResultadosParciales;
+    private JScrollPane jScrollPane1;
+    private JTable jTableInstancias;
+    private JScrollPane jScrollPane2;
+    private JTable jTableResultados;
+    private JScrollPane jScrollPane3;
+    private JTable jTableResultadosParciales;
+    private JScrollPane jScrollPane4;
+    private JTable jTableDetallesModal;
+    
     private int instanciaSeleccionada;
     private boolean init;
     
+        private QsFrame parent;
+
         private QsDadPanel DAD;
 
-    
+  
     /**
      * Creates new form ValorInstancias
      */
-    public QsEvaluacionPanel(JFrame parent) {
-        System.out.println("Constructor1");
+    public QsEvaluacionPanel(QsFrame parent) {
+        this.setBackground(Color.decode("#D6CE93"));
+        this.parent=parent;
         initComponents();
-        System.out.println("constructor2");
         this.vars = new ArrayList<>();
         this.instancias = new ArrayList<>();
         this.init = true;
+        this.jPanel0.setBackground(Color.decode("#EFEBCE"));
+        this.jPanel3.setBackground(Color.decode("#EFEBCE"));
+        
+        this.stylingComponent(jButtonCreate);        
+        this.stylingComponent(jButtonElim);        
+        this.stylingComponent(jButtonModif);        
+        this.stylingComponent(jButtonResults);        
         this.initTablaInstancias();
         this.initTablaResultados();
         this.initTableResultadosParciales();
         this.setVisible(true);
     }
+    
 
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -97,6 +116,13 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         
     }
 
+    private void stylingComponent(JComponent b){
+        b.setBackground(Color.decode("#D6CE93"));
+ //       b.setForeground(Color.decode("#BB8588"));
+        b.setBorder(BorderFactory.createLineBorder(Color.decode("#A3A380"),1,true));
+        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    } 
+    
     public QsDadPanel getDAD() {
         return DAD;
     }
@@ -108,102 +134,103 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     private boolean isVariable(QsNodo var){
         return var.getClass() == QsVariable.class;
     }
-    
+    /** 
+     * Iniciacion de la tabla 
+     */
     private void initTablaInstancias(){
-        //Tabla de instancias 
-        jScrollPane1 = new JScrollPane();
-        jTableInstancias = new JTable(new CustomTableModel()); // para deshabilitar la edicion de la primer columna
-        jTableInstancias.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jScrollPane1.setViewportView(jTableInstancias);
-        DefaultTableModel model = (DefaultTableModel) jTableInstancias.getModel();
-
-        jTableInstancias.setModel(instanciasTableModel());
         
-        jTableInstancias.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jTableInstancias.setColumnSelectionAllowed(true);
-        jTableInstancias.setRowSelectionAllowed(true);
-
-        TableCustom.apply(jScrollPane1, TableCustom.TableType.MULTI_LINE);
-        jPanel1.setLayout(new BorderLayout());
-        jPanel1.add(jScrollPane1,BorderLayout.CENTER);
-        jTableInstancias.addMouseListener(new java.awt.event.MouseAdapter() {
+        jTableInstancias = new JTable(new CustomTableModel());                  // deshabilita la edicion de la primer columna
+        configTableLookAndFeel(jTableInstancias);                               //vista
+        TableModel model = instanciasTableModel();                              //modelo
+        jTableInstancias.setModel(model);
+        jTableInstancias.addMouseListener(new java.awt.event.MouseAdapter() {   // listenner
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-             //  int row = jTable1.rowAtPoint(evt.getPoint());
-               int col = jTableInstancias.columnAtPoint(evt.getPoint());
-                System.out.println(col);
-               if ( col > 0 ) {
-                    instanciaSeleccionada = col;
-               }
-               int[] selectedColumns = jTableInstancias.getSelectedColumns();
-                for (int c : selectedColumns) {
-                    TableColumn column = jTableInstancias.getColumnModel().getColumn(c);
-                    // Realiza operaciones en la columna seleccionada, por ejemplo:
-                    // column.setMinWidth(50); // Establece el ancho mínimo de la columna
-                    // column.setMaxWidth(200); // Establece el ancho máximo de la columna
-                }
+                int col = jTableInstancias.columnAtPoint(evt.getPoint());
+                if ( col > 0 )
+                     instanciaSeleccionada = col;
+//                int[] selectedColumns = jTableInstancias.getSelectedColumns();
+//                for (int c : selectedColumns) {
+//                    TableColumn column = jTableInstancias.getColumnModel().getColumn(c);
+//                }
             }
-        });
+        });         
+
+        jScrollPane1 = new JScrollPane(jTableInstancias);
+        jScrollPane1.getViewport().setBackground(Color.decode("#EFEBCE"));
+        jPanel1.setLayout(new BorderLayout());
+        jPanel1.add(jScrollPane1,BorderLayout.CENTER);
     }
     
+    
+    /**
+     * Configura el aspecto de la tabla 
+     * @param table la tabla a ser configurada 
+     */
+    private void configTableLookAndFeel(JTable table){
+        table.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setColumnSelectionAllowed(true);
+        table.setRowSelectionAllowed(true);
+        table.getTableHeader().setReorderingAllowed(false);
+        table.getTableHeader().setBackground(new Color(250, 250, 250));
+        table.getTableHeader().setDefaultRenderer(new TableHeaderCustomCellRender(jTableInstancias));
+        table.setSelectionBackground(Color.decode("#D8A48F")); 
+        table.setRowHeight(40);
+    }
+    /** 
+     * Iniciacion de la tabla 
+     */    
     private void initTablaResultados(){
-
-        //Tabla de evaluacion de resultados
-        jScrollPane2 = new JScrollPane();
         jTableResultados = new JTable(new CustomTableModel());
         jTableResultados.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jScrollPane2.setViewportView(jTableResultados);
-        DefaultTableModel model2 = (DefaultTableModel) jTableResultados.getModel();
+        configTableLookAndFeel(jTableResultados);                               //vista 
+        
+        DefaultTableModel model2 = (DefaultTableModel) jTableResultados.getModel(); //modelo 
         model2.addColumn("Instancias :");
         model2.addColumn("Resultados :");
         model2.addColumn("Acciones :");
-        //TableCustom.apply(jScrollPane2, TableCustom.TableType.DEFAULT);
-        jTableResultados.getTableHeader().setBackground(new Color(250, 250, 250));
-        jTableResultados.getTableHeader().setReorderingAllowed(false);
-        jTableResultados.getTableHeader().setDefaultRenderer(new TableHeaderCustomCellRender(jTableResultados));
-        jPanel4.add(jScrollPane2);
-        jPanel4.setLayout(new BorderLayout());      
-        jPanel4.add(jScrollPane2,BorderLayout.CENTER);
-        TableActionEvent event = new TableActionEvent() {
+        
+        TableActionEvent event = new TableActionEvent() {                       //listenner
             @Override
             public void onEdit(int row) {
-                System.out.println("Edit row : " + row);
-                
+//                System.out.println("Edit row : " + row);                
             }
-
             @Override
             public void onDelete(int row) {
-                if (jTableResultados.isEditing()) {
-                    jTableResultados.getCellEditor().stopCellEditing();
-                }
-                DefaultTableModel model = (DefaultTableModel) jTableResultados.getModel();
-                model.removeRow(row);
+//                if (jTableResultados.isEditing()) {
+//                    jTableResultados.getCellEditor().stopCellEditing();
+//                }
+//                DefaultTableModel model = (DefaultTableModel) jTableResultados.getModel();
+//                model.removeRow(row);
             }
-
             @Override
             public void onView(int row) {
-                System.out.println("View row : " + row);
                 mostrarResultadosParciales(row);
-                
-                
-                
             }
-        }; 
-        tablaSettings(jTableResultados,2,event);
-
+        };
+        addActionPanelToColumn(jTableResultados,2,event);
+        
+        jScrollPane2 = new JScrollPane(jTableResultados);
+        jScrollPane2.getViewport().setBackground(Color.decode("#EFEBCE"));
+        jPanel4.setLayout(new BorderLayout());      
+        jPanel4.add(jScrollPane2,BorderLayout.CENTER);
     }
     
-    public void initTablaModal(int row) {
-        JTable table = new JTable();
-            DefaultTableModel model = new DefaultTableModel(
-                new Object[][] {},
-                new String[] {"Hijo", "Ponderación", "Retorno"}
-            );
-            String operFilaId = this.orderOper.get(row);
-            ArrayList<QsNodo> hijos = this.relPadreHijos.get(operFilaId);
+    public void initTablaModal(int row){
+        jTableDetallesModal = new JTable();
+        configTableLookAndFeel(jTableDetallesModal);                            //vista
+        
+        DefaultTableModel model = new DefaultTableModel(                        //modelo
+            new Object[][] {},
+            new String[] {"Hijo", "Ponderación", "Retorno"}
+        );
         //Filas
         int cols = model.getColumnCount();
-        
+ 
+        String operFilaId = this.orderOper.get(row);
+        ArrayList<QsNodo> hijos = this.relPadreHijos.get(operFilaId);
+ 
         for (int i = 0; i < hijos.size(); i++) {
             Object[] fila = new Object[cols]; 
             QsNodo hijoFila = hijos.get(i);
@@ -220,54 +247,46 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
             }
             model.addRow(fila);    
         }// Crear el diálogo modal
-                    table.setModel(model);
-
-            JDialog dialog = new JDialog();
-            dialog.setLayout(new BorderLayout());
-            Container contenedor = this.DAD.getParent();
-             JScrollPane scrollPanel = new JScrollPane(DAD);
-             Dimension viewportSize = scrollPanel.getViewport().getSize();
-
-        // Calcular la posición dentro del componente grande que deseas centrar
-        System.out.println(viewportSize.height + " " + viewportSize.width);
         QsOperador op = this.operadores.get(operFilaId);
+        jTableDetallesModal.setModel(model);
+        crearDialog(jTableDetallesModal,op);
+    } 
+
+    public void crearDialog(JTable table,QsOperador op){
+        JDialog dialog = new JDialog(this.parent,"",ModalityType.APPLICATION_MODAL);
+        dialog.setLayout(new BorderLayout());
+        Container contenedor = this.DAD.getParent();
+        jScrollPane4 = new JScrollPane(DAD);
         DAD.setNodoSeleccionado(op);
         int x = op.getLocation().x; // coordenada x deseada
         int y = op.getLocation().y; // coordenada y deseada// Ajustar la posición de desplazamiento del JScrollPane para que la posición deseada esté centrada en la vista
-//        int newX = Math.max(0, x - viewportSize.width / 2);
-//        int newY = Math.max(0, y - viewportSize.height / 2);
-
-         scrollPanel.getViewport().setViewPosition(new Point(x-100, y ));
-                                dialog.add(new JScrollPane(table), BorderLayout.WEST); // Añadir la tabla a un JScrollPane
-                               dialog.add(scrollPanel, BorderLayout.CENTER); // Añadir la tabla a un JScrollPane
-            dialog.setTitle("Detalles del nodo : dominio");
-            dialog.setSize(800, 600); // Establecer tamaño
-            dialog.setLocationRelativeTo(null); // Centrar en la pantalla
-            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE); // Cerrar al hacer clic en la cruz
-            dialog.setFocusable(true); // Establecer enfoque
-            dialog.requestFocusInWindow(); // Solicitar enfoque
-            dialog.setAlwaysOnTop(true);
-            dialog.addWindowListener(new WindowAdapter() {
+        jScrollPane4.getViewport().setViewPosition(new Point(x-100, y ));       // ajusto el foco del scroll
+        JScrollPane sp = new JScrollPane(table);
+        sp.getViewport().setBackground(Color.decode("#EFEBCE"));
+        dialog.add(sp, BorderLayout.WEST);  
+        dialog.add(jScrollPane4, BorderLayout.CENTER);  
+        
+        dialog.setTitle("Retorno del nodo = " + op.getValorResultado() );
+        dialog.setSize(800, 600); // Establecer tamaño
+        dialog.setLocationRelativeTo(null); // Centrar en la pantalla
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE); // Cerrar al hacer clic en la cruz
+        dialog.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
+                op.setBackground(Color.WHITE);
                 setEditableNodos(true);
                 contenedor.remove(DAD); // Remove panel from its original container
-               contenedor.add(DAD); // Add panel to the new container
-               contenedor.revalidate(); // Revalidate the new container to reflect changes
-               contenedor.repaint();
-                System.out.println("habilitao");
-             }
-            
+                contenedor.add(DAD); // Add panel to the new container
+                contenedor.revalidate(); // Revalidate the new container to reflect changes
+                contenedor.repaint();
+            }
+
             public void windowOpened(WindowEvent e) {
                 setEditableNodos(false);
-
-                 System.out.println("deshabilitao");             }
+                op.setBackground(Color.decode("#D8A48F"));
+            }
         });
-            
-            
-            
-            dialog.setVisible(true);
-
-    } 
+        dialog.setVisible(true);
+    }
     
     public void setEditableNodos(boolean editable) {
     ArrayList<String> nodos = new ArrayList<>(this.operadores.keySet()); // copiade operadores a evaluar
@@ -281,64 +300,54 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     }
     
     private void initTableResultadosParciales(){    
-        jScrollPane3 = new JScrollPane();
         jTableResultadosParciales = new JTable(new CustomTableModel());
-        jTableResultadosParciales.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jScrollPane3.setViewportView(jTableResultadosParciales);
-        DefaultTableModel model3 = (DefaultTableModel) jTableResultadosParciales.getModel();
+        configTableLookAndFeel(jTableResultadosParciales);                      // vista
+        
+        DefaultTableModel model3 = (DefaultTableModel) jTableResultadosParciales.getModel(); //modelo
         model3.addColumn("Operador :");
         model3.addColumn("Resultados-Valor :");
-        model3.addColumn("Dominio(hijos) :");  
-        jTableResultadosParciales.getTableHeader().setBackground(new Color(250, 250, 250));
-        jTableResultadosParciales.getTableHeader().setReorderingAllowed(false);
-        jTableResultadosParciales.getTableHeader().setDefaultRenderer(new TableHeaderCustomCellRender(jTableResultados));
+        model3.addColumn("Detalle - Inputs :");  
         
-        jPanel5.add(jScrollPane3);
-        jPanel5.setLayout(new BorderLayout());
-        jPanel5.add(jScrollPane3,BorderLayout.CENTER);
-        
-        TableActionEvent event = new TableActionEvent() {
+        TableActionEvent event = new TableActionEvent() {                       //listenner
             @Override
             public void onEdit(int row) {
-            // Crear y configurar la tabla
             }
 
             @Override
             public void onDelete(int row) {
-                if (jTableResultadosParciales.isEditing()) {
-                    jTableResultadosParciales.getCellEditor().stopCellEditing();
-                }
-                DefaultTableModel model = (DefaultTableModel) jTableResultadosParciales.getModel();
-                model.removeRow(row);
+//                if (jTableResultadosParciales.isEditing()) {
+//                    jTableResultadosParciales.getCellEditor().stopCellEditing();
+//                }
+//                DefaultTableModel model = (DefaultTableModel) jTableResultadosParciales.getModel();
+//                model.removeRow(row);
             }
 
             @Override
             public void onView(int row) {
-                System.out.println("View row : " + row);
-                               initTablaModal(row);
-
-                
-                
+                initTablaModal(row);
             }
         }; 
-        tablaSettings(jTableResultadosParciales,2,event);
-     }
-    public void tablaSettings(JTable table, int actionColumn,TableActionEvent event){
-        table.setRowHeight(35);
-        table.setSelectionBackground(new java.awt.Color(56, 138, 112));
+        addActionPanelToColumn(jTableResultadosParciales,2,event);
         
-        if(actionColumn<0){   
-        }else{
-            table.getColumnModel().getColumn(2).setCellRenderer(new TableActionCellRender());
-            table.getColumnModel().getColumn(2).setCellEditor(new TableActionCellEditor(event));
-        }
-        table.getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-                setHorizontalAlignment(SwingConstants.RIGHT);
-                return super.getTableCellRendererComponent(jtable, o, bln, bln1, i, i1);
-            }
-        });
+        jScrollPane3 = new JScrollPane(jTableResultadosParciales);
+        jScrollPane3.getViewport().setBackground(Color.decode("#EFEBCE"));
+        jPanel5.setLayout(new BorderLayout());
+        jPanel5.add(jScrollPane3,BorderLayout.CENTER);
+    }
+    
+    
+    public void addActionPanelToColumn(JTable table, int actionColumn,TableActionEvent event){
+        table.getColumnModel().getColumn(actionColumn).setCellRenderer(new TableActionCellRender());
+        table.getColumnModel().getColumn(actionColumn).setCellEditor(new TableActionCellEditor(event));
+       
+//        table.getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer() {
+//            @Override
+//            public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+//                setHorizontalAlignment(SwingConstants.RIGHT);
+//                return super.getTableCellRendererComponent(jtable, o, bln, bln1, i, i1);
+//            }
+//        });
+
     }
     
     public void reinicializarOperadores(){
@@ -363,12 +372,14 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         for (int i = 0; i < ops.size(); i++) {
             String ordenOp = orderOper.get(i);
             Object[] fila = new Object[cols]; 
-            fila[0] = this.operadores.get(ordenOp).getSymbol() + ":" +this.operadores.get(ordenOp).getNombre();
+            fila[0] = this.operadores.get(ordenOp).getSymbol();
             fila[1] = this.operadores.get(ordenOp).getValorResultado();
-            fila[2] = this.operadores.get(ordenOp).getName(); // no hace falta por que el render de la tabla lo complleta con los botones ... 
+//            fila[2] = this.operadores.get(ordenOp).getName(); // no hace falta por que el render de la tabla lo complleta con los botones ... 
             model.addRow(fila);           
         }       
+        
     }
+    
     
     
     public ArrayList<QsVariable> getVars(){
@@ -454,6 +465,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         ArrayList<Double> valores =  this.instancias.get(instancia).getValores();
         for(int i = 0 ; i < valores.size() ; i++){
             QsVariable qsv = this.vars.get(i);
+            qsv.setValorResultado(valores.get(i));
             String nameID = qsv.getName();
             this.variablesMap.get(nameID).setValorResultado(valores.get(i));
         }
@@ -467,7 +479,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     
     */
     public void agregarValor(Double dou, int instancia,int variable){
-        this.instancias.get(instancia -1 ).getValores().set(variable, dou); // -1 para respetar el arreglo por la columna q sobra al principio
+        this.instancias.get(instancia - 1 ).getValores().set(variable, dou); // -1 para respetar el arreglo por la columna q sobra al principio
     }
     
     private void crearInstancia(String nombre){
@@ -509,33 +521,38 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     }
     private void eliminarInstancia(){
         if(instanciaSeleccionada > 0 ){
-        this.instancias.remove(instanciaSeleccionada -1 );
-        int cols = this.instancias.size() + 1 ; // A grego columna de variables
-        Object[] columnas = new Object[cols];
-        
-        for(int i=0;i<cols;i++){
-            if(i==0)
-                columnas[i] = "Variables :";
-            else
-                columnas[i] = this.instancias.get(i-1).getNombre();
-        }        
-        
-        DefaultTableModel tmodel = new DefaultTableModel(
-                columnas, 0);
-        //Filas
-        for (int i = 0; i < this.vars.size(); i++) {
-            Object[] fila = new Object[cols]; 
-            for(int j=0;j<cols;j++){
-                 if(j==0){
-                     fila[j] = this.vars.get(i).getDescripcion();
-                 }else{
-                     fila[j] = this.instancias.get(j-1).getValores().get(i);
-                 }    
-             }
-            tmodel.addRow(fila);           
-        }
-        jTableInstancias.setModel(tmodel);
-            JOptionPane.showMessageDialog(this, "Seleccione una instancia de la tabla.");
+            this.instancias.remove(instanciaSeleccionada -1 );
+            int cols = this.instancias.size() + 1 ; // A grego columna de variables
+            Object[] columnas = new Object[cols];
+
+            for(int i=0;i<cols;i++){
+                if(i==0)
+                    columnas[i] = "Variables :";
+                else
+                    columnas[i] = this.instancias.get(i-1).getNombre();
+            }        
+
+            DefaultTableModel tmodel = new DefaultTableModel(
+                    columnas, 0);
+            //Filas
+            for (int i = 0; i < this.vars.size(); i++) {
+                Object[] fila = new Object[cols]; 
+                for(int j=0;j<cols;j++){
+                     if(j==0){
+                         fila[j] = this.vars.get(i).getDescripcion();
+                     }else{
+                         fila[j] = this.instancias.get(j-1).getValores().get(i);
+                     }    
+                 }
+                tmodel.addRow(fila);           
+            }
+            jTableInstancias.setModel(tmodel);
+            for (int columnIndex = 1; columnIndex < jTableInstancias.getColumnCount(); columnIndex++) {
+                jTableInstancias.getColumnModel().getColumn(columnIndex).setCellEditor(new CustomCellEditor(new JTextField()));
+            }
+        }else{
+                        JOptionPane.showMessageDialog(this, "Seleccione una instancia de la tabla.");
+
         }
     }
     private void modificarInstancia(String nombre){
@@ -566,7 +583,9 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
             tmodel.addRow(fila);           
         }
         jTableInstancias.setModel(tmodel);
-
+        for (int columnIndex = 1; columnIndex < jTableInstancias.getColumnCount(); columnIndex++) {
+            jTableInstancias.getColumnModel().getColumn(columnIndex).setCellEditor(new CustomCellEditor(new JTextField()));
+        }
         }else{
             JOptionPane.showMessageDialog(this, "Seleccione una instancia de la tabla.");
         }
@@ -611,7 +630,6 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
  * @return 
  */
     public double calcularFuncion(boolean debug) {
-        
         if(debug)
             orderOper = new ArrayList<>();
         else
@@ -669,7 +687,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
 
         jPanel0 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        jButtonCreate = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
         jButtonModif = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
@@ -680,27 +698,29 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
+        jButtonResults = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
 
         setPreferredSize(new java.awt.Dimension(1280, 1200));
 
+        jPanel0.setBackground(Color.decode("#EFEBCE"));
         jPanel0.setLayout(null);
 
         jLabel1.setText("Agregue las instancias que desee.");
         jPanel0.add(jLabel1);
         jLabel1.setBounds(540, 0, 463, 17);
 
-        jButton1.setText("Crear Instancia");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButtonCreate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/create-25.png"))); // NOI18N
+        jButtonCreate.setText("Crear Instancia");
+        jButtonCreate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButtonCreateActionPerformed(evt);
             }
         });
-        jPanel0.add(jButton1);
-        jButton1.setBounds(540, 30, 170, 29);
+        jPanel0.add(jButtonCreate);
+        jButtonCreate.setBounds(540, 30, 170, 29);
 
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -710,6 +730,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         jPanel0.add(jTextField1);
         jTextField1.setBounds(180, 30, 350, 29);
 
+        jButtonModif.setIcon(new javax.swing.ImageIcon(getClass().getResource("/edit-25.png"))); // NOI18N
         jButtonModif.setText("Modificar Instancia");
         jButtonModif.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -718,9 +739,13 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         });
         jPanel0.add(jButtonModif);
         jButtonModif.setBounds(720, 30, 170, 30);
+
+        jSeparator1.setBackground(Color.decode("#EFEBCE"));
+        jSeparator1.setForeground(Color.decode("#A3A380"));
         jPanel0.add(jSeparator1);
         jSeparator1.setBounds(10, 80, 520, 10);
 
+        jButtonElim.setIcon(new javax.swing.ImageIcon(getClass().getResource("/delete-24.png"))); // NOI18N
         jButtonElim.setText("Eliminar Instancia");
         jButtonElim.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -755,10 +780,11 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
 
         jLabel5.setText("Evalúe sus resultados.");
 
-        jButton3.setText("Ver Resultados");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        jButtonResults.setIcon(new javax.swing.ImageIcon(getClass().getResource("/show-25.png"))); // NOI18N
+        jButtonResults.setText("Ver Resultados");
+        jButtonResults.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                jButtonResultsActionPerformed(evt);
             }
         });
 
@@ -776,8 +802,8 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(550, 550, 550)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE))))
+                            .addComponent(jButtonResults, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(359, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -786,7 +812,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
                 .addGap(8, 8, 8)
                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(6, 6, 6)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButtonResults, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(15, 15, 15)
                 .addComponent(jLabel9))
         );
@@ -818,21 +844,17 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jPanel0, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(41, 41, 41)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 12, Short.MAX_VALUE)))
-                .addContainerGap())
+                .addGap(41, 41, 41)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel0, javax.swing.GroupLayout.DEFAULT_SIZE, 1221, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -851,7 +873,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButtonCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCreateActionPerformed
         /*Object[][] data = {
             {"Row 1, Col 1", "Row 1, Col 2"},
             {"Row 2, Col 1", "Row 2, Col 2"},
@@ -862,7 +884,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         model.setColumnIdentifiers(columnNames);
         model.setDataVector(data, columnNames);*/
         crearInstancia(jTextField1.getText());
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButtonCreateActionPerformed
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
@@ -876,9 +898,9 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         modificarInstancia(jTextField1.getText());
     }//GEN-LAST:event_jButtonModifActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButtonResultsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResultsActionPerformed
         evaluarResultados();
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_jButtonResultsActionPerformed
 
 public class CustomCellEditor extends DefaultCellEditor {
     
@@ -932,10 +954,10 @@ public class CustomCellEditor extends DefaultCellEditor {
 }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButtonCreate;
     private javax.swing.JButton jButtonElim;
     private javax.swing.JButton jButtonModif;
+    private javax.swing.JButton jButtonResults;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

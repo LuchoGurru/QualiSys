@@ -38,7 +38,7 @@ public class QsVariable extends QsNodo{
         this.descripcion=descripcion;
         this.orden=orden;
         this.setBounds((int)x,(int)y,80,30);
-        this.setBackground(Color.getHSBColor(238, 238, 238));
+        this.setBackground(Color.decode("#EFEBCE"));
         //this.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         ClickListener clickListener = new ClickListener(this);
         this.addMouseListener(clickListener);
@@ -53,7 +53,7 @@ public class QsVariable extends QsNodo{
         this.descripcion=descripcion;
         this.orden=orden;
         this.setBounds((int)x,(int)y,80,30);
-        this.setBackground(Color.getHSBColor(238, 238, 238));
+        this.setBackground(Color.decode("#EFEBCE"));
         this.setPonderacion(ponderacion);
         //this.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         ClickListener clickListener = new ClickListener(this);
@@ -145,7 +145,8 @@ public class QsVariable extends QsNodo{
         public void mousePressed(MouseEvent evt){
             //.setBorder(BorderFactory.createLineBorder(Color.BLACK, 10));
             if(editable){
-               this.qsVarInstance.setBackground(Color.getHSBColor(238, 238, 238));
+               this.qsVarInstance.setBackground(Color.decode("#EFEBCE"));
+
                GUIParent.setNodoSeleccionado(this.qsVarInstance);
             }   
         }
