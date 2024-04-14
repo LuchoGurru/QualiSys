@@ -461,7 +461,7 @@ public class QsBarraHerramientas extends JToolBar{
         String cadena="";
         JFileChooser fileExplorer = new JFileChooser(); // Elector de archivos
         JMenuBar barra = new JMenuBar();
-        FileNameExtensionFilter fileExtensions = new FileNameExtensionFilter("Archivos de calidad", "txt"); // Filtro de archivos
+        FileNameExtensionFilter fileExtensions = new FileNameExtensionFilter("Archivos de calidad", "qsy"); // Filtro de archivos
         fileExplorer.setFileFilter(fileExtensions);
         int selected = fileExplorer.showOpenDialog(barra);// Archivo seleccionado
         if (selected == fileExplorer.APPROVE_OPTION) {
@@ -488,8 +488,7 @@ public class QsBarraHerramientas extends JToolBar{
             
 // Map<String, QsOperador> operadores = this.tabGrafico.getDAD().getOperadores();
             Map<String, ArrayList<QsNodo>> relPadreHijos = this.tabGrafico.getDAD().getRelPadreHijos();
-            ArrayList<QsInstancia> instancias = this.tabInstanciado.getInstancias();
-
+           
             System.out.println(sesion.getString("texto"));
 
             JSONObject nodos = sesion.getJSONObject("nodos");
@@ -596,7 +595,47 @@ public class QsBarraHerramientas extends JToolBar{
              //   cantOperadores ++; 
             }
             
+            JSONArray instanciasJA = sesion.getJSONArray("instancias");
+            ArrayList<QsInstancia> instancias = new ArrayList<>();// this.tabInstanciado.getInstancias();
+
+            for(Object iJson: instanciasJA){
+                JSONObject instanciaJSON = (JSONObject) iJson;
+                
+                Map<String,Double> valores = new HashMap<>();
+                JSONArray valoresJA = instanciaJSON.getJSONArray("valores");
+                for(Object vJson : valoresJA){
+                    JSONObject valorJO = (JSONObject) vJson;
+                    valores.put(valorJO.getString("varID"), valorJO.getDouble("valor"));
+                }
+                QsInstancia i = new QsInstancia(
+                        instanciaJSON.getString("nombre"),
+                        valores);
+                instancias.add(i);
+            }
+            this.tabInstanciado.setInstancias(instancias);
         }
+        /*
+        
+        for(QsInstancia i: instancias ){
+            JSONArray valoresI = new JSONArray();
+            String nombreI = i.getNombre();                        
+            Map<String,Double> valores = i.getValores();                               
+            ArrayList<String> keyValores = new ArrayList<>(valores.keySet());    
+            for(String k : keyValores){                                          // Por cada variable clave, valor Double
+                JSONObject v = new JSONObject();
+                v.put(k, valores.get(k));
+                valoresI.put(v);// Armo listo de valores
+            }
+            JSONObject relacionI = new JSONObject();
+            relacionI.put(nombreI,valoresI);                              // Creo el objeto instancia con el nombre correspondiente
+            jsonInstancias.put(relacionI);         //Instancia
+        }
+        
+        
+        
+        */
+        
+        
         
     }
     /**
@@ -659,14 +698,8 @@ public class QsBarraHerramientas extends JToolBar{
             jsonRelaciones.put(relacionPH);
         }
         
-        for(QsInstancia i: instancias ){
-            JSONArray valoresI = new JSONArray();
-            for(Double valor : i.getValores()){            
-                valoresI.put(valor);// Armo listo de valores
-            }
-            JSONObject relacionPH = new JSONObject();
-            relacionPH.put(i.getNombre(),valoresI); // Creo el objeto instancia con el nombre correspondiente
-            jsonInstancias.put(relacionPH);
+        for(QsInstancia i: instancias ){                            // Creo el objeto instancia con el nombre correspondiente
+            jsonInstancias.put(i.toJSON());         //Instancia
         }
         
         sesion.put("texto",texto) ;

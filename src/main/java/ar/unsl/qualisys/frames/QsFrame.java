@@ -89,24 +89,37 @@ public class QsFrame extends JFrame{
         this.add(tabbedPane,BorderLayout.CENTER);
         this.setVisible(true);   
     }
- 
-    private Chart createChart (){
-        Chart chart = new GUIUtils.Chart();
+    /**
+     * Llamar antes de cambiar la pestaña
+     */
+    public void initPanelGrafico(){
+        if(tabTexto.isTextoBienFormado()){ 
+            this.tabGrafico.setVariables(tabTexto.getVariablesDelTexto()); 
+        }
+    }
 
-        setLocationRelativeTo(null);
-        getContentPane().setBackground(new Color(250, 250, 250));
-        chart.addLegend("Income", new Color(245, 189, 135));
-        chart.addLegend("Expense", new Color(135, 189, 245));
-        chart.addLegend("Profit", new Color(189, 135, 245));
-        chart.addLegend("Cost", new Color(139, 229, 222));
-        chart.addData(new ModelChart("January", new double[]{500, 200, 80,89}));
-        chart.addData(new ModelChart("February", new double[]{600, 750, 90,150}));
-        chart.addData(new ModelChart("March", new double[]{200, 350, 460,900}));
-        chart.addData(new ModelChart("April", new double[]{480, 150, 750,700}));
-        chart.addData(new ModelChart("May", new double[]{350, 540, 300,150}));
-        chart.addData(new ModelChart("June", new double[]{190, 280, 81,200}));
-        return chart;
-}
+    /**
+     * Llamar antes de cambiar la pestaña
+     */
+    public void initPanelInstancias(){
+        ArrayList<QsVariable> listaVariables = new ArrayList<QsVariable>();
+        for(Item item : tabTexto.getVariablesDelTexto()){
+            QsVariable var = new QsVariable(this.tabGrafico.getDAD(), 50, 0, item.getNumeration(),item.getCadenaDeTexto(),item.getNumeroDeLinea());
+            listaVariables.add(var);
+        }
+        Map<String, ArrayList<QsNodo>>  relPadreHijos = this.tabGrafico.getDAD().getRelPadreHijos();
+        Map<String, QsOperador> opers = this.tabGrafico.getDAD().getOperadores();
+        Map<String, QsVariable> variables = this.tabGrafico.getDAD().getVariables();
+        
+        this.tabInstancias.setDAD(this.tabGrafico.getDAD());
+        this.tabInstancias.setListaVariables(listaVariables); // Asigno lista de variables ordenadas para muestra por pantalla
+        this.tabInstancias.setRelPadreHijos(relPadreHijos);
+        this.tabInstancias.setOperadores(opers);
+        this.tabInstancias.setVariables(variables);
+        this.tabInstancias.setInit(true);
+        this.tabInstancias.repaint();
+    }
+    
 
     public static boolean isTURN_OFF_LISTENERS() {
         return TURN_OFF_LISTENERS;
@@ -115,50 +128,6 @@ public class QsFrame extends JFrame{
     public static void setTURN_OFF_LISTENERS(boolean TURN_OFF_LISTENERS) {
         QsFrame.TURN_OFF_LISTENERS = TURN_OFF_LISTENERS;
     }
-    /**
-     * Llamar antes de cambiar la pestaña
-     */
-    public void initPanelGrafico(){
-        if(tabTexto.isTextoBienFormado()){ 
-            this.tabGrafico.setVariables(tabTexto.getVariables()); 
-        }
-    }
-
-    /**
-     * Llamar antes de cambiar la pestaña
-     */
-    public void initPanelInstancias(){
-        //ArrayList<QsVariable> vars = new ArrayList<QsVariable>(this.tabGrafico.getDAD().getVariables().values()) ; 
-        //this.tabInstancias.setVars(vars);
-        ArrayList<QsVariable> vars = new ArrayList<QsVariable>();
-        for(Item item : tabTexto.getVariables()){
-            QsVariable var = new QsVariable(this.tabGrafico.getDAD(), 50, 0, item.getNumeration(),item.getCadenaDeTexto(),item.getNumeroDeLinea());
-            vars.add(var);
-        }
-        Map<String, ArrayList<QsNodo>>  relPadreHijos = this.tabGrafico.getDAD().getRelPadreHijos();
-        Map<String, QsOperador> opers = this.tabGrafico.getDAD().getOperadores();
-        Map<String, QsVariable> variablesMap = this.tabGrafico.getDAD().getVariables();
-        this.tabInstancias.setRelPadreHijos(relPadreHijos);
-        this.tabInstancias.setOperadores(opers);
-        this.tabInstancias.setVars(vars); // Asigno lista de variables ordenadas para muestra por pantalla
-        this.tabInstancias.setVariablesMap(variablesMap);
-        this.tabInstancias.setDAD(this.tabGrafico.getDAD());
-    }
-
-    /*
-        private JPanel panel1;  
-        private JButton button1;
-        private JTabbedPane JTParchivo;
-        private JTextPane textPane1;
-        private JTextArea textArea1;
-
-        public EditorPanel(){
-            this.setContentPane(new EditorPanel().panel1);
-            this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            this.pack();
-            this.setVisible(true);
-        }
-    */
 
     public JTabbedPane getTabbedPane() {
         return tabbedPane;

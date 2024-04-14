@@ -7,7 +7,6 @@ package ar.unsl.qualisys.paneles.grafo.memento;
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.componentes.nodos.QsOperador;
 import ar.unsl.qualisys.componentes.nodos.QsVariable;
-import ar.unsl.qualisys.paneles.texto.memento.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;

@@ -29,7 +29,7 @@ public class QsVariable extends QsNodo{
     private int orden;
     private boolean editable;
 
-    public QsVariable (QsDadPanel parent, double x, double y,String name,String descripcion,int orden){
+    public QsVariable (QsDadPanel parent, int x, int y,String name,String descripcion,int orden){
         super();
         this.menuPopUp();
         this.setName(name); 
@@ -37,7 +37,7 @@ public class QsVariable extends QsNodo{
         this.GUIParent = parent;
         this.descripcion=descripcion;
         this.orden=orden;
-        this.setBounds((int)x,(int)y,80,30);
+        this.setBounds(x,y,80,30);
         this.setBackground(Color.decode("#EFEBCE"));
         //this.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         ClickListener clickListener = new ClickListener(this);
@@ -48,6 +48,7 @@ public class QsVariable extends QsNodo{
     public QsVariable (QsDadPanel parent, int x, int y,String name,String descripcion,int orden, double ponderacion){
         super();
         super.setPonderacion(ponderacion);
+        this.menuPopUp();
         this.setName(name); 
         this.editable= true;
         this.GUIParent = parent;

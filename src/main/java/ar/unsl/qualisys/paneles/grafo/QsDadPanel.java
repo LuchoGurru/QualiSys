@@ -171,6 +171,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
             }
         }   
         this.relPadreHijos = relPadreHijosSinVars; // relaciones entre operadores
+        this.caretTaker = new CaretTaker(); //Borro memoria 'cache'.
         this.guardarEstado(); // actualiza memento con las nuevas variables traidas del panel anterior
         this.repaint(); 
     }

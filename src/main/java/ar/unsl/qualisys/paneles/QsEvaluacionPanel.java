@@ -5,13 +5,9 @@
 package ar.unsl.qualisys.paneles;
 
 import GUIUtils.CustomTableModel;
-import javax.swing.JFrame;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
-import GUIUtils.TableCustom;
 import GUIUtils.TableHeaderCustomCellRender;
 import LSP.QsInstancia;
-import ar.unsl.qualisys.paneles.ModalTablaHijos;
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.componentes.nodos.QsOperador;
 import ar.unsl.qualisys.componentes.nodos.QsVariable;
@@ -24,7 +20,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dialog.ModalityType;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
@@ -33,8 +28,6 @@ import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComponent;
@@ -44,25 +37,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 /**
  *
  * @author luciano.gurruchaga
  */
-public class QsEvaluacionPanel extends javax.swing.JPanel {
-    private ArrayList<QsVariable> vars;
-    private Map<String, QsVariable> variablesMap;
-    private ArrayList<QsInstancia> instancias;
-    private Map<String, QsOperador> operadores = new HashMap<String, QsOperador>();
-    private Map<String, ArrayList<QsNodo>> relPadreHijos = new HashMap<String, ArrayList<QsNodo>>();
-
-    ArrayList<String> orderOper = null;
-        
-    
+public class QsEvaluacionPanel extends JPanel {
+    //Swing
     private JScrollPane jScrollPane1;
     private JTable jTableInstancias;
     private JScrollPane jScrollPane2;
@@ -71,56 +54,68 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     private JTable jTableResultadosParciales;
     private JScrollPane jScrollPane4;
     private JTable jTableDetallesModal;
-    
+    //MoreSwing
+    private QsFrame parent;
+    private QsDadPanel DAD;
+    //Qualisys
+    private ArrayList<QsVariable> listaVariables;
+    private Map<String, QsVariable> variables;
+    private ArrayList<QsInstancia> instancias;
+    private Map<String, QsOperador> operadores;
+    private Map<String, ArrayList<QsNodo>> relPadreHijos;
+    //PanelUse
+    ArrayList<String> orderOper = null;//El primero en calcular su resultado
     private int instanciaSeleccionada;
     private boolean init;
     
-        private QsFrame parent;
-
-        private QsDadPanel DAD;
-
+    
   
     /**
      * Creates new form ValorInstancias
      */
     public QsEvaluacionPanel(QsFrame parent) {
-        this.setBackground(Color.decode("#D6CE93"));
         this.parent=parent;
-        initComponents();
-        this.vars = new ArrayList<>();
-        this.instancias = new ArrayList<>();
         this.init = true;
+        //Swing
+        initComponents();
+        this.setBackground(Color.decode("#D6CE93"));
         this.jPanel0.setBackground(Color.decode("#EFEBCE"));
         this.jPanel0.setBorder(BorderFactory.createLineBorder(Color.decode("#A3A380")));
         this.jPanel3.setBackground(Color.decode("#EFEBCE"));
         this.jPanel3.setBorder(BorderFactory.createLineBorder(Color.decode("#A3A380")));
-        
+        //Styling
         this.stylingComponent(jButtonCreate);        
         this.stylingComponent(jButtonElim);        
         this.stylingComponent(jButtonModif);        
         this.stylingComponent(jButtonResults);        
+        //Qualisys
+        this.listaVariables = new ArrayList<>();// Se settea desp
+        this.instancias = new ArrayList<>();// Se settea desp
+        this.variables = new HashMap<>(); // Se settea desp 
+        this.operadores = new HashMap<>();// Se settea desp
+        this.relPadreHijos = new HashMap<>();// Se settea desp
+        //PanelUse
         this.initTablaInstancias();
         this.initTablaResultados();
         this.initTableResultadosParciales();
         this.setVisible(true);
     }
     
-
-    
     @Override
     protected void paintComponent(Graphics g) {
+        System.out.println("Paint");
         super.paintComponent(g);
-        if(this.init)   
-            initData(); 
-        init = false;
-        System.out.println("initData");
-        //tablaSettings(jTable1,-1);
-        
+        if(this.init){
+            initInstancias(); // inicializa si es que existen
+        }
+             
+        init = false; 
     }
-
+    
+        
     private void stylingComponent(JComponent b){
         b.setBackground(Color.decode("#D6CE93"));
- //       b.setForeground(Color.decode("#BB8588"));
+//       b.setForeground(Color.decode("#BB8588"));
         b.setBorder(BorderFactory.createLineBorder(Color.decode("#A3A380"),1,true));
         b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     } 
@@ -132,16 +127,12 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     public void setDAD(QsDadPanel DAD) {
         this.DAD = DAD;
     }
-    
-    private boolean isVariable(QsNodo var){
-        return var.getClass() == QsVariable.class;
-    }
     /** 
      * Iniciacion de la tabla 
      */
     private void initTablaInstancias(){
         
-        jTableInstancias = new JTable(new CustomTableModel());                  // deshabilita la edicion de la primer columna
+        jTableInstancias = new JTable();                  
         configTableLookAndFeel(jTableInstancias);                               //vista
         TableModel model = instanciasTableModel();                              //modelo
         jTableInstancias.setModel(model);
@@ -184,15 +175,15 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
      * Iniciacion de la tabla 
      */    
     private void initTablaResultados(){
-        jTableResultados = new JTable(new CustomTableModel());
+        jTableResultados = new JTable();
         jTableResultados.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         configTableLookAndFeel(jTableResultados);                               //vista 
         
-        DefaultTableModel model2 = (DefaultTableModel) jTableResultados.getModel(); //modelo 
+        CustomTableModel model2 = (CustomTableModel) new CustomTableModel(); //modelo 
         model2.addColumn("Instancias :");
         model2.addColumn("Resultados :");
-        model2.addColumn("Acciones :");
-        
+        model2.addColumn("Acciones :"); 
+        jTableResultados.setModel(model2);
         TableActionEvent event = new TableActionEvent() {                       //listenner
             @Override
             public void onEdit(int row) {
@@ -223,7 +214,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         jTableDetallesModal = new JTable();
         configTableLookAndFeel(jTableDetallesModal);                            //vista
         
-        DefaultTableModel model = new DefaultTableModel(                        //modelo
+        CustomTableModel model = new CustomTableModel(                        //modelo
             new Object[][] {},
             new String[] {"Hijo", "Ponderación", "Retorno"}
         );
@@ -236,7 +227,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         for (int i = 0; i < hijos.size(); i++) {
             Object[] fila = new Object[cols]; 
             QsNodo hijoFila = hijos.get(i);
-            if(isVariable(hijoFila)){
+            if(hijoFila instanceof QsVariable){
                 QsVariable hijoVar = (QsVariable) hijoFila;
                 fila[0] = hijoVar.getName() + ": " + hijoVar.getDescripcion();
                 fila[1] = hijoVar.getPonderacion(); 
@@ -295,21 +286,20 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         for (int i = 0; i < nodos.size(); i++) {
             this.operadores.get(nodos.get(i)).setEditable(editable);
         }
-    nodos = new ArrayList<>(this.variablesMap.keySet()); // copiade operadores a evaluar
+    nodos = new ArrayList<>(this.variables.keySet()); // copiade operadores a evaluar
         for (int i = 0; i < nodos.size(); i++) {
-            this.variablesMap.get(nodos.get(i)).setEditable(editable);
+            this.variables.get(nodos.get(i)).setEditable(editable);
         }    
     }
     
     private void initTableResultadosParciales(){    
-        jTableResultadosParciales = new JTable(new CustomTableModel());
+        jTableResultadosParciales = new JTable();
         configTableLookAndFeel(jTableResultadosParciales);                      // vista
-        
-        DefaultTableModel model3 = (DefaultTableModel) jTableResultadosParciales.getModel(); //modelo
+        CustomTableModel model3 = (CustomTableModel) new CustomTableModel(); //modelo 
         model3.addColumn("Operador :");
         model3.addColumn("Resultados-Valor :");
         model3.addColumn("Detalle - Inputs :");  
-        
+        jTableResultadosParciales.setModel(model3);
         TableActionEvent event = new TableActionEvent() {                       //listenner
             @Override
             public void onEdit(int row) {
@@ -366,7 +356,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         reinicializarOperadores();
         calcularFuncion(true);
        
-        DefaultTableModel model = (DefaultTableModel) jTableResultadosParciales.getModel();
+        CustomTableModel model = (CustomTableModel) jTableResultadosParciales.getModel(); //modelo  
         model.setRowCount(0);
         //Filas
         int cols = model.getColumnCount();
@@ -381,24 +371,28 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         }       
         
     }
-    
-    
+
+    public void setInit(boolean init) {
+        this.init = init;
+    }
     
     public ArrayList<QsVariable> getVars(){
-        return vars;
+        return listaVariables;
     }
-
-    public void setVars(ArrayList<QsVariable> vars) {
-        this.vars = vars;
-        this.repaint();
+    /**
+     * Invoca: Repaint
+     * @param variables 
+     */
+    public void setListaVariables(ArrayList<QsVariable> variables) {
+        this.listaVariables = variables;
     }
 
     public Map<String, QsVariable> getVariablesMap() {
-        return variablesMap;
+        return variables;
     }
 
-    public void setVariablesMap(Map<String, QsVariable> variablesMap) {
-        this.variablesMap = variablesMap;
+    public void setVariables(Map<String, QsVariable> variables) {
+        this.variables = variables;
     }
     
     public Map<String, QsOperador> getOperadores() {
@@ -428,14 +422,13 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
             else
                 columnas[i] = this.instancias.get(i).getNombre();
         }
-        DefaultTableModel tmodel = new DefaultTableModel(
-                columnas, 0);
+        CustomTableModel tmodel = new CustomTableModel(columnas, 0); //// deshabilita la edicion de la primer columna
         //Filas
-        for (int i = 0; i < this.vars.size(); i++) {
+        for (int i = 0; i < this.listaVariables.size(); i++) {
             Object[] fila = new Object[cols]; 
             for(int j=0;j<cols;j++){
                  if(j==0){
-                     fila[j] = this.vars.get(i);
+                     fila[j] = this.listaVariables.get(i);
                  }else{
                      fila[j] = this.instancias.get(j).getValores().get(i);
                  }    
@@ -446,7 +439,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     }
     
     public void mostrarResultados(double[] resultados) {
-        DefaultTableModel model = (DefaultTableModel) jTableResultados.getModel();
+        CustomTableModel model = (CustomTableModel) jTableResultados.getModel(); //modelo  
         model.setRowCount(0);
         //Filas
         int cols = model.getColumnCount();
@@ -457,6 +450,7 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
 //                fila[2] = ""; // no hace falta por que el render de la tabla lo complleta con los botones ... 
             model.addRow(fila);           
         }
+        jTableResultados.setModel(model);
         //return model;
     }
     
@@ -464,12 +458,12 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
      * Asigna la instancia a las variables a evaluar, en toria si sigue vigente la referencia ya estaria resuelto
      */
     public void asignarInstancia(int instancia){
-        ArrayList<Double> valores =  this.instancias.get(instancia).getValores();
+        Map<String,Double> valores = this.instancias.get(instancia).getValores();
         for(int i = 0 ; i < valores.size() ; i++){
-            QsVariable qsv = this.vars.get(i);
-            qsv.setValorResultado(valores.get(i));
+            QsVariable qsv = this.listaVariables.get(i);
+            qsv.setValorResultado(valores.get(qsv.getName()));
             String nameID = qsv.getName();
-            this.variablesMap.get(nameID).setValorResultado(valores.get(i));
+            this.variables.get(nameID).setValorResultado(valores.get(qsv.getName()));
         }
     }
     
@@ -481,15 +475,36 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
     
     */
     public void agregarValor(Double dou, int instancia,int variable){
-        this.instancias.get(instancia - 1 ).getValores().set(variable, dou); // -1 para respetar el arreglo por la columna q sobra al principio
+        this.instancias.get(instancia - 1 ).getValores().put(this.listaVariables.get(variable).getName(), dou); // -1 para respetar el arreglo por la columna q sobra al principio
     }
     
     private void crearInstancia(String nombre){
-        QsInstancia nuevaI = new QsInstancia(nombre, new ArrayList<>());
-        for(int i = 0 ; i < this.vars.size();i++){
-            nuevaI.getValores().add(0d);
+        QsInstancia nuevaI = new QsInstancia(nombre, new HashMap<String,Double>());
+        for(int i = 0 ; i < this.listaVariables.size();i++){
+            nuevaI.getValores().put(listaVariables.get(i).getName(),0d);
         }
         this.instancias.add(nuevaI);
+        cargarInstancias();
+    }
+    private void eliminarInstancia(){
+        if(instanciaSeleccionada > 0 ){
+            this.instancias.remove(instanciaSeleccionada -1 );
+            cargarInstancias();
+        }else{
+                        JOptionPane.showMessageDialog(this, "Seleccione una instancia de la tabla.");
+
+        }
+    }
+    private void modificarInstancia(String nombre){
+        if(instanciaSeleccionada > 0 ){
+            this.instancias.get(instanciaSeleccionada -1 ).setNombre(nombre);
+            cargarInstancias();
+        }else{
+            JOptionPane.showMessageDialog(this, "Seleccione una instancia de la tabla.");
+        }
+    }
+
+    private void cargarInstancias(){
         int cols = this.instancias.size() + 1 ; // A grego columna de variables
         Object[] columnas = new Object[cols];
         
@@ -500,50 +515,17 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
                 columnas[i] = this.instancias.get(i-1).getNombre();
         }        
         
-        DefaultTableModel tmodel = new DefaultTableModel(
-                columnas, 0);
-        //Filas
-        for (int i = 0; i < this.vars.size(); i++) {
-            Object[] fila = new Object[cols]; 
-            for(int j=0;j<cols;j++){
-                 if(j==0){
-                     fila[j] = this.vars.get(i).getDescripcion();
-                 }else{
-                     fila[j] = this.instancias.get(j-1).getValores().get(i);
-                 }    
-             }
-            tmodel.addRow(fila);            
-        }
-       
-        jTableInstancias.setModel(tmodel);
-        for (int columnIndex = 1; columnIndex < jTableInstancias.getColumnCount(); columnIndex++) {
-            jTableInstancias.getColumnModel().getColumn(columnIndex).setCellEditor(new CustomCellEditor(new JTextField()));
-        }
+        CustomTableModel tmodel = new CustomTableModel(columnas, 0);
 
-    }
-    private void eliminarInstancia(){
-        if(instanciaSeleccionada > 0 ){
-            this.instancias.remove(instanciaSeleccionada -1 );
-            int cols = this.instancias.size() + 1 ; // A grego columna de variables
-            Object[] columnas = new Object[cols];
-
-            for(int i=0;i<cols;i++){
-                if(i==0)
-                    columnas[i] = "Variables :";
-                else
-                    columnas[i] = this.instancias.get(i-1).getNombre();
-            }        
-
-            DefaultTableModel tmodel = new DefaultTableModel(
-                    columnas, 0);
             //Filas
-            for (int i = 0; i < this.vars.size(); i++) {
+            for (int i = 0; i < this.listaVariables.size(); i++) {
                 Object[] fila = new Object[cols]; 
                 for(int j=0;j<cols;j++){
                      if(j==0){
-                         fila[j] = this.vars.get(i).getDescripcion();
+                         fila[j] = this.listaVariables.get(i).getDescripcion();
                      }else{
-                         fila[j] = this.instancias.get(j-1).getValores().get(i);
+                         String var =  this.listaVariables.get(i).getName();
+                         fila[j] = this.instancias.get(j-1).getValores().get(var);
                      }    
                  }
                 tmodel.addRow(fila);           
@@ -552,62 +534,28 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
             for (int columnIndex = 1; columnIndex < jTableInstancias.getColumnCount(); columnIndex++) {
                 jTableInstancias.getColumnModel().getColumn(columnIndex).setCellEditor(new CustomCellEditor(new JTextField()));
             }
-        }else{
-                        JOptionPane.showMessageDialog(this, "Seleccione una instancia de la tabla.");
-
-        }
     }
-    private void modificarInstancia(String nombre){
-        if(instanciaSeleccionada > 0 ){
-        this.instancias.get(instanciaSeleccionada -1 ).setNombre(nombre);
-        int cols = this.instancias.size() + 1 ; // A grego columna de variables
-        Object[] columnas = new Object[cols];
-        
-        for(int i=0;i<cols;i++){
-            if(i==0)
-                columnas[i] = "Variables :";
-            else
-                columnas[i] = this.instancias.get(i-1).getNombre();
-        }        
-        
-        DefaultTableModel tmodel = new DefaultTableModel(
-                columnas, 0);
-        //Filas
-        for (int i = 0; i < this.vars.size(); i++) {
-            Object[] fila = new Object[cols]; 
-            for(int j=0;j<cols;j++){
-                 if(j==0){
-                     fila[j] = this.vars.get(i).getDescripcion();
-                 }else{
-                     fila[j] = this.instancias.get(j-1).getValores().get(i);
-                 }    
-             }
-            tmodel.addRow(fila);           
-        }
-        jTableInstancias.setModel(tmodel);
-        for (int columnIndex = 1; columnIndex < jTableInstancias.getColumnCount(); columnIndex++) {
-            jTableInstancias.getColumnModel().getColumn(columnIndex).setCellEditor(new CustomCellEditor(new JTextField()));
-        }
-        }else{
-            JOptionPane.showMessageDialog(this, "Seleccione una instancia de la tabla.");
-        }
-    }
-    private void initData() {
-        int cantVars = vars.size();
-        DefaultTableModel model = (DefaultTableModel) jTableInstancias.getModel();
-        
-        if (model.getRowCount() > 0) { // Elimino filas
-            for (int i = model.getRowCount() - 1; i > -1; i--) {
-                model.removeRow(i);
+     /**
+     * Carga las relaciones de los operadores y reinicializa las variables
+     * @param variables 
+     */
+    public void initInstancias() {
+        ArrayList<QsInstancia> instanciasRefresh = new ArrayList<>();
+        for(QsInstancia i : this.instancias){
+            String nombre = i.getNombre();
+            Map<String,Double> valores = new HashMap<>();
+            for(QsVariable v : this.listaVariables){
+                Double ceroOValor = i.getValores().getOrDefault(v.getName(),0d);// Asigna el valor viejo o deja un 0 en su lugar.
+                valores.put(v.getName(), ceroOValor);
             }
+            instanciasRefresh.add(new QsInstancia(nombre, valores));
         }
-        
-        for(QsVariable v: this.vars){
-            Object[] fila = new Object[]{v.getDescripcion()};
-            model.addRow(fila);
-        }
+        this.instancias = instanciasRefresh;
+        cargarInstancias(); // las carga en la tabla si es que existen
     }
 
+    
+    
     public ArrayList<QsInstancia> getInstancias() {
         return instancias;
     }

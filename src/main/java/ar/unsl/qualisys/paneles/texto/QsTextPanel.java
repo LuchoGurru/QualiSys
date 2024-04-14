@@ -811,7 +811,7 @@ public class QsTextPanel extends JPanel {
      *
      * @return
      */
-    public ArrayList<Item> getVariables() { 
+    public ArrayList<Item> getVariablesDelTexto() { 
         String texto = panelDeTexto.getText();
         String[] lineas = texto.split("\n");
         renglones = new ArrayList<>();
@@ -819,14 +819,6 @@ public class QsTextPanel extends JPanel {
             renglonActual = armarItem(lineas[i], i); // init  
             renglones.add(renglonActual);
         }
-        
-        
-        
-        /*
-        if (TURN_OFF_LISTENERS == false) {
-            TURN_OFF_LISTENERS = true;
-            actualizarEstructuraDeTexto();//Le paso lineas distintas para que actualice todo el texto..
-        } */
         boolean primero = true;
         Item anterior = null;
         ArrayList<Item> rVariables = new ArrayList<>();
@@ -838,10 +830,8 @@ public class QsTextPanel extends JPanel {
             }
             if (anterior.getNivel() >= renglon.getNivel()) { // Si el nivel actual es el mismo que el anterior entonces el nivel anterior es una variable .
                 rVariables.add(anterior);
-            }//else if(anterior.getNivel() < renglon.getNivel()){// Si el nivel anterior es menor al nivel actual entonces No es variable.
+            }
             anterior = renglon;
-            //}//else{ // Si el nivel anterior es mayor al nivel actual entonces es una variable
-            //}
         }
         rVariables.add(anterior);    //El ultimo nivel es una variable if or if         
         return rVariables;
