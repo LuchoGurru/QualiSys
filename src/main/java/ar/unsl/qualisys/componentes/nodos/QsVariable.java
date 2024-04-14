@@ -45,16 +45,16 @@ public class QsVariable extends QsNodo{
         this.setToolTipText(this.descripcion);
     }
 
-    public QsVariable (QsDadPanel parent, double x, double y,String name,String descripcion,int orden, double ponderacion){
+    public QsVariable (QsDadPanel parent, int x, int y,String name,String descripcion,int orden, double ponderacion){
         super();
+        super.setPonderacion(ponderacion);
         this.setName(name); 
         this.editable= true;
         this.GUIParent = parent;
         this.descripcion=descripcion;
         this.orden=orden;
-        this.setBounds((int)x,(int)y,80,30);
+        this.setBounds(x,y,80,30);
         this.setBackground(Color.decode("#EFEBCE"));
-        this.setPonderacion(ponderacion);
         //this.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         ClickListener clickListener = new ClickListener(this);
         this.addMouseListener(clickListener);

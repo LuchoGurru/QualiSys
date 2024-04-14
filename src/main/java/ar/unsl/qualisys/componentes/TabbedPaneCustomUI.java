@@ -65,7 +65,7 @@ public class TabbedPaneCustomUI extends BasicTabbedPaneUI {
         Color color = getTabColor(selected);
         g2.setPaint(new GradientPaint(rec.x, rec.y, color.brighter(), rec.x, rec.y + rec.height, color));
         Shape shape = createTabArea(rec);
-     //   g2.drawImage(new ShadowRenderer(6, 0.8f, new Color(50, 50, 50)).createShadow(shape), rec.x, rec.y, null);
+        g2.drawImage(new ShadowRenderer(6, 0.8f, new Color(50, 50, 50)).createShadow(shape), rec.x, rec.y, null);
         g2.fill(shape);
     }
  private Color selectedTabColor = Color.GREEN; // Change this color to your desired color

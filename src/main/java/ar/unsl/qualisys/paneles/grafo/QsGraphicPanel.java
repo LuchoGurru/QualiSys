@@ -60,23 +60,33 @@ public class QsGraphicPanel extends JPanel {
             mapaDeVariables.put(var.getName(), var);
             desplazamiento+= 35;
         }
-        this.DAD.setVariables(mapaDeVariables);
+        this.DAD.initVariables(mapaDeVariables);
     }
     
     public void agregarOperadorANulLayout(Point punto,QsOperador modelOperador){ 
-        QsOperador nuevoOperador = new QsOperador(DAD,
-                DAD.cantOperadores,
+        int margin = menuOperadores.getWidth(); 
+        int x = (int)punto.getX() - margin -20; // para centrar respecto del mouse
+        int y = (int)punto.getY()-20;// para centrar respecto del mouse
+        int w = 51;
+        int h = 51;
+        QsOperador nuevoOperador = new QsOperador(
+                this.DAD,
+                x,
+                y,
+                w,
+                h,
+                "op_"+DAD.cantOperadores, //Esta es la inicializacion del OPERADOR ID DEL SISTEMA DAD
                 modelOperador.getNombre(),
                 modelOperador.getSymbol(),
                 modelOperador.getD(),
                 modelOperador.getR2(),
                 modelOperador.getR3(),
                 modelOperador.getR4(),
-                modelOperador.getR5());
+                modelOperador.getR5(),
+                -1d // Para saber que es virgen ... o la raiz ya que nunca debería ser setteado ya que no tiene padre ya que es la raiz ja.
+            );
+        
         QsDadPanel.cantOperadores ++;
-        int margin = menuOperadores.getWidth(); 
-        nuevoOperador.setBounds((int)punto.getX() - margin -20,(int)punto.getY()-20,51,51);
-        nuevoOperador.setBackground(Color.white);
         DAD.addOperator(nuevoOperador);
         DAD.repaint();
     }

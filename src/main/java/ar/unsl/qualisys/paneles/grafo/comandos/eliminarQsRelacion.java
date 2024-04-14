@@ -26,10 +26,11 @@ public class eliminarQsRelacion implements IComando{
         QsNodo nodoSelec = this.pizzarra.getNodoSeleccionado();
         String padre = nodoSelec.getPadreID();
         if(!padre.equals("")){ // Si tenia padre (DEBERIA)
-            ArrayList<QsNodo> hermanos = this.pizzarra.getRelPadreHijos().get(padre);
             nodoSelec.setPadreID("");
+            ArrayList<QsNodo> hermanos = this.pizzarra.getRelPadreHijos().get(padre);
             hermanos.remove(nodoSelec); // jeje
         }
+        this.pizzarra.guardarEstado();
         this.pizzarra.repaint(); // Repaint 
     }
     

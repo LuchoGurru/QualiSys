@@ -25,7 +25,7 @@ public class eliminarQsNodo implements IComando {
     public void ejecutar() {   
         QsOperador opSelec = (QsOperador) this.pizzarra.getNodoSeleccionado();
         String padreViejo = opSelec.getPadreID();
-        if(!padreViejo.equals("")){ // Si tenia padre
+      /*  if(!padreViejo.equals("")){ // Si tenia padre
             ArrayList<QsNodo> hermanos = this.pizzarra.getRelPadreHijos().get(padreViejo);
             hermanos.remove(opSelec); // jeje
             this.pizzarra.actualizarArbolGenealogico(opSelec, padreViejo, "");
@@ -41,8 +41,10 @@ public class eliminarQsNodo implements IComando {
         this.pizzarra.getOperadores().remove(clave); //Lo borro en la lista de operadores
         
         this.pizzarra.setNodoSeleccionado(null); //Limpio el operador seleccionado
-        
-        
+        this.pizzarra.repaint(); // Repaint 
+
+        */
+        this.pizzarra.actualizarArbolGenealogico(opSelec, padreViejo, "");
         this.pizzarra.repaint(); // Repaint 
     }
     

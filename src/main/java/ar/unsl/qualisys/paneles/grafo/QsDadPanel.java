@@ -148,35 +148,35 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
      * Carga las relaciones de los operadores y reinicializa las variables
      * @param variables 
      */
-    public void setVariables(Map<String, QsVariable> varsNuevas) {
+    public void initVariables(Map<String, QsVariable> varsNuevas) {
         HashMap<String,ArrayList<QsNodo>> relPadreHijosSinVars = new HashMap<>();
-        Map<String, QsVariable> varsViejas = this.variables;
+//        Map<String, QsVariable> varsViejas = this.variables;
         this.variables = varsNuevas;
         for(String padreID : this.relPadreHijos.keySet()){
             relPadreHijosSinVars.put(padreID, new ArrayList<>());
-                for(QsNodo h : this.relPadreHijos.get(padreID)){
-                    if(h.getClass()!=QsVariable.class){ // Operador
-                        relPadreHijosSinVars.get(padreID).add(h);
-                    }else if (this.variables.keySet().contains(h.getName())){
-                        QsVariable varVieja = (QsVariable) h;
-                        String varID = h.getName();
-                        this.variables.get(varID).setPadreID(varVieja.getPadreID());
-                        this.variables.get(varID).setPonderacion(varVieja.getPonderacion());
-                        this.variables.get(varID).setName(varVieja.getName());
-                        this.variables.get(varID).setDescripcion(varVieja.getDescripcion());
-                       // this.variables.get(varID).setBounds(varVieja.getBounds());
-                        this.variables.get(varID).setGUIParent(varVieja.getGUIParent());
-                        relPadreHijosSinVars.get(padreID).add(this.variables.get(varID)); 
-                    }
+            for(QsNodo h : this.relPadreHijos.get(padreID)){
+                if(h.getClass()!=QsVariable.class){ // Operador
+                    relPadreHijosSinVars.get(padreID).add(h);
+                }else if (this.variables.keySet().contains(h.getName())){
+                    QsVariable varVieja = (QsVariable) h;
+                    String varID = h.getName();
+                    this.variables.get(varID).setPadreID(varVieja.getPadreID());
+                    this.variables.get(varID).setPonderacion(varVieja.getPonderacion());
+                    this.variables.get(varID).setName(varVieja.getName());
+                    this.variables.get(varID).setDescripcion(varVieja.getDescripcion());
+                   // this.variables.get(varID).setBounds(varVieja.getBounds());
+                    this.variables.get(varID).setGUIParent(varVieja.getGUIParent());
+                    relPadreHijosSinVars.get(padreID).add(this.variables.get(varID)); //Añado variable a hermanos List
                 }
-            }   
+            }
+        }   
         this.relPadreHijos = relPadreHijosSinVars; // relaciones entre operadores
-        this.repaint();
-        
-//        EstadoGrafo nuevoEstado = new EstadoGrafo(this.variables, this.operadores,this.relPadreHijos);
-//        originator.setEstado(nuevoEstado);
-//        caretTaker.addMemento(originator.guardar());
+        this.guardarEstado(); // actualiza memento con las nuevas variables traidas del panel anterior
+        this.repaint(); 
+    }
     
+    public void setVariables(Map<String, QsVariable> varsNuevas){
+        this.variables = varsNuevas;
     }
 
     public QsNodo getNodoSeleccionado() {
@@ -204,15 +204,16 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
 
     @Override
     public void paintComponent(Graphics g) {
+        super.removeAll();
+        super.paintComponent(g); 
         System.out.println("Paint: ");
         area.width=0;
         area.height=0;
-        super.paintComponent(g);
-        super.removeAll();
         pintarVariables(g);
         pintarOperadores(g);
         dibujarLineas(g); 
         this.revalidate(); //Let the scroll pane know to update itself and its scrollbars.
+
     }
     
     private void pintarVariables(Graphics g){
@@ -264,12 +265,12 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
      * @param g 
      */
     public void dibujarLineas(Graphics g){
-        ArrayList<ArrayList<QsNodo>> hermanos = new ArrayList<ArrayList<QsNodo>>(this.relPadreHijos.values());
-        for(int j=0;j < hermanos.size(); j++){
-            ArrayList<QsNodo> hijos = hermanos.get(j);
+        ArrayList<ArrayList<QsNodo>> hijos = new ArrayList<ArrayList<QsNodo>>(this.relPadreHijos.values());
+        for(int j=0;j < hijos.size(); j++){
+            ArrayList<QsNodo> hermanos = hijos.get(j);
             Point padreLocation=null;
-            for(int i=0;i< hijos.size();i++){
-                QsNodo h = hijos.get(i);
+            for(int i=0;i< hermanos.size();i++){
+                QsNodo h = hermanos.get(i);
                 if(padreLocation == null){
                     padreLocation = obtenerPadreLocation(h);
                 }
@@ -354,7 +355,10 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         if(ponderValue>1){
             JOptionPane.showMessageDialog(this,"Debe ingresar un valor <= 1.");
             isGood = false;
-        }else{
+        }else if(isGood && ponderValue<0){
+            JOptionPane.showMessageDialog(this,"Debe ingresar un valor > 0.");
+            isGood = false;            
+        }else if(isGood){
             Double ponderacionTotal = ponderValue;
             for(QsNodo n: this.relPadreHijos.get(padre)){
                 if(!n.getName().equals(hijo.getName())){ // No se suma asi mismo
@@ -373,8 +377,8 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     /** 
      * @return 100/Cantidad de hijos
      */
-    private float getPonderacionBalanceada(int cantHijos){
-        float balanceo = 1f/(float)cantHijos;
+    private double getPonderacionBalanceada(int cantHijos){
+        double balanceo = 1d/(double)cantHijos;
         System.out.println("cantHijos = " + cantHijos);
         System.out.println("balanceo = " + balanceo);
         return balanceo;
@@ -399,10 +403,10 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                     1f);
         } while (!isGoodPonder(s, padre.getName()));
 */
-       //hijo.setPonderacion(Float.valueOf(s));
+       //hijo.setPonderacion(Double.valueOf(s));
     }
     
-        /**
+    /**
      * Actualiza todos las ponderaciones de los hermanos del padre
      * @param padre 
      */
@@ -413,11 +417,14 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
             valor = JOptionPane.showInputDialog(
                     this,
                     "Selecciona el peso deseado de la relación (recuerda que la suma de los pesos tiene que ser igual a 1).",
-                    1f);
+                    1d);
         } while (!isGoodPonder(hijo,valor, padre));
 
        hijo.setPonderacion(Double.valueOf(valor));
+       
+    
     }
+    
     /**
      * Sí el hijo puede ser dominiio ... 
      * se setea el peso ponderado de la relacion 
@@ -495,9 +502,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     public void addOperator(QsOperador q){
         this.operadores.put(q.getName(),q);
         this.relPadreHijos.put(q.getName(),new ArrayList<QsNodo>());
-//        EstadoGrafo nuevoEstado = new EstadoGrafo(this.variables, this.operadores,this.relPadreHijos);
-//        originator.setEstado(nuevoEstado);
-//        caretTaker.addMemento(originator.guardar());
+        this.guardarEstado();
     }
     /**
      * El planteamiento del problema 
@@ -535,12 +540,15 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     
     
     /**
-     * Actualizo la estructura primero tengo que borrar el hijo del dominio 
-     * y agregarlo al nuevo dominio 
+     * Actualizo la estructura solo en casos de Modificaciones en relaciones.
+     * Modificacion de padre.
+     * Eliminacion de nodo. 
+     * ¿Eliminacion de relacion? 
      */
     public void actualizarArbolGenealogico(QsNodo adoptado, String padreViejo, String padreNuevo){
+        System.out.println("padre del adoptado " + padreViejo);
         //Ahora
-        if(!padreViejo.equals("")){ // Si tenia padre
+        if(!padreViejo.equals("")){                                             // Si tenia padre, actualizo los ex hermanos 
             ArrayList<QsNodo> hermanosViejos = this.relPadreHijos.get(padreViejo);
             for(int i =0; i<hermanosViejos.size(); i++){
                 if(hermanosViejos.get(i).getName().equals(adoptado.getName())){
@@ -549,26 +557,30 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                 }
             }
             if(!hermanosViejos.isEmpty()){
-                updatePonderValue(this.operadores.get(padreViejo));
+                updatePonderValue(this.operadores.get(padreViejo));             //actualizao balanceo
             }
-        }  
- 
-        
-        
-        if(!padreNuevo.equals("")){ // Si es una eliminacion no hay padre nuevo
+        }   
+        if(!padreNuevo.equals("")){                                             // Lo agrego a lista de hermanos del nuevo padre
             //Despues
             ArrayList<QsNodo> hermanosNuevos = this.relPadreHijos.get(padreNuevo);
             hermanosNuevos.add(adoptado); 
-            this.updatePonderValue(this.operadores.get(padreNuevo)); //Actualizo los nuevos hermanos
-
+            this.updatePonderValue(this.operadores.get(padreNuevo));            //Actualizo los nuevos hermanos 
+        }else{ // ELIMINACION no hay padre nuevo
+            String clave = adoptado.getName();
+            
+            ArrayList<QsNodo> hijos = this.relPadreHijos.get(clave);
+            for(QsNodo h : hijos){                                              // Limpio padreID de hijos huerfanos
+                System.out.println("hijo" +h.getName() +" al que borro el padreID = " + h.getPadreID());
+                h.setPadreID("");
+            }
+            this.relPadreHijos.remove(clave);                                   // Lo borro en la relacion de padre
+            this.operadores.remove(clave);                                      //Lo borro en la lista de operadores
+            this.setNodoSeleccionado(null);                                     //Limpio el operador seleccionado
         }
-//        EstadoGrafo nuevoEstado = new EstadoGrafo(this.variables, this.operadores,this.relPadreHijos);
-//        originator.setEstado(nuevoEstado);
-//        caretTaker.addMemento(originator.guardar());
+        this.guardarEstado();
     }
-    public void ponderadoAutomatico(){
-        
-    }
+    
+    
      
     /**
      * Árbol Bien Formado : means, a imaginary tree. In wich the  leaves are variables and the root its an operator wich no father. Or a symbolic Father.
@@ -627,6 +639,11 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
      * Y Una estructura Auxiliar que contiene la relacion Padre - Hijos . La cual es la encargada de realizar todos lontroles y las restricciones necesarias en la formacion del arbol 
      * implementada con un hasMap distinguido por Padre ID y un conjunto de hijos[2,5],  
      */
+    public void guardarEstado(){
+        EstadoGrafo nuevoEstado = new EstadoGrafo(this.variables, this.operadores,this.relPadreHijos);//Guardo Estado 
+        originator.setEstado(nuevoEstado);
+        caretTaker.addMemento(originator.guardar());
+    }
 }
 /**
  * *LISTENER DOBLE CLICK DESPLIEGO MENU *

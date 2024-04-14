@@ -50,12 +50,17 @@ public class QsOperador extends QsNodo implements QsOperacion{
     private static double xmax=0;
     
     
-    
-    public QsOperador(JPanel GUIparent, int name,String nombre,String symbol, double d, double r2, double r3, double r4, double r5){
+    /**
+     * Usado por panel de Operadores.
+     */
+    public QsOperador(QsOperatorsPanel GUIparent,String nombre,String symbol, double d, double r2, double r3, double r4, double r5){
         super();
+        this.OPParent=GUIparent; 
+        this.DADParent=null;
         this.editable = true;
         this.menuPopUp();
-        this.setName("op_" + name); 
+        this.setName("op_0_desactivado"); 
+        this.setPreferredSize(new Dimension(51,51)); // no anda setSize ni setBounds ..
         this.padreID = "";
         this.symbol = symbol;
         this.nombre = nombre;
@@ -64,26 +69,25 @@ public class QsOperador extends QsNodo implements QsOperacion{
         this.r3=r3;
         this.r4=r4;
         this.r5=r5;
-
-        if(GUIparent.getClass() == QsDadPanel.class){ 
-            this.DADParent = (QsDadPanel) GUIparent;     // Para usar los metodos del DandD directamente
-        }else{
-            this.OPParent = (QsOperatorsPanel) GUIparent;
-        }
-        this.setPreferredSize(new Dimension(51,51));
+        this.setToolTipText(this.nombre);
         ClickListener clickListener = new ClickListener(this);
         this.addMouseListener(clickListener);
 //        DragListener dragListener = new DragListener(this);
-   //     this.addMouseMotionListener(dragListener);
-        this.setToolTipText(this.nombre);
-
+//        this.addMouseMotionListener(dragListener);
     } 
-    
-    public QsOperador(JPanel GUIparent, int name,String nombre,String symbol, float d, double r2, double r3, double r4, double r5,double ponderacion){
+    /**
+     * Usado por panel de Drag and Drop(Arrastrar y soltar).
+     */
+    public QsOperador(QsDadPanel GUIparent, int x,int y,int w,int h, String name,String nombre,String symbol, double d, double r2, double r3, double r4, double r5,double ponderacion){
         super();
-        this.editable = true;
+        this.OPParent=null;
+        this.DADParent=GUIparent;
+        super.setPonderacion(ponderacion);
+        this.setBackground(Color.white);        
+        this.setBounds(x,y,w,h);
         this.menuPopUp();
-        this.setName("op_" + name); 
+        this.editable = true;
+        this.setName(name); 
         this.padreID = "";
         this.symbol = symbol;
         this.nombre = nombre;
@@ -91,19 +95,12 @@ public class QsOperador extends QsNodo implements QsOperacion{
         this.r2=r2;
         this.r3=r3;
         this.r4=r4;
-        this.r5=r5;
-        this.setPonderacion(ponderacion);
-        if(GUIparent.getClass() == QsDadPanel.class){ 
-            this.DADParent = (QsDadPanel) GUIparent;     // Para usar los metodos del DandD directamente
-        }else{
-            this.OPParent = (QsOperatorsPanel) GUIparent;
-        }
-        this.setPreferredSize(new Dimension(51,51));
+        this.r5=r5;  
+        this.setToolTipText(this.nombre);
         ClickListener clickListener = new ClickListener(this);
         this.addMouseListener(clickListener);
 //        DragListener dragListener = new DragListener(this);
-   //     this.addMouseMotionListener(dragListener);
-        this.setToolTipText(this.nombre);
+//        this.addMouseMotionListener(dragListener);
 
     }
     
@@ -506,7 +503,7 @@ public class QsOperador extends QsNodo implements QsOperacion{
     
     public JSONObject toJSON(){
         JSONObject jsonVar= new JSONObject();
-        jsonVar.put("name", this.getName()); // var_1.n.n
+        jsonVar.put("name", this.getName()); // op_n
         jsonVar.put("nombre", this.nombre);
         jsonVar.put("symbol", this.symbol);
         jsonVar.put("d", this.d);

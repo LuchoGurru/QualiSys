@@ -28,6 +28,7 @@ public class editarPesoPonderado implements IComando {
         if(!padre.equals("")){ // Si tenia padre (DEBERIA)
             this.pizzarra.setPonderValue(nodoSelec, padre);
         } 
+        this.pizzarra.guardarEstado();
         this.pizzarra.repaint(); // Repaint 
     }
     

@@ -12,6 +12,7 @@ import ar.unsl.qualisys.frames.QsFrame;
 import ar.unsl.qualisys.paneles.*;
 import ar.unsl.qualisys.paneles.texto.*;
 import ar.unsl.qualisys.paneles.grafo.*;
+import ar.unsl.qualisys.paneles.grafo.memento.EstadoGrafo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.awt.Color;
@@ -187,6 +188,7 @@ public class QsBarraHerramientas extends JToolBar{
             @Override
             public void actionPerformed(ActionEvent e) {
                 abrirArchivo();
+                reinicializarTab();
             }
         });
 
@@ -234,16 +236,29 @@ public class QsBarraHerramientas extends JToolBar{
                         //tabTexto.getJTextPanel().setCaretPosition();
                     }
                 }else if(tab == 1){
-//                    ar.unsl.qualisys.paneles.grafo.memento.CaretTaker caretaker = tabGrafico.getDAD().getCaretTaker();
-//                    ar.unsl.qualisys.paneles.grafo.memento.Originator originator = tabGrafico.getDAD().getOriginator();
-//                    ar.unsl.qualisys.paneles.grafo.memento.Memento undoMemento = caretaker.undo();
-//                    if (undoMemento != null) {
-//                        originator.restaurar(undoMemento);
-//                        tabGrafico.getDAD().setVariables(originator.getEstado().getVariables());
-//                        tabGrafico.getDAD().setOperadores(originator.getEstado().getOperadores());
-//                        tabGrafico.getDAD().setRelPadreHijos(originator.getEstado().getRelPadreHijos());
-//                         tabGrafico.getDAD().repaint();  
-//                    }
+                    ar.unsl.qualisys.paneles.grafo.memento.CaretTaker caretaker = tabGrafico.getDAD().getCaretTaker();
+                    ar.unsl.qualisys.paneles.grafo.memento.Originator originator = tabGrafico.getDAD().getOriginator();
+                    ar.unsl.qualisys.paneles.grafo.memento.Memento undoMemento = caretaker.undo();
+                    if (undoMemento != null) {
+                        originator.restaurar(undoMemento);
+                        EstadoGrafo estadoSolicitado = originator.getEstado();
+                        
+                        Map<String,QsVariable> varSolicitadas = estadoSolicitado.getVariables();
+                        Map<String,QsOperador> opSolicitados = estadoSolicitado.getOperadores();
+                        Map<String,ArrayList<QsNodo>> relSolicitadas = estadoSolicitado.getRelPadreHijos();
+                        
+                        
+                        Map<String,QsVariable> varNuevas = estadoSolicitado.factoryVaiables(varSolicitadas);
+                        Map<String,QsOperador> opNuevos = estadoSolicitado.factoryOperadores(opSolicitados);
+                        Map<String,ArrayList<QsNodo>> relNuevas = estadoSolicitado.factoryRelPadreHijos(varNuevas,opNuevos,relSolicitadas);
+                        
+                        
+                        
+                        tabGrafico.getDAD().setVariables(varNuevas);
+                        tabGrafico.getDAD().setOperadores(opNuevos);
+                        tabGrafico.getDAD().setRelPadreHijos(relNuevas);
+                        tabGrafico.getDAD().repaint();  
+                    }
 //                    
                 }
                 
@@ -274,16 +289,29 @@ public class QsBarraHerramientas extends JToolBar{
                     }
                 }else if(tab == 1){
                 
-//                    ar.unsl.qualisys.paneles.grafo.memento.CaretTaker caretaker = tabGrafico.getDAD().getCaretTaker();
-//                    ar.unsl.qualisys.paneles.grafo.memento.Originator originator = tabGrafico.getDAD().getOriginator();
-//                    ar.unsl.qualisys.paneles.grafo.memento.Memento redoMemento = caretaker.redo();
-//                    if (redoMemento != null) {
-//                        originator.restaurar(redoMemento);
-//                        tabGrafico.getDAD().setVariables(originator.getEstado().getVariables());
-//                        tabGrafico.getDAD().setOperadores(originator.getEstado().getOperadores());
-//                        tabGrafico.getDAD().setRelPadreHijos(originator.getEstado().getRelPadreHijos());
-//                        tabGrafico.getDAD().repaint();  
-//                    }
+                    ar.unsl.qualisys.paneles.grafo.memento.CaretTaker caretaker = tabGrafico.getDAD().getCaretTaker();
+                    ar.unsl.qualisys.paneles.grafo.memento.Originator originator = tabGrafico.getDAD().getOriginator();
+                    ar.unsl.qualisys.paneles.grafo.memento.Memento redoMemento = caretaker.redo();
+                    if (redoMemento != null) {
+                        originator.restaurar(redoMemento);
+                        EstadoGrafo estadoSolicitado = originator.getEstado();
+                        
+                        Map<String,QsVariable> varSolicitadas = estadoSolicitado.getVariables();
+                        Map<String,QsOperador> opSolicitados = estadoSolicitado.getOperadores();
+                        Map<String,ArrayList<QsNodo>> relSolicitadas = estadoSolicitado.getRelPadreHijos();
+                        
+                        
+                        Map<String,QsVariable> varNuevas = estadoSolicitado.factoryVaiables(varSolicitadas);
+                        Map<String,QsOperador> opNuevos = estadoSolicitado.factoryOperadores(opSolicitados);
+                        Map<String,ArrayList<QsNodo>> relNuevas = estadoSolicitado.factoryRelPadreHijos(varNuevas,opNuevos,relSolicitadas);
+                        
+                        
+                        
+                        tabGrafico.getDAD().setVariables(varNuevas);
+                        tabGrafico.getDAD().setOperadores(opNuevos);
+                        tabGrafico.getDAD().setRelPadreHijos(relNuevas);
+                        tabGrafico.getDAD().repaint();  
+                    }
                 }
             }
         });
@@ -394,6 +422,15 @@ public class QsBarraHerramientas extends JToolBar{
             }
         } 
     }
+    private void reinicializarTab(){
+        ventana.setTURN_OFF_LISTENERS(true);         
+        // SET READ ONLY 
+        ventana.getTabbedPane().setSelectedIndex(0);
+        ventana.setIndiceActual(0);
+        ventana.setTURN_OFF_LISTENERS(false);
+    }
+    
+    
     private void retrocederTab(){
        ventana.setTURN_OFF_LISTENERS(true);         
        // SET READ ONLY 
@@ -417,7 +454,8 @@ public class QsBarraHerramientas extends JToolBar{
         
         
         /*En esta parte tenemos que leer una estructura JSON */
-        
+        QsDadPanel.cantOperadores =0; // x las dudas
+
          
         
         String cadena="";
@@ -484,25 +522,23 @@ public class QsBarraHerramientas extends JToolBar{
             for(Object op : operadores){
                 JSONObject opJson = (JSONObject) op;
                 System.out.println(opJson.get("name"));
-                QsOperador qsOp = new QsOperador(this.tabGrafico.getDAD(),
-                    0, // name que despues lo reemplazo
+                QsOperador qsOp = new QsOperador(
+                    this.tabGrafico.getDAD(),
+                    opJson.getInt("x"),
+                    opJson.getInt("y"),
+                    opJson.getInt("width"),
+                    opJson.getInt("height"),
+                    opJson.getString("name"), // name que despues lo reemplazo
                     opJson.getString("nombre"),
                     opJson.getString("symbol"),
-                    opJson.getFloat("d"),
+                    opJson.getDouble("d"),
                     opJson.getDouble("r2"),
                     opJson.getDouble("r3"),
                     opJson.getDouble("r4"),
                     opJson.getDouble("r5"),
                     opJson.getDouble("ponderacion")
                 );
-                qsOp.setName(opJson.getString("name"));
                 QsDadPanel.cantOperadores ++;
-                int x = opJson.getInt("x") ;
-                int y = opJson.getInt("y") ;
-                int width = opJson.getInt("width") ;
-                int height = opJson.getInt("height");
-                qsOp.setBounds(x,y,width,height);
-                qsOp.setBackground(Color.white);
                 this.tabGrafico.getDAD().addOperator(qsOp);
             }        
             
@@ -604,8 +640,8 @@ public class QsBarraHerramientas extends JToolBar{
         ArrayList<QsOperador> operadoresList = new ArrayList<>(operadores.values());
         
         for(QsOperador o : operadoresList ){
-            System.out.println("v = " + o.getName());
-            System.out.println("v = " + o.getNombre());
+            System.out.println("o = " + o.getName());
+            System.out.println("o = " + o.getNombre());
             jsonOperadores.put(o.toJSON());
         }
         

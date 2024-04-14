@@ -1,5 +1,6 @@
 /*
  // Palette: https://coolors.co/palette/a3a380-d6ce93-efebce-d8a48f-bb8588
+Icons : https://icons8.com/icons/set/edit--static--c-bb8588
         //Fondo armonica, o nodo seleccionado.
         //Fondo texto #EFEBCE 
         //Fondo grafica EFEBCE

@@ -91,7 +91,9 @@ public class QsEvaluacionPanel extends javax.swing.JPanel {
         this.instancias = new ArrayList<>();
         this.init = true;
         this.jPanel0.setBackground(Color.decode("#EFEBCE"));
+        this.jPanel0.setBorder(BorderFactory.createLineBorder(Color.decode("#A3A380")));
         this.jPanel3.setBackground(Color.decode("#EFEBCE"));
+        this.jPanel3.setBorder(BorderFactory.createLineBorder(Color.decode("#A3A380")));
         
         this.stylingComponent(jButtonCreate);        
         this.stylingComponent(jButtonElim);        

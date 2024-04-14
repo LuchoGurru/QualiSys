@@ -3,8 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package ar.unsl.qualisys.paneles.grafo.memento;
-
-import ar.unsl.qualisys.paneles.texto.memento.*;
 import java.util.ArrayList;
 
 /**
@@ -12,13 +10,16 @@ import java.util.ArrayList;
  * @author luciano.gurruchaga
  */
 public class CaretTaker {
-     private ArrayList<Memento> mementos = new ArrayList<>();
-    private int currentIndex = -1; // Current position in mementos list
+    private ArrayList<Memento> mementos;
+    private int currentIndex; 
     
+    public CaretTaker(){
+        this.mementos = new ArrayList<>();
+        this.currentIndex = -1; // Current position in mementos list
+    }
     public void addMemento(Memento memento) {
         // When a new memento is added, we discard any future redos
         mementos.subList(currentIndex + 1, mementos.size()).clear();
-        
         mementos.add(memento);
         currentIndex++;
     }

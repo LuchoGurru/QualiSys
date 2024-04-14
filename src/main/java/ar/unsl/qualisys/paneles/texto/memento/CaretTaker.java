@@ -11,7 +11,8 @@ import java.util.ArrayList;
  * @author luciano.gurruchaga
  */
 public class CaretTaker {
-     private ArrayList<Memento> mementos = new ArrayList<>();
+    
+    private ArrayList<Memento> mementos = new ArrayList<>();
     private int currentIndex = -1; // Current position in mementos list
     
     public void addMemento(Memento memento) {
@@ -29,7 +30,7 @@ public class CaretTaker {
     public Memento undo() {
         if (currentIndex > 0) {
             currentIndex--;
-            return getMemento(currentIndex);
+            return this.getMemento(currentIndex);
         } else {
             return null;
         }
@@ -38,7 +39,7 @@ public class CaretTaker {
     public Memento redo() {
         if (currentIndex < mementos.size() - 1) {
             currentIndex++;
-            return getMemento(currentIndex);
+            return this.getMemento(currentIndex);
         } else {
             return null;
         }
