@@ -43,7 +43,7 @@ public class QsVistaPreviaModal  extends JDialog {
         jButton1.setText("Aceptar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                GUIpadre.mostrarPanelGrafico();
+                //GUIpadre.mostrarPanelGrafico();
                 este.dispose();
             }
         });

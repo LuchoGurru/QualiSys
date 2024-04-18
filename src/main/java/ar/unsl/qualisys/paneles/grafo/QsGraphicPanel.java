@@ -23,7 +23,7 @@ import javax.swing.JScrollPane;
  * @author luciano
  */
 public class QsGraphicPanel extends JPanel {
-    private QsFrame parent;
+    private QsFrame GUIParent;
     private QsOperatorsPanel menuOperadores;
     private QsDadPanel DAD;
     JScrollPane scroll;
@@ -31,7 +31,7 @@ public class QsGraphicPanel extends JPanel {
      * Creates new form examples
      */
     public QsGraphicPanel(QsFrame parent) {
-        this.parent=parent;
+        this.GUIParent=parent;
         this.setLayout(new BorderLayout());
         this.setName("GUIPanel");
         //this.add(new QsBarraHerramientas(this.parent,null), BorderLayout.NORTH);
@@ -49,6 +49,14 @@ public class QsGraphicPanel extends JPanel {
         //this.DAD.setBackground(Color.WHITE); 
         this.add(menuOperadores,BorderLayout.WEST);
         this.add(scroll ,BorderLayout.CENTER); 
+    }
+
+    public QsFrame getGUIParent() {
+        return GUIParent;
+    }
+
+    public void setGUIParent(QsFrame GUIParent) {
+        this.GUIParent = GUIParent;
     }
     
     public void setVariables(ArrayList<Item> renglones){
@@ -69,6 +77,7 @@ public class QsGraphicPanel extends JPanel {
         int y = (int)punto.getY()-20;// para centrar respecto del mouse
         int w = 51;
         int h = 51;
+        QsDadPanel.cantOperadores ++;
         QsOperador nuevoOperador = new QsOperador(
                 this.DAD,
                 x,
@@ -86,7 +95,6 @@ public class QsGraphicPanel extends JPanel {
                 -1d // Para saber que es virgen ... o la raiz ya que nunca debería ser setteado ya que no tiene padre ya que es la raiz ja.
             );
         
-        QsDadPanel.cantOperadores ++;
         DAD.addOperator(nuevoOperador);
         DAD.repaint();
     }

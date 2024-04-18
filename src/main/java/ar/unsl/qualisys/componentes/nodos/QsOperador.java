@@ -20,6 +20,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -120,18 +121,37 @@ public class QsOperador extends QsNodo implements QsOperacion{
         }  
     }
     //METHODS
-    
+    private void ajustarPosicionRelativa(MouseEvent e, JComponent comparadorX, JComponent comparadorY){
+        Point posRelativaPantalla = e.getLocationOnScreen();
+
+    }
     /**
      * Decide la accion a realizar en caso de que se haya hecho un soltado de click
      * @param e evento del mouse
      */
     public void determinarAccionReleased(MouseEvent e){
+ 
+        System.out.println("e.getLocationOnScreen() = " + e.getLocationOnScreen());
         System.out.println("e.getButton() = " + e.getButton());
         System.out.println("\ne.getButton() = " + e.getPoint()+"\n");
        if(this.getGUIParent()!= null ){ // Verdadero si esta en DandD
+                   System.out.println("e.getLocationOnScreen() = " + this.getGUIParent().getLocationOnScreen());
+
             Rectangle oldPosition = this.getBounds(); // Guardo la posision inicial
-            this.setBounds(this.getBounds().getLocation().x+ e.getX() - 20, //para centrar el mouse y sacar el margin
-                                 this.getBounds().getLocation().y + e.getY() -20 , //para centrar el mouse
+            
+                int corrimientoX = e.getLocationOnScreen().x - this.getGUIParent().getLocationOnScreen().x;
+                int corrimientoY = e.getLocationOnScreen().y - this.getGUIParent().getLocationOnScreen().y;
+            //        int corrimientoY = posRelativaPantalla.y - GUIParent.getGUIParent().getLocationOnScreen().y; 
+                if(corrimientoX>0){
+                    corrimientoX=0;
+                }
+                 if(corrimientoY>0){
+                    corrimientoY=0; 
+                }
+        
+            
+            this.setBounds(this.getBounds().getLocation().x+ e.getPoint().x - 20 -corrimientoX, //para centrar el mouse y sacar el margin
+                                 this.getBounds().getLocation().y + e.getPoint().y -20-corrimientoY , //para centrar el mouse
                                 51, 51);
             if (!DADParent.isColision(this)) { 
                 DADParent.repaint(); // actualizo la posicion de this en el panel.
@@ -168,7 +188,7 @@ public class QsOperador extends QsNodo implements QsOperacion{
         Point ubiActual = this.getLocation();
         ubiActual.x += e.getPoint().x + scrollPosition.x;
         ubiActual.y += e.getPoint().y + scrollPosition.y; 
-        papi.dibujarOperadorEn(ubiActual,this);
+        papi.dibujarOperadorEn(e.getLocationOnScreen(),ubiActual,this);
     }
 
    /**

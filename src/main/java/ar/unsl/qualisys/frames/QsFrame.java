@@ -31,7 +31,7 @@ public class QsFrame extends JFrame{
     private QsGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
     private QsEvaluacionPanel tabInstancias; // panel donde se asignan valores a las variables de distintos modelos LPS en particular
     private JPanel tablUtilidades; // Estadisticas TODO Opcion dejar como visual como propuesta de escalabilidad;
-    private int indiceActual;
+    private int indiceAnterior;
     private JTabbedPane tabbedPane;
     
     public ArrayList<Item> g_variables;
@@ -72,18 +72,27 @@ public class QsFrame extends JFrame{
         //tabbedPane.addTab("Resultados 5", paneel);
 
         //LISTENER
-        indiceActual = 0 ; //indice anterior();
+        indiceAnterior = 0 ; //indice anterior();
 
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 //manejarTabs(indiceAnterior,tabbedPane);
-                 System.out.println("mouse clicked stateChanged"+ tabbedPane.getSelectedIndex());                // No hacer nada cuando se hace clic en el JTabbedPane
+                System.out.println("mouse clicked stateChanged"+ tabbedPane.getSelectedIndex());                // No hacer nada cuando se hace clic en el JTabbedPane
                 System.out.println("mouse clicked getSelectedIndice"+ tabbedPane.getSelectedIndex());                // No hacer nada cuando se hace clic en el JTabbedPane
-                if (TURN_OFF_LISTENERS == false) {// para que no se vaya del limite
-                    tabbedPane.setSelectedIndex(indiceActual);
-                }
+                int selectedIndex = tabbedPane.getSelectedIndex();
+                // Verificar si el cambio es un retroceso o avance
+                if (selectedIndex < indiceAnterior) {
+                    indiceAnterior = selectedIndex; // Libre
+                } else if (selectedIndex > indiceAnterior) {
+                     if(avanzarUnaTab()){ 
+                        indiceAnterior++;
+                    } 
+                } 
+                // Actualizar la posición anterior de la pestaña seleccionada
+                tabbedPane.setSelectedIndex(indiceAnterior);
             }
         });
+                
         
 //        tabbedPane.addMouseListener(clickListener);
         this.add(tabbedPane,BorderLayout.CENTER);
@@ -137,11 +146,56 @@ public class QsFrame extends JFrame{
         this.tabbedPane = tabbedPane;
     }
     
-    public int getIndiceActual(){
-        return this.indiceActual;
+    public void reinicializarTab(){
+        this.tabbedPane.setSelectedIndex(0);
     }
 
-    public void setIndiceActual(int indiceAnterior) {
-        this.indiceActual = indiceAnterior;
+
+    public void retrocederTab(){
+        this.tabbedPane.setSelectedIndex(indiceAnterior - 1);
+    }
+    
+    public boolean avanzarUnaTab(){
+        boolean avanzaONoAvanza = false;
+        int siguiente = indiceAnterior + 1;
+        int cantidadTabs = this.tabbedPane.getTabCount();
+        if(siguiente<cantidadTabs){
+            avanzaONoAvanza =  manejarCambioDePagina(siguiente);
+        }
+        return avanzaONoAvanza;
+    }
+    
+    public boolean manejarCambioDePagina(int pagina){
+        boolean cambia = false;
+        switch(pagina){
+            case 1:{
+                if(cambia = tabTexto.isTextoBienFormado()){
+                  initPanelGrafico();
+                }else{
+                    JOptionPane.showMessageDialog(this, "El listado de variables no esta bien formado"); 
+                }
+                break;
+            }
+            case 2:{
+                if(cambia = tabGrafico.getDAD().isArbolBienFormado()){
+                    // CAMBIO DE PAGINA
+                    initPanelInstancias();
+                }else{
+                    JOptionPane.showMessageDialog(this, "¡La funcion de Evaluacion no esta correcta!    1) Asigne todas las variables.    2) Respete la cardinalidad del dominio de cada operador [2,5].     3) Recuerde que la raíz de el árbol debe ser unica.");
+                }
+                break;
+            }
+            case 3:{
+                //if(controlarValoresInstantias){
+                  //EVALUAR N FUNCIONES  
+                //}
+                break;
+            }
+            case 4:{
+                
+                break;
+            }
+        } 
+        return cambia;
     }
 }

@@ -427,10 +427,11 @@ public class QsEvaluacionPanel extends JPanel {
         for (int i = 0; i < this.listaVariables.size(); i++) {
             Object[] fila = new Object[cols]; 
             for(int j=0;j<cols;j++){
+                
                  if(j==0){
-                     fila[j] = this.listaVariables.get(i);
+                     fila[j] = this.listaVariables.get(i).getDescripcion();
                  }else{
-                     fila[j] = this.instancias.get(j).getValores().get(i);
+                     fila[j] = this.instancias.get(j).getValores().get(this.listaVariables.get(i).getName());
                  }    
              }
             tmodel.addRow(fila);           
@@ -461,8 +462,8 @@ public class QsEvaluacionPanel extends JPanel {
         Map<String,Double> valores = this.instancias.get(instancia).getValores();
         for(int i = 0 ; i < valores.size() ; i++){
             QsVariable qsv = this.listaVariables.get(i);
-            qsv.setValorResultado(valores.get(qsv.getName()));
             String nameID = qsv.getName();
+            qsv.setValorResultado(valores.get(qsv.getName()));
             this.variables.get(nameID).setValorResultado(valores.get(qsv.getName()));
         }
     }
@@ -849,6 +850,8 @@ public class QsEvaluacionPanel extends JPanel {
     }//GEN-LAST:event_jButtonModifActionPerformed
 
     private void jButtonResultsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResultsActionPerformed
+        if(jTableInstancias.isEditing())
+            jTableInstancias.getCellEditor().stopCellEditing();
         evaluarResultados();
     }//GEN-LAST:event_jButtonResultsActionPerformed
 
@@ -885,13 +888,14 @@ public class CustomCellEditor extends DefaultCellEditor {
     }
 
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int col) {
         isValid = true; // Restablece la validación al editar una nueva celda.
         rowSelected=row;
+        instanciaSeleccionada = col;
        // if(instanciaSeleccionada==column){
        //     System.out.println("yout rock");
         //}
-        return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+        return super.getTableCellEditorComponent(table, value, isSelected, row, col);
     } 
     private boolean isValidValue(String value) {
         try {

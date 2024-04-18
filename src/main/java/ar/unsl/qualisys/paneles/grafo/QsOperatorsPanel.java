@@ -145,12 +145,28 @@ public class QsOperatorsPanel extends JPanel {
         GUIParent=parent;
     }
     
-    public void dibujarOperadorEn(Point punto,QsOperador operador){
+    public void dibujarOperadorEn(Point posRelativaPantalla, Point punto,QsOperador operador){
+        int corrimientoX = posRelativaPantalla.x - GUIParent.getDAD().getLocationOnScreen().x;
+        int corrimientoY = posRelativaPantalla.y - this.getLocationOnScreen().y;
+//        int corrimientoY = posRelativaPantalla.y - GUIParent.getGUIParent().getLocationOnScreen().y;
         
-        if(GUIParent.getComponentAt(punto) != null && GUIParent.getComponentAt(punto).getClass()==JScrollPane.class){
+        
+        if(corrimientoX<0){
+            punto.x -= corrimientoX; 
+        }
+         if(corrimientoY<0){
+            punto.y -= corrimientoY; 
+        }
+        
+//        System.out.println("GUIParent GRAFIC" +GUIParent.getLocationOnScreen() );
+//        System.out.println("GUIParent DAD" +GUIParent.getDAD().getLocationOnScreen() );
+//        System.out.println("GUIParent OP" +this.getLocationOnScreen() );
+//         
+//        if(GUIParent.getComponentAt(punto) != null && GUIParent.getComponentAt(punto).getClass()==JScrollPane.class){
             //QsGraphicPanel panelGrafico = (QsGraphicPanel) this.getParent();
+//            System.out.println("GUIParent.getBounds() = " + GUIParent.getBounds());
             GUIParent.agregarOperadorANulLayout(punto,operador);
-        } 
+//        } 
     }
 
     public HashMap<String, QsOperador> getOperadorBySymbol() {

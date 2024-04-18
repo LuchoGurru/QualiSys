@@ -68,8 +68,6 @@ import org.json.JSONObject;
  */
 public class QsBarraHerramientas extends JToolBar{
     // Rest of the code for your JPanel
-    
-    
     protected QsFrame ventana; // Ventana Principal
     private QsTextPanel tabTexto; // panel donde se forma la estructura de variables
     private QsGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
@@ -89,7 +87,7 @@ public class QsBarraHerramientas extends JToolBar{
         this.tabTexto = tabText; // panel donde se forma la estructura de variables
         this.tabGrafico = tabGrafic;
         this.tabInstanciado = tabInstancias;
-      //JToolBar menuHerramientas = new JToolBar();
+        //JToolBar menuHerramientas = new JToolBar();
         JButton volver = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/back-30.png"));
         stylingComponent(volver);
         JButton siguiente = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/forward-30.png"));
@@ -172,14 +170,14 @@ public class QsBarraHerramientas extends JToolBar{
         volver.addActionListener(new ActionListener() {            
             @Override
             public void actionPerformed(ActionEvent e) {
-                retrocederTab();
+                ventana.retrocederTab();
             } 
         });
         
         siguiente.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                avanzarTab();
+                ventana.getTabbedPane().setSelectedIndex(2); 
             }
         });
         
@@ -188,7 +186,7 @@ public class QsBarraHerramientas extends JToolBar{
             @Override
             public void actionPerformed(ActionEvent e) {
                 abrirArchivo();
-                reinicializarTab();
+                ventana.reinicializarTab();
             }
         });
 
@@ -351,22 +349,7 @@ public class QsBarraHerramientas extends JToolBar{
     } 
     
     
-    public void mostrarPanelGrafico(){
-        ventana.setTURN_OFF_LISTENERS(true);         
-        ventana.getTabbedPane().setSelectedIndex(1);
-        ventana.setIndiceActual(1);
-        ventana.setTURN_OFF_LISTENERS(false); 
-        ventana.initPanelGrafico();
-    }
-    
-    
-    public void mostrarPanelDeInstanciadoLSP(){
-        ventana.setTURN_OFF_LISTENERS(true);         
-        ventana.getTabbedPane().setSelectedIndex(2);
-        ventana.setIndiceActual(2);
-        ventana.setTURN_OFF_LISTENERS(false); 
-        ventana.initPanelInstancias();
-    }
+
     /**
      * 
 
@@ -382,81 +365,15 @@ public class QsBarraHerramientas extends JToolBar{
     
     
     
-    public void manejarCambioDePagina(int pagina){
-        switch(pagina){
-            case 1:{
-               // tabTexto.setTextoConCaret(tabTexto.getJTextPanel().getText(),tabTexto.getJTextPanel().getCaretPosition()); // para activar el F5
 
-                
-                if(tabTexto.isTextoBienFormado()){
-                   // QsVistaPreviaModal modal = new QsVistaPreviaModal(ventana,this,"Vista Previa:",true);
-                   // getTextoVariables();
-                   // modal.setTextoPane1(this.getTextoVariables());
-                  //  modal.setVisible(true);
-                  mostrarPanelGrafico();
-                }else{
-                    ventana.getTabbedPane().setSelectedIndex(0);
-                    JOptionPane.showMessageDialog(this, "El listado de variables no esta bien formado");
-                }
-                break;
-            }
-            case 2:{
-                if(tabGrafico.getDAD().isArbolBienFormado()){
-                    // CAMBIO DE PAGINA
-                    mostrarPanelDeInstanciadoLSP();
-                }else{
-                    ventana.getTabbedPane().setSelectedIndex(1);//nota: hacer ponderacion automatica
-                    JOptionPane.showMessageDialog(this, "¡La funcion de Evaluacion no esta correcta!    1) Asigne todas las variables.    2) Respete la cardinalidad del dominio de cada operador [2,5].     3) Recuerde que la raíz de el árbol debe ser unica.");
-                }
-                break;
-            }
-            case 3:{
-                //if(controlarValoresInstantias){
-                  //EVALUAR N FUNCIONES  
-                //}
-                break;
-            }
-            case 4:{
-                
-                break;
-            }
-        } 
-    }
-    private void reinicializarTab(){
-        ventana.setTURN_OFF_LISTENERS(true);         
-        // SET READ ONLY 
-        ventana.getTabbedPane().setSelectedIndex(0);
-        ventana.setIndiceActual(0);
-        ventana.setTURN_OFF_LISTENERS(false);
-    }
     
-    
-    private void retrocederTab(){
-       ventana.setTURN_OFF_LISTENERS(true);         
-       // SET READ ONLY 
-       int anterior = ventana.getIndiceActual() - 1;
-       if(anterior>-1){
-           ventana.getTabbedPane().setSelectedIndex(anterior);
-           ventana.setIndiceActual(anterior);
-       }
-       ventana.setTURN_OFF_LISTENERS(false);
-    }
-    
-    private void avanzarTab(){
-        int siguiente = ventana.getIndiceActual() + 1;
-        int cantidadTabs = ventana.getTabbedPane().getTabCount();
-        if(siguiente<cantidadTabs){
-            manejarCambioDePagina(siguiente);
-        }
-    }
     
     private void abrirArchivo(){
         
         
         /*En esta parte tenemos que leer una estructura JSON */
-        QsDadPanel.cantOperadores =0; // x las dudas
-
-         
+        QsDadPanel.cantOperadores =-1; // x las dudas
+ 
         
         String cadena="";
         JFileChooser fileExplorer = new JFileChooser(); // Elector de archivos
@@ -487,7 +404,7 @@ public class QsBarraHerramientas extends JToolBar{
             ArrayList<QsVariable> variablesList  = this.tabGrafico.getDAD().getListaVariables();//ordenada
             
 // Map<String, QsOperador> operadores = this.tabGrafico.getDAD().getOperadores();
-            Map<String, ArrayList<QsNodo>> relPadreHijos = this.tabGrafico.getDAD().getRelPadreHijos();
+//            Map<String, ArrayList<QsNodo>> relPadreHijos = this.tabGrafico.getDAD().getRelPadreHijos();
            
             System.out.println(sesion.getString("texto"));
 
@@ -515,8 +432,8 @@ public class QsBarraHerramientas extends JToolBar{
                 mapaDeVariables.put(qsVar.getName(), qsVar);
             }   
              
-             
-            HashMap<String,ArrayList<QsNodo>> relPadreHijosSinVars = new HashMap<>();
+            HashMap<String, QsOperador> mapaDeOperadores = new HashMap();
+
             JSONArray operadores = nodos.getJSONArray("operadores");
             for(Object op : operadores){
                 JSONObject opJson = (JSONObject) op;
@@ -537,12 +454,14 @@ public class QsBarraHerramientas extends JToolBar{
                     opJson.getDouble("r5"),
                     opJson.getDouble("ponderacion")
                 );
-                QsDadPanel.cantOperadores ++;
-                this.tabGrafico.getDAD().addOperator(qsOp);
+                mapaDeOperadores.put(qsOp.getName(),qsOp);
+                int operadorMayor = Integer.parseInt(opJson.getString("name").split("_")[1]);
+                if(operadorMayor>QsDadPanel.cantOperadores) 
+                    QsDadPanel.cantOperadores = operadorMayor;
             }        
-            
-            this.tabGrafico.getDAD().repaint();
-            
+            this.tabGrafico.getDAD().setOperadores(mapaDeOperadores);
+            //this.tabGrafico.getDAD().repaint();
+
             JSONArray relaciones = nodos.getJSONArray("relaciones");
             /*
             //Si hay al menos una cosa, voy a empezar desde el operador _ op0
@@ -572,11 +491,12 @@ public class QsBarraHerramientas extends JToolBar{
                 cantOperadores ++;
                 
             }*/
-            
+            HashMap<String,ArrayList<QsNodo>> mapaDeRelPadreHijos = new HashMap<>();
             for(Object rel : relaciones){
                 JSONObject relJson = (JSONObject) rel;
                 String padreID = relJson.getString("padreID");
                 JSONArray hijos = relJson.getJSONArray("hijos");
+                mapaDeRelPadreHijos.put(padreID, new ArrayList<>());
 
                 for( Object h : hijos ){
                     String hijoID = "" + h;
@@ -584,17 +504,19 @@ public class QsBarraHerramientas extends JToolBar{
                     if(hijoID.contains(".")){ // variable
                         QsVariable varHija = mapaDeVariables.get(hijoID);
                         varHija.setPadreID(padreID);
-                        relPadreHijos.get(padreID).add(varHija); 
+                        mapaDeRelPadreHijos.get(padreID).add(varHija); 
                     }else{
-                        QsOperador opHijo = this.tabGrafico.getDAD().getOperadores().get(hijoID);
+//                        QsOperador opHijo = this.tabGrafico.getDAD().getOperadores().get(hijoID);
+                        QsOperador opHijo = mapaDeOperadores.get(hijoID);
                         opHijo.setPadreID(padreID);
-                        relPadreHijos.get(padreID).add(opHijo); 
+                        mapaDeRelPadreHijos.get(padreID).add(opHijo); 
                     }
                 }
                 //            var get var add a la lista de relaciones . 
              //   cantOperadores ++; 
             }
             
+            this.tabGrafico.getDAD().setRelPadreHijos(mapaDeRelPadreHijos); 
             JSONArray instanciasJA = sesion.getJSONArray("instancias");
             ArrayList<QsInstancia> instancias = new ArrayList<>();// this.tabInstanciado.getInstancias();
 
@@ -613,6 +535,7 @@ public class QsBarraHerramientas extends JToolBar{
                 instancias.add(i);
             }
             this.tabInstanciado.setInstancias(instancias);
+
         }
         /*
         

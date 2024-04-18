@@ -73,7 +73,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
     
     private QsNodo nodoSeleccionado; 
     private Dimension area; //indicates area taken up by graphics 
-    public static int cantOperadores = 0;
+    public static int cantOperadores = -1;
 
     /**
      * Constructores 
@@ -238,6 +238,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
 //            if (changed) {
 //                              this.setPreferredSize(new Dimension(this_width, this_height));           
 //        }
+
         }
     }
     
@@ -260,6 +261,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                 this.setPreferredSize(new Dimension(area.width, this_height));
             }
         } 
+        
     }
     /**
      * Recorre, anidacion de arreglos.
