@@ -57,12 +57,7 @@ public class QsEvaluacionPanel extends JPanel {
     //MoreSwing
     private QsFrame parent;
     private QsDadPanel DAD;
-    //Qualisys
-    private ArrayList<QsVariable> listaVariables;
-    private Map<String, QsVariable> variables;
-    private ArrayList<QsInstancia> instancias;
-    private Map<String, QsOperador> operadores;
-    private Map<String, ArrayList<QsNodo>> relPadreHijos;
+
     //PanelUse
     ArrayList<String> orderOper = null;//El primero en calcular su resultado
     private int instanciaSeleccionada;
@@ -187,15 +182,9 @@ public class QsEvaluacionPanel extends JPanel {
         TableActionEvent event = new TableActionEvent() {                       //listenner
             @Override
             public void onEdit(int row) {
-//                System.out.println("Edit row : " + row);                
             }
             @Override
             public void onDelete(int row) {
-//                if (jTableResultados.isEditing()) {
-//                    jTableResultados.getCellEditor().stopCellEditing();
-//                }
-//                DefaultTableModel model = (DefaultTableModel) jTableResultados.getModel();
-//                model.removeRow(row);
             }
             @Override
             public void onView(int row) {
@@ -307,11 +296,7 @@ public class QsEvaluacionPanel extends JPanel {
 
             @Override
             public void onDelete(int row) {
-//                if (jTableResultadosParciales.isEditing()) {
-//                    jTableResultadosParciales.getCellEditor().stopCellEditing();
-//                }
-//                DefaultTableModel model = (DefaultTableModel) jTableResultadosParciales.getModel();
-//                model.removeRow(row);
+
             }
 
             @Override
@@ -331,15 +316,6 @@ public class QsEvaluacionPanel extends JPanel {
     public void addActionPanelToColumn(JTable table, int actionColumn,TableActionEvent event){
         table.getColumnModel().getColumn(actionColumn).setCellRenderer(new TableActionCellRender());
         table.getColumnModel().getColumn(actionColumn).setCellEditor(new TableActionCellEditor(event));
-       
-//        table.getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer() {
-//            @Override
-//            public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-//                setHorizontalAlignment(SwingConstants.RIGHT);
-//                return super.getTableCellRendererComponent(jtable, o, bln, bln1, i, i1);
-//            }
-//        });
-
     }
     
     public void reinicializarOperadores(){
@@ -825,15 +801,7 @@ public class QsEvaluacionPanel extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCreateActionPerformed
-        /*Object[][] data = {
-            {"Row 1, Col 1", "Row 1, Col 2"},
-            {"Row 2, Col 1", "Row 2, Col 2"},
-            {"Row 3, Col 1", "Row 3, Col 2"}
-        };
-        // Column names
-        String[] columnNames = {"Column 1", "Column 2"};        
-        model.setColumnIdentifiers(columnNames);
-        model.setDataVector(data, columnNames);*/
+
         crearInstancia(jTextField1.getText());
     }//GEN-LAST:event_jButtonCreateActionPerformed
 

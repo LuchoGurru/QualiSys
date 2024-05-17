@@ -363,29 +363,7 @@ public class QsOperador extends QsNodo implements QsOperacion{
         }
         
     }
-    /*
-    private class DragListener extends MouseMotionAdapter {
-        private QsOperator qsOpInstance;
-        public DragListener(QsOperator qsOpInstance){
-            this.qsOpInstance = qsOpInstance;
-        }
-        @Override
-        public void mouseDragged(MouseEvent evt){ 
-            this.qsOpInstance.setBounds(evt.getPoint().x, evt.getPoint().y, this.qsOpInstance.getWidth(), this.qsOpInstance.getHeight());
-            this.qsOpInstance.repaint();
-        }
-    }
-    private class menuDesplegableListener implements ActionListener{
-        private QualyOperator qsOpInstance;
-        public menuDesplegableListener(QualyOperator qsOpInstance){
-            this.qsOpInstance = qsOpInstance;
-        }
-        @Override
-        public void actionPerformed(ActionEvent e) {
-                new eliminarQsNodo(GUIParent,qsOpInstance).ejecutar();
-        }
-        
-    }*/
+
     public void menuPopUp(){
         menuDesplegable = new JPopupMenu();
         JMenuItem eliminar = new JMenuItem("Eliminar");

@@ -62,12 +62,7 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
 
     private QsGraphicPanel GUIpadre;
     private QsOperatorsPanel brother;
-    private Map<String, QsOperador> operadores = new HashMap<String, QsOperador>();
-    
-    private Map<String, QsVariable> variables = new HashMap<String, QsVariable>();
-    
-    private Map<String, ArrayList<QsNodo>> relPadreHijos = new HashMap<String, ArrayList<QsNodo>>();
-    
+
     private Originator originator;
     private CaretTaker caretTaker;
     
@@ -297,12 +292,6 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         padreLocation = this.operadores.get(h.getPadreID()).getLocation();   
         return padreLocation;
     }
-    /**
-     * Drawablecomponent ... Variables - Operadores y Flechas 
-     * 
-     * Lista de Variables 
-     * Lista de operadores con Dominio () Flechas  
-     */
 
      /**
       * Chequea si colisiona con algun componente del panel operador o variable
@@ -398,15 +387,6 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         for(QsNodo h :hermanos){
             h.setPonderacion(balanceo);
         }
-        // create a dialog Box
-/*        do {
-            s = JOptionPane.showInputDialog(
-                    this,
-                    "Selecciona el peso deseado de la relación (recuerda que la suma de los pesos tiene que ser igual a 1).",
-                    1f);
-        } while (!isGoodPonder(s, padre.getName()));
-*/
-       //hijo.setPonderacion(Double.valueOf(s));
     }
     
     /**
@@ -486,11 +466,6 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                     if(!noCicles(op_candidato,padreAdoptivo)){
                         System.out.println("no podes ser parte de este dominio por que formaras un ciclo");
                         allow = false;
-                        // Este padre soy yo ? no  
-                        // GetPadres ancestros  
-                        // este otro padre tiene padre ?  no 
-                        // op_candidato.setPadreID(padreAdoptivo.getName());
-                        // actualizarArbolGenealogico(op_candidato,op_candidato.getPadreID(),padreAdoptivo.getName());
                     }else{
                         System.out.println("!noCicles means that no hay cicles");
                     }    
@@ -507,22 +482,6 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         this.relPadreHijos.put(q.getName(),new ArrayList<QsNodo>());
         this.guardarEstado();
     }
-    /**
-     * El planteamiento del problema 
-     * @param hijo
-     * @param padreLoc 
-    public void addHijoToRel(QsNodo hijo, Point padreLoc){
-        QsOperator padreOperator = getOperatorByLocation(padreLoc);
-        if(canBeDomain(hijo, padreOperator)){
-            ArrayList<QsNodo> sons = relPadreHijos.get(padreOperator.getName());
-            if(sons.size() < 5){
-                sons.add(hijo);
-                relPadreHijos.put(padreOperator.getName(), sons);
-            }else{
-                System.out.println("YA tiene 5 hijos");
-            }
-        }
-    }     */
 
     //ERROR : un abuelo que se tenia como su propio abuelo, entonces, este chabon, 
     //        tenia infinitos abuelos que no eran él!!! 
@@ -627,10 +586,6 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                     this.operadores.get(padreID).setBackground(Color.red);
                     bienFormado = false;
                 }
-                
-            //   if (this.relPadreHijos.get(padreID).size() < 2 || > 5 ) { aca tengo uqe jajaja me qcague de miedo,
-            //             tengo que agarrar todos que tengan entre el r ango pero con la raiz no o con las variables no jaja si es != var si sino no        
-            // }
             }
         }
         
@@ -648,38 +603,3 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
         caretTaker.addMemento(originator.guardar());
     }
 }
-/**
- * *LISTENER DOBLE CLICK DESPLIEGO MENU *
- * Simple click set Nodo Activo + shortcuts .
-
-
-        public void menuPopUp(){
-             
-        JMenuItem deshacer = new JMenuItem("Deshacer");
-        JMenuItem rehacer = new JMenuItem("Rehacer");
-        JMenuItem guardar = new JMenuItem("guardar");
-        JMenuItem abrir = new JMenuItem("abrir");
-        JMenuItem cerrar = new JMenuItem("cerrar");
-        JMenuItem archivosRecientes = new JMenuItem("archivos recientes");
-        JMenuItem exportar = new JMenuItem("exportar");
-
-        deshacer.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,InputEvent.CTRL_DOWN_MASK));
-        rehacer.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y,InputEvent.CTRL_DOWN_MASK));
-        cortar.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,InputEvent.CTRL_DOWN_MASK));
-        copiar.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,InputEvent.CTRL_DOWN_MASK));
-        pegar.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,InputEvent.CTRL_DOWN_MASK));
-        deshacer.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,InputEvent.CTRL_DOWN_MASK));
-        cortar.addActionListener(new eliminar.ejecutar());
-        copiar.addActionListener(new StyledEditorKit.CopyAction());
-        pegar.addActionListener(new StyledEditorKit.PasteAction());
-
-        menuDesplegable.add(deshacer);
-        menuDesplegable.add(rehacer);
-        menuDesplegable.add(cortar);
-        menuDesplegable.add(copiar);
-        menuDesplegable.add(pegar);
-
-        this.setComponentPopupMenu(menuDesplegable);
-    }
-
-*/
