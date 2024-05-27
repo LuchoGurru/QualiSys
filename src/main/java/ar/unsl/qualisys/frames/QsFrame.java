@@ -99,7 +99,7 @@ public class QsFrame extends JFrame{
         this.setVisible(true);   
     }
     /**
-     * Llamar antes de cambiar la pestaña
+     * Se llama antes de cambiar la pestaña
      */
     public void initPanelGrafico(){
         if(tabTexto.isTextoBienFormado()){ 

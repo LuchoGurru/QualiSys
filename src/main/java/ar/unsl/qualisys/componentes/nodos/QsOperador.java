@@ -1,5 +1,6 @@
 package ar.unsl.qualisys.componentes.nodos;
 
+import ar.unsl.qualisys.controllers.PanelGrafoController;
 import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
 import ar.unsl.qualisys.paneles.grafo.QsOperatorsPanel;
 import ar.unsl.qualisys.paneles.grafo.comandos.cambiarOperador;
@@ -22,7 +23,6 @@ import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import org.json.JSONObject;
@@ -197,11 +197,12 @@ public class QsOperador extends QsNodo implements QsOperacion{
     * la posision absoluta en el panel DAndD
     */     
    public void addToFatherDomain(Point padreRelativeLocation){ 
+        PanelGrafoController c = PanelGrafoController.getInstance();
         // CREAR PUNTO QUE QUIERO REALMENTE 
         Point padreLocation = new Point();
         padreLocation.x = this.getLocation().x + padreRelativeLocation.x;
         padreLocation.y = this.getLocation().y + padreRelativeLocation.y;
-        this.DADParent.addToDomain(this,padreLocation);
+        c.addToDomain(this,padreLocation);
    }
 
    // -------------------PARTE LSP------------------ 
@@ -352,9 +353,10 @@ public class QsOperador extends QsNodo implements QsOperacion{
          * @param evt 
          */
         public void mousePressed(MouseEvent evt){
+        PanelGrafoController c = PanelGrafoController.getInstance();
             if(editable && DADParent!=null){
                 //this.qsOpInstance.setBackground(Color.decode("#A3A380"));
-                DADParent.setNodoSeleccionado(this.qsOpInstance);
+                c.setNodoSeleccionado(this.qsOpInstance);
             }
         }
         public void mouseReleased(MouseEvent e){

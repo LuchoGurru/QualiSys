@@ -6,6 +6,7 @@ package ar.unsl.qualisys.paneles.grafo.comandos;
 
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.componentes.nodos.QsOperador;
+import ar.unsl.qualisys.controllers.PanelGrafoController;
 import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
 import java.util.ArrayList;
 
@@ -23,8 +24,12 @@ public class eliminarQsNodo implements IComando {
     }
     @Override
     public void ejecutar() {   
-        QsOperador opSelec = (QsOperador) this.pizzarra.getNodoSeleccionado();
+        PanelGrafoController c = PanelGrafoController.getInstance();
+        QsOperador opSelec = (QsOperador) c.getNodoSeleccionado();
         String padreViejo = opSelec.getPadreID();
+        c.actualizarArbolGenealogico(opSelec, padreViejo, "");
+        this.pizzarra.repaint(); // Repaint 
+    }
       /*  if(!padreViejo.equals("")){ // Si tenia padre
             ArrayList<QsNodo> hermanos = this.pizzarra.getRelPadreHijos().get(padreViejo);
             hermanos.remove(opSelec); // jeje
@@ -44,9 +49,5 @@ public class eliminarQsNodo implements IComando {
         this.pizzarra.repaint(); // Repaint 
 
         */
-        this.pizzarra.actualizarArbolGenealogico(opSelec, padreViejo, "");
-        this.pizzarra.repaint(); // Repaint 
-    }
-    
     
 }

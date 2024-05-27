@@ -6,6 +6,7 @@ package ar.unsl.qualisys.paneles.grafo.comandos;
 
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.componentes.nodos.QsOperador;
+import ar.unsl.qualisys.controllers.PanelGrafoController;
 import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
 import java.util.ArrayList;
 
@@ -23,14 +24,15 @@ public class eliminarQsRelacion implements IComando{
     }
     @Override
     public void ejecutar() {
-        QsNodo nodoSelec = this.pizzarra.getNodoSeleccionado();
+        PanelGrafoController c = PanelGrafoController.getInstance();
+        QsNodo nodoSelec = c.getNodoSeleccionado();
         String padre = nodoSelec.getPadreID();
         if(!padre.equals("")){ // Si tenia padre (DEBERIA)
             nodoSelec.setPadreID("");
-            ArrayList<QsNodo> hermanos = this.pizzarra.getRelPadreHijos().get(padre);
+            ArrayList<QsNodo> hermanos = c.getRelPadreHijos().get(padre);
             hermanos.remove(nodoSelec); // jeje
         }
-        this.pizzarra.guardarEstado();
+        c.guardarEstado();
         this.pizzarra.repaint(); // Repaint 
     }
     

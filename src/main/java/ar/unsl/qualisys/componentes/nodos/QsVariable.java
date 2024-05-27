@@ -1,24 +1,18 @@
 package ar.unsl.qualisys.componentes.nodos;
 
+import ar.unsl.qualisys.controllers.PanelGrafoController;
 import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
-import ar.unsl.qualisys.paneles.grafo.comandos.cambiarOperador;
 import ar.unsl.qualisys.paneles.grafo.comandos.editarPesoPonderado;
-import ar.unsl.qualisys.paneles.grafo.comandos.eliminarQsNodo;
 import ar.unsl.qualisys.paneles.grafo.comandos.eliminarQsRelacion;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.KeyStroke;
 import org.json.JSONObject;
 
 public class QsVariable extends QsNodo{
@@ -28,7 +22,10 @@ public class QsVariable extends QsNodo{
     private JPopupMenu menuDesplegable;
     private int orden;
     private boolean editable;
-
+    
+    /*
+        Primera vez que crea el panel ... 
+    */
     public QsVariable (QsDadPanel parent, int x, int y,String name,String descripcion,int orden){
         super();
         this.menuPopUp();
@@ -44,7 +41,9 @@ public class QsVariable extends QsNodo{
         this.addMouseListener(clickListener);
         this.setToolTipText(this.descripcion);
     }
-
+    /*
+        Cuando se carga la sesion
+    */
     public QsVariable (QsDadPanel parent, int x, int y,String name,String descripcion,int orden, double ponderacion){
         super();
         super.setPonderacion(ponderacion);
@@ -70,7 +69,6 @@ public class QsVariable extends QsNodo{
         super.paintComponent(g);
         String numeracion = this.getName();
         g.drawString(numeracion , 10, 20); 
-
     }
     public void menuPopUp(){
         menuDesplegable = new JPopupMenu();
@@ -104,11 +102,11 @@ public class QsVariable extends QsNodo{
     * la posision absoluta en el panel DAndD
     */     
    public void addToFatherDomain(Point padreRelativeLocation){ 
-        // CREAR PUNTO QUE QUIERO REALMENTE 
+        PanelGrafoController c = PanelGrafoController.getInstance();
         Point padreLocation = new Point();
         padreLocation.x = this.getLocation().x + padreRelativeLocation.x;
         padreLocation.y = this.getLocation().y + padreRelativeLocation.y;
-        this.GUIParent.addToDomain(this,padreLocation);
+        c.addToDomain(this,padreLocation);
    }
     
     
@@ -119,7 +117,7 @@ public class QsVariable extends QsNodo{
     public void accionSoltar(MouseEvent e){ 
         Point puntin = new Point(this.getBounds().getLocation().x + e.getX(), this.getBounds().getLocation().y + e.getY());
         System.out.println("Punto " + e.getPoint());
-        if (GUIParent.getOperatorByLocation(puntin) != null) { 
+        if (GUIParent.getOperatorAtPoint(puntin) != null) { 
             this.addToFatherDomain(e.getPoint());//Sí 
         } 
 
@@ -144,11 +142,11 @@ public class QsVariable extends QsNodo{
          * @param evt 
          */
         public void mousePressed(MouseEvent evt){
+            PanelGrafoController c = PanelGrafoController.getInstance();
             //.setBorder(BorderFactory.createLineBorder(Color.BLACK, 10));
             if(editable){
                this.qsVarInstance.setBackground(Color.decode("#EFEBCE"));
-
-               GUIParent.setNodoSeleccionado(this.qsVarInstance);
+               c.setNodoSeleccionado(this.qsVarInstance);
             }   
         }
         public void mouseReleased(MouseEvent e){

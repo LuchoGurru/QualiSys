@@ -4,13 +4,7 @@
  */
 package ar.unsl.qualisys.componentes.nodos;
 
-import java.awt.AWTException;
 import java.awt.Cursor;
-import java.awt.HeadlessException;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 /**
@@ -69,6 +63,15 @@ public class QsNodo extends JPanel {
         this.ponderacion = ponderacion;
     }
     
- 
+    private boolean isVariable(QsNodo var){
+        System.out.println("isVariable" + this.getClass()); 
+        return var.getClass() == QsVariable.class;
+    }
+    private QsVariable getVariable(QsNodo var){
+        return (QsVariable) var;
+    }  
+    private QsOperador getOperator(QsNodo var){
+        return (QsOperador) var;
+    }  
 }
 

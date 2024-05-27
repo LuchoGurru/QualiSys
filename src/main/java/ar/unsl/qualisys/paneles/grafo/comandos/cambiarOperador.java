@@ -6,6 +6,7 @@ package ar.unsl.qualisys.paneles.grafo.comandos;
 
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.componentes.nodos.QsOperador;
+import ar.unsl.qualisys.controllers.PanelGrafoController;
 import ar.unsl.qualisys.paneles.grafo.QsDadPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,6 +27,7 @@ public class cambiarOperador implements IComando {
     }
 
     public void myOptionPane() {  
+        PanelGrafoController c = PanelGrafoController.getInstance();
         //Icon errorIcon = UIManager.getIcon("OptionPane.errorIcon");  
         Object[] possibilities = {
             "D",
@@ -53,8 +55,8 @@ public class cambiarOperador implements IComando {
                 "Selecciona el tipoa de operador que desea", "ShowInputDialog",  
                 JOptionPane.PLAIN_MESSAGE, null, possibilities, "Numbers");  
         System.out.println("ii = " + simbolo);
-        QsOperador opNuevo = pizzarra.getBrother().getOperadorBySymbol().get(simbolo);
-        QsOperador opSelec = (QsOperador) pizzarra.getNodoSeleccionado();
+        QsOperador opNuevo = pizzarra.getGUIBrother().getOperadorBySymbol().get(simbolo);
+        QsOperador opSelec = (QsOperador) c.getNodoSeleccionado();
         opSelec.setNombre(opNuevo.getNombre());
         opSelec.setSymbol(opNuevo.getSymbol());        
         opSelec.setD(opNuevo.getD());

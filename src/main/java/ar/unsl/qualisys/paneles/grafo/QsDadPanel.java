@@ -7,6 +7,7 @@ package ar.unsl.qualisys.paneles.grafo;
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.componentes.nodos.QsOperador;
 import ar.unsl.qualisys.componentes.nodos.QsVariable; 
+import ar.unsl.qualisys.controllers.PanelGrafoController;
 import ar.unsl.qualisys.paneles.grafo.memento.CaretTaker;
 import ar.unsl.qualisys.paneles.grafo.memento.EstadoGrafo;
 import ar.unsl.qualisys.paneles.grafo.memento.Originator;
@@ -15,7 +16,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 
 /**
  * Lo que voy a hacer en este componente sera lo siguiente : 
@@ -53,168 +52,58 @@ import javax.swing.JPopupMenu;
  * Una vez terminado esto rendiré ingles para festejar ! 
  *  Ya tengo 25 y medio y todavía no me recibo 
  * 17/09/23
- * 
+ * Que sean 26
  * 
  * 
  * @author luciano.gurruchaga
  */
-public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesArbolLSP
+public class QsDadPanel extends JPanel implements DrawAndDropView { //implements LspTreeCotrols { ControlesArbolLSP
 
     private QsGraphicPanel GUIpadre;
-    private QsOperatorsPanel brother;
-
-    private Originator originator;
-    private CaretTaker caretTaker;
+    private QsOperatorsPanel GUIBrother;
+    private QsDadPanel esta;
     
-    private QsNodo nodoSeleccionado; 
     private Dimension area; //indicates area taken up by graphics 
-    public static int cantOperadores = -1;
+    
 
     /**
      * Constructores 
      */
      public QsDadPanel(QsGraphicPanel parent,QsOperatorsPanel brother){    
         this.setLayout(null);
+        this.esta = this;
         this.GUIpadre = parent;
-        this.brother =brother;
-        this.area = new Dimension();
-        this.originator = new Originator();
-        this.caretTaker = new CaretTaker();
-        this.setBackground(Color.decode("#FFFFFF"));
-     }    
-
-    public QsOperatorsPanel getBrother() {
-        return brother;
+        this.GUIBrother = brother;
+        this.area = new Dimension(); 
+        this.setBackground(Color.decode("#FFFFFF")); 
     }
 
-    public QsGraphicPanel getGUIpadre() {
+    public QsOperatorsPanel getGUIBrother() {
+        return GUIBrother;
+    }
+
+    public QsGraphicPanel getGUIPadre() {
         return GUIpadre;
-    }
-    
-    public Map<String, QsOperador> getOperadores(){
-        return operadores;
     } 
-
-    public void setOperadores(Map<String, QsOperador> operadores) {
-        this.operadores = operadores;
-    }
-
-    public Map<String, ArrayList<QsNodo>> getRelPadreHijos() {
-        return relPadreHijos;
-    }
-
-    /**
-     * Devuelve la lista ordenada de QsVariable
-     */
-    public ArrayList<QsVariable> getListaVariables(){
-         // Sort the list based on the 'name' attribute using a custom comparator
-               // Convert the map values to a list
-        ArrayList<QsVariable> variableList = new ArrayList<>(variables.values());
-
-        // Sort the list based on the 'nombre' attribute using a custom comparator
-        Collections.sort(variableList, Comparator.comparing(QsVariable::getOrden));
- 
-        return variableList;
-    }
-    
-    public Map<String, QsVariable> getVariables() {
-        return variables;
-    }
-
-    public Originator getOriginator() {
-        return originator;
-    }
-
-    public void setOriginator(Originator originator) {
-        this.originator = originator;
-    }
-
-    public CaretTaker getCaretTaker() {
-        return caretTaker;
-    }
-
-    public void setCaretTaker(CaretTaker caretTaker) {
-        this.caretTaker = caretTaker;
-    }
-    
-    
-    
-    /**
-     * Carga las relaciones de los operadores y reinicializa las variables
-     * @param variables 
-     */
-    public void initVariables(Map<String, QsVariable> varsNuevas) {
-        HashMap<String,ArrayList<QsNodo>> relPadreHijosSinVars = new HashMap<>();
-//        Map<String, QsVariable> varsViejas = this.variables;
-        this.variables = varsNuevas;
-        for(String padreID : this.relPadreHijos.keySet()){
-            relPadreHijosSinVars.put(padreID, new ArrayList<>());
-            for(QsNodo h : this.relPadreHijos.get(padreID)){
-                if(h.getClass()!=QsVariable.class){ // Operador
-                    relPadreHijosSinVars.get(padreID).add(h);
-                }else if (this.variables.keySet().contains(h.getName())){
-                    QsVariable varVieja = (QsVariable) h;
-                    String varID = h.getName();
-                    this.variables.get(varID).setPadreID(varVieja.getPadreID());
-                    this.variables.get(varID).setPonderacion(varVieja.getPonderacion());
-                    this.variables.get(varID).setName(varVieja.getName());
-                    this.variables.get(varID).setDescripcion(varVieja.getDescripcion());
-                   // this.variables.get(varID).setBounds(varVieja.getBounds());
-                    this.variables.get(varID).setGUIParent(varVieja.getGUIParent());
-                    relPadreHijosSinVars.get(padreID).add(this.variables.get(varID)); //Añado variable a hermanos List
-                }
-            }
-        }   
-        this.relPadreHijos = relPadreHijosSinVars; // relaciones entre operadores
-        this.caretTaker = new CaretTaker(); //Borro memoria 'cache'.
-        this.guardarEstado(); // actualiza memento con las nuevas variables traidas del panel anterior
-        this.repaint(); 
-    }
-    
-    public void setVariables(Map<String, QsVariable> varsNuevas){
-        this.variables = varsNuevas;
-    }
-
-    public QsNodo getNodoSeleccionado() {
-        return nodoSeleccionado;
-    }
-
-    public void setNodoSeleccionado(QsNodo nodoSeleccionado) {
-        if(this.nodoSeleccionado!=null)
-            this.nodoSeleccionado.setBorder(null);
-        this.nodoSeleccionado = nodoSeleccionado;
-        if(this.nodoSeleccionado!=null)
-            this.nodoSeleccionado.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-    }
-    
-    /**
-     * Pintado del Drag And Drop component:
-     *      Parametros del constructor : 
-     *          Lista de Variables,
-     *          Lista de Operadores (inicialmente vacia)
-     * @param g 
-     */
-    public void setRelPadreHijos(Map<String, ArrayList<QsNodo>> relPadreHijos) {
-        this.relPadreHijos = relPadreHijos;
-    }
-
+   
     @Override
     public void paintComponent(Graphics g) {
         super.removeAll();
         super.paintComponent(g); 
         System.out.println("Paint: ");
+        PanelGrafoController c = PanelGrafoController.getInstance();
         area.width=0;
         area.height=0;
-        pintarVariables(g);
-        pintarOperadores(g);
-        dibujarLineas(g); 
+        paintVariables(g, c.getVariables());
+        paintOperadores(g,c.getOperadores());
+        paintLineas(g,c.getOperadores(),c.getRelPadreHijos()); 
         this.revalidate(); //Let the scroll pane know to update itself and its scrollbars.
 
     }
-    
-    private void pintarVariables(Graphics g){
+    @Override
+    public void paintVariables(Graphics g, Map<String, QsVariable> variables){
         boolean changed = false;
-        for(QsVariable qv: this.variables.values()){
+        for(QsVariable qv: variables.values()){
            // System.out.println("qv.getName() = " + qv.getName());
             this.add(qv);
             // Listo, ahora a ajustar el SCROLL panel
@@ -236,9 +125,9 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
 
         }
     }
-    
-    private void pintarOperadores(Graphics g){
-        for(QsOperador qo: this.operadores.values()){
+    @Override
+    public void paintOperadores(Graphics g, Map<String, QsOperador> operadores){
+        for(QsOperador qo: operadores.values()){
             boolean changed = false;
            // System.out.println("qo.getName() = " + qo.getName());
             this.add(qo);
@@ -262,15 +151,16 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
      * Recorre, anidacion de arreglos.
      * @param g 
      */
-    public void dibujarLineas(Graphics g){
-        ArrayList<ArrayList<QsNodo>> hijos = new ArrayList<ArrayList<QsNodo>>(this.relPadreHijos.values());
+    @Override
+    public void paintLineas(Graphics g,Map<String, QsOperador> operadores,Map<String, ArrayList<QsNodo>> relPadreHijos){
+        ArrayList<ArrayList<QsNodo>> hijos = new ArrayList<ArrayList<QsNodo>>(relPadreHijos.values());
         for(int j=0;j < hijos.size(); j++){
             ArrayList<QsNodo> hermanos = hijos.get(j);
             Point padreLocation=null;
             for(int i=0;i< hermanos.size();i++){
                 QsNodo h = hermanos.get(i);
                 if(padreLocation == null){
-                    padreLocation = obtenerPadreLocation(h);
+                    padreLocation = obtenerPadreLocation(h,operadores);
                 }
                 //Pinto (x,y) to (x',y')
                 if(h.getClass() == QsVariable.class)
@@ -286,18 +176,18 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
             }
         }
     }
-
-    private Point obtenerPadreLocation(QsNodo h){
+    
+    private Point obtenerPadreLocation(QsNodo h,Map<String, QsOperador> operadores){
         Point padreLocation = null;
-        padreLocation = this.operadores.get(h.getPadreID()).getLocation();   
+        padreLocation = operadores.get(h.getPadreID()).getLocation();   
         return padreLocation;
     }
-
      /**
       * Chequea si colisiona con algun componente del panel operador o variable
       * @param colisionador
       * @return 
       */
+    @Override
     public boolean isColision(QsNodo colisionador){
         boolean colision = false;
         for(int i=0;i<this.getComponents().length;i++){
@@ -311,295 +201,22 @@ public class QsDadPanel extends JPanel {//implements LspTreeCotrols { ControlesA
                 colision = true;
                 break;
             }else{
-                                System.out.println("colision =false");
-
+                System.out.println("colision = false");
             }
         }
         return colision;
     }
-    
-    public QsOperador getOperatorByLocation(Point loc){
-        Component c = this.getComponentAt(loc);
-        if(this.getComponentAt(loc).getClass() == QsOperador.class){
+     
+    @Override
+    public QsOperador getOperatorAtPoint(Point p){
+        Component c = this.getComponentAt(p);
+        if(c instanceof QsOperador){
             return (QsOperador) c;
         }
         return null;
-    }
-    private boolean isVariable(QsNodo var){
-        return var.getClass() == QsVariable.class;
-    }
-    private QsVariable getVariable(QsNodo var){
-        return (QsVariable) var;
-    }  
-    private QsOperador getOperator(QsNodo var){
-        return (QsOperador) var;
-    }   
-    private boolean isGoodPonder(QsNodo hijo, String valor,String padre){
-        boolean isGood = true;
-        Double ponderValue = 0d;
-        try{
-            ponderValue = Double.parseDouble(valor);
-        }catch(NumberFormatException nex){
-            JOptionPane.showMessageDialog(this,"Debe ingresar un valor real.");
-            isGood = false;
-        }
-        //Control <= a 1 
-        if(ponderValue>1){
-            JOptionPane.showMessageDialog(this,"Debe ingresar un valor <= 1.");
-            isGood = false;
-        }else if(isGood && ponderValue<0){
-            JOptionPane.showMessageDialog(this,"Debe ingresar un valor > 0.");
-            isGood = false;            
-        }else if(isGood){
-            Double ponderacionTotal = ponderValue;
-            for(QsNodo n: this.relPadreHijos.get(padre)){
-                if(!n.getName().equals(hijo.getName())){ // No se suma asi mismo
-                    ponderacionTotal += n.getPonderacion();
-                    if(ponderacionTotal > 1 ){
-                        JOptionPane.showMessageDialog(this,"La suma total de los pesos del dominio de un operador debe ser igual a 1.");
-                        isGood = false;
-                        break;
-                    }
-                } 
-            }
-        }
-        return isGood;
-    }
-    
-    /** 
-     * @return 100/Cantidad de hijos
-     */
-    private double getPonderacionBalanceada(int cantHijos){
-        double balanceo = 1d/(double)cantHijos;
-        System.out.println("cantHijos = " + cantHijos);
-        System.out.println("balanceo = " + balanceo);
-        return balanceo;
-    }
-    
-    /**
-     * Actualiza todos las ponderaciones de los hermanos del padre
-     * @param padre 
-     */
-    private void updatePonderValue(QsNodo padre) {
-        ArrayList<QsNodo> hermanos=this.relPadreHijos.get(padre.getName());
-        
-        double balanceo = getPonderacionBalanceada(hermanos.size());
-        for(QsNodo h :hermanos){
-            h.setPonderacion(balanceo);
-        }
-    }
-    
-    /**
-     * Actualiza todos las ponderaciones de los hermanos del padre
-     * @param padre 
-     */
-    public void setPonderValue(QsNodo hijo, String padre) {
-        // create a dialog Box
-        String valor;
-        do {
-            valor = JOptionPane.showInputDialog(
-                    this,
-                    "Selecciona el peso deseado de la relación (recuerda que la suma de los pesos tiene que ser igual a 1).",
-                    1d);
-        } while (!isGoodPonder(hijo,valor, padre));
-
-       hijo.setPonderacion(Double.valueOf(valor));
-       
-    
-    }
-    
-    /**
-     * Sí el hijo puede ser dominiio ... 
-     * se setea el peso ponderado de la relacion 
-     * y esta se agrega como nueva relacion controlando que no sea mayor a uno 
-     * 
-     * @param hijoCandidato
-     * @param padreLocation 
-     */
-    public void addToDomain(QsNodo hijoCandidato, Point  padreLocation){
-        try{
-            QsOperador operadorPadre = (QsOperador) this.getComponentAt(padreLocation) ; 
-            System.out.println("canBeDomain?");
-            if(canBeDomain(hijoCandidato,operadorPadre)){
-                if(isVariable(hijoCandidato)){
-                    QsVariable var_candidato = (QsVariable) hijoCandidato;
-                    actualizarArbolGenealogico(var_candidato,var_candidato.getPadreID(),operadorPadre.getName());
-                    var_candidato.setPadreID(operadorPadre.getName());//SETTEO PADRE ADOPTIVO
-                }else{
-                    QsOperador op_candidato =(QsOperador) hijoCandidato;
-                    actualizarArbolGenealogico(op_candidato,op_candidato.getPadreID(),operadorPadre.getName());
-                    op_candidato.setPadreID(operadorPadre.getName());//SETTEO PADRE ADOPTIVO
-                }
-                this.repaint();
-            }
-
-        }catch(ClassCastException ce){
-            System.out.println("ERROR  = DAD.addToDomain no es un operador. " + padreLocation );
-            System.out.println(ce.getMessage()); 
-            this.repaint();
-        }
-        
-        
-        
-    }
-    /**
-     * Las variables pueden ser dominio de cualquier operador. Solo de uno a la vez.
-     * @param qo
-     * @param posX
-     * @param posY
-     */
-    public boolean canBeDomain(QsNodo hijoCandidato, QsOperador padreAdoptivo){
-        boolean allow=true;
-        if(padreAdoptivo != null){//OK
-            if(this.relPadreHijos.get(padreAdoptivo.getName()).size() >= 5){
-                allow=false;
-                System.out.println("el dominio ya esta lleno");
-            }
-            if(allow && hijoCandidato.getName().equals(padreAdoptivo.getName())){
-                System.out.println("No podes formar parte de tu dominio");
-                allow = false;
-            }
-            if(allow && !isVariable(hijoCandidato)){// es un operador ... 
-                QsOperador op_candidato = getOperator(hijoCandidato); 
-                if(!padreAdoptivo.getPadreID().equals("")){ //... operador con padre
-                    System.out.println("controlando ciclos... operador adoptivo tiene padre");
-                    if(!noCicles(op_candidato,padreAdoptivo)){
-                        System.out.println("no podes ser parte de este dominio por que formaras un ciclo");
-                        allow = false;
-                    }else{
-                        System.out.println("!noCicles means that no hay cicles");
-                    }    
-                }
-            }
-        }else{
-            System.out.println("No podes ser parte de su dominio por que no es un operador o es una variable");
-            allow = false;
-        }
-        return allow;
-    }
-    public void addOperator(QsOperador q){
-        this.operadores.put(q.getName(),q);
-        this.relPadreHijos.put(q.getName(),new ArrayList<QsNodo>());
-        this.guardarEstado();
-    }
-
-    //ERROR : un abuelo que se tenia como su propio abuelo, entonces, este chabon, 
-    //        tenia infinitos abuelos que no eran él!!! 
-    public boolean noCicles(QsOperador hijoCandidato, QsOperador padreCandidato){
-        boolean adopto=true;     
-        String abuelo = padreCandidato.getPadreID();
-        //   System.out.println("No me digas que me quedo loopeando" + abuelo);
-        while(!abuelo.equals("") && adopto){ // esta restringido que sea yo mismo la primera vez 
-            QsOperador abu = this.operadores.get(abuelo);
-            System.out.println("abu " + abu.getPadreID());
-            System.out.println("hijoCandidato " + hijoCandidato.getName());
-            if(abu.getName().equals(hijoCandidato.getName()))
-                adopto = false;
-            abuelo = abu.getPadreID();
-        }
-        return adopto;
-    }
-    
-    
-    /**
-     * Actualizo la estructura solo en casos de Modificaciones en relaciones.
-     * Modificacion de padre.
-     * Eliminacion de nodo. 
-     * ¿Eliminacion de relacion? 
-     */
-    public void actualizarArbolGenealogico(QsNodo adoptado, String padreViejo, String padreNuevo){
-        System.out.println("padre del adoptado " + padreViejo);
-        //Ahora
-        if(!padreViejo.equals("")){                                             // Si tenia padre, actualizo los ex hermanos 
-            ArrayList<QsNodo> hermanosViejos = this.relPadreHijos.get(padreViejo);
-            for(int i =0; i<hermanosViejos.size(); i++){
-                if(hermanosViejos.get(i).getName().equals(adoptado.getName())){
-                    hermanosViejos.remove(i);
-                    break;
-                }
-            }
-            if(!hermanosViejos.isEmpty()){
-                updatePonderValue(this.operadores.get(padreViejo));             //actualizao balanceo
-            }
-        }   
-        if(!padreNuevo.equals("")){                                             // Lo agrego a lista de hermanos del nuevo padre
-            //Despues
-            ArrayList<QsNodo> hermanosNuevos = this.relPadreHijos.get(padreNuevo);
-            hermanosNuevos.add(adoptado); 
-            this.updatePonderValue(this.operadores.get(padreNuevo));            //Actualizo los nuevos hermanos 
-        }else{ // ELIMINACION no hay padre nuevo
-            String clave = adoptado.getName();
-            
-            ArrayList<QsNodo> hijos = this.relPadreHijos.get(clave);
-            for(QsNodo h : hijos){                                              // Limpio padreID de hijos huerfanos
-                System.out.println("hijo" +h.getName() +" al que borro el padreID = " + h.getPadreID());
-                h.setPadreID("");
-            }
-            this.relPadreHijos.remove(clave);                                   // Lo borro en la relacion de padre
-            this.operadores.remove(clave);                                      //Lo borro en la lista de operadores
-            this.setNodoSeleccionado(null);                                     //Limpio el operador seleccionado
-        }
-        this.guardarEstado();
-    }
-    
-    
-     
-    /**
-     * Árbol Bien Formado : means, a imaginary tree. In wich the  leaves are variables and the root its an operator wich no father. Or a symbolic Father.
-     * Todas las hojas tienen padre y ningun hijo.
-     * Todos los nodos operadores - root tienen a lo más 5 hijos y minimo 2 excepto root que tiene a lo mas 5 hijos y ningun padre.
-     * Ningun nodo puede ser hijo de algun descendiente.
-    */
-    public boolean isArbolBienFormado(){//HACER LO MISMO CON EL TEXTO
-        //THere is cicles ? 
-        // All variables HAve one father ? 
-        // All operators are ¨2,5* domain 
-        // Cant  operators with out father == 1 
-        boolean bienFormado = true; 
-        for(QsVariable qv: this.variables.values()){
-            if(qv.getPadreID().equals("")){
-                qv.setBackground(Color.red);
-                bienFormado = false;
-                break;
-            }
-        }
-        if(bienFormado){
-            int onlyOneRoot = 0;
-            for(QsOperador qo: this.operadores.values()){
-                if(qo.getPadreID().equals("")){
-                    onlyOneRoot ++;
-                    if(onlyOneRoot > 1){
-                        qo.setBackground(Color.red);
-                        bienFormado = false;
-                        break;
-                    }
-                }
-            }
-            if(bienFormado)
-                bienFormado = onlyOneRoot > 0;//tampoco puede estar vacia
-        }
-        if(bienFormado){
-            for(String padreID : this.relPadreHijos.keySet()){
-                if (this.relPadreHijos.get(padreID).size() < 2 || this.relPadreHijos.get(padreID).size() > 5 ) {// aca tengo uqe jajaja me qcague de miedo,
-                    System.out.println("Mal Rango"); 
-                    System.out.println(padreID);
-                    this.operadores.get(padreID).setBackground(Color.red);
-                    bienFormado = false;
-                }
-            }
-        }
-        
-        return bienFormado;
-    }
-    /**
-     * El árbol (imaginario) está formado por 3 estructuras de datos.
-     * Estas son 2 listas de nosod. una de variables y otra de operadores. las cuales se implementan mediante un hashMap distinguido por ID .
-     * Y Una estructura Auxiliar que contiene la relacion Padre - Hijos . La cual es la encargada de realizar todos lontroles y las restricciones necesarias en la formacion del arbol 
-     * implementada con un hasMap distinguido por Padre ID y un conjunto de hijos[2,5],  
-     */
-    public void guardarEstado(){
-        EstadoGrafo nuevoEstado = new EstadoGrafo(this.variables, this.operadores,this.relPadreHijos);//Guardo Estado 
-        originator.setEstado(nuevoEstado);
-        caretTaker.addMemento(originator.guardar());
-    }
+    }      
+    @Override 
+    public void repintar(){
+        this.repaint();
+    } 
 }
