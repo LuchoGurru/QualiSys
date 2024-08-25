@@ -20,7 +20,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.BorderFactory;
-import javax.swing.JOptionPane;
+
 /**
  *
  * @author luciano
@@ -43,7 +43,7 @@ public class PanelGrafoController implements ArrastrarYSoltarPresentadorLSP{
         this.sesion = Sesion.getInstance();
     }
     
-    public void setvista(DrawAndDropView vista){
+    public void setVista(DrawAndDropView vista){
         this.vista = vista; 
         this.originator = new Originator();
         this.caretTaker = new CaretTaker();
@@ -67,7 +67,7 @@ public class PanelGrafoController implements ArrastrarYSoltarPresentadorLSP{
         if(this.nodoSeleccionado!=null)
             this.nodoSeleccionado.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
     }
-    
+
     public Map<String, QsOperador> getOperadores(){
         return sesion.operadores;
     } 
@@ -75,11 +75,22 @@ public class PanelGrafoController implements ArrastrarYSoltarPresentadorLSP{
     public void setOperadores(Map<String, QsOperador> operadores) {
         sesion.operadores = operadores;
     }
+    
+    public Map<String, QsVariable> getVariables(){
+        return sesion.variables;
+    } 
+
+    public void setVariables(Map<String, QsVariable> variables) {
+        sesion.variables = variables;
+    }
 
     public Map<String, ArrayList<QsNodo>> getRelPadreHijos() {
         return sesion.relPadreHijos;
     }
 
+    public void  setRelPadreHijos(Map<String, ArrayList<QsNodo>> relPadreHijos) {
+        this.sesion.relPadreHijos = relPadreHijos;
+    }    
     public Originator getOriginator() {
         return originator;
     }
@@ -96,9 +107,6 @@ public class PanelGrafoController implements ArrastrarYSoltarPresentadorLSP{
         this.caretTaker = caretTaker;
     }
     
-    public Map<String, QsVariable> getVariables() {
-        return sesion.variables;
-    }
     
     @Override
     public void initData(Map<String, QsVariable> varsNuevas) {
@@ -186,7 +194,7 @@ public class PanelGrafoController implements ArrastrarYSoltarPresentadorLSP{
                 }
             }
         }
-        
+            
         return bienFormado;
     }
     //this.getSesion().estructura;

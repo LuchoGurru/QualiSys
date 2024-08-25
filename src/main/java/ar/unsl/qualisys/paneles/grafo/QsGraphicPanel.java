@@ -32,18 +32,18 @@ public class QsGraphicPanel extends JPanel {
     /**
      * Creates new form examples
      */
-    public QsGraphicPanel(QsFrame parent) {
+    public QsGraphicPanel(QsFrame parent, PanelGrafoController control) {
         this.GUIParent=parent;
         this.setLayout(new BorderLayout());
         this.setName("QsGraphicPanel");
-        grafoController = PanelGrafoController.getInstance(); // Creacion de controlador
+        grafoController = control; // Creacion de controlador
         this.menuOperadores = new QsOperatorsPanel(this);   
         this.menuOperadores.setPreferredSize(new Dimension(150,300));
 
         this.DAD = new QsDadPanel(this,menuOperadores);
         scroll = new JScrollPane(DAD);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
-        grafoController.setvista(this.DAD);
+        grafoController.setVista(this.DAD);
         //AGREGO LOS 2 PANELES
         this.add(menuOperadores,BorderLayout.WEST);
         this.add(scroll ,BorderLayout.CENTER); 

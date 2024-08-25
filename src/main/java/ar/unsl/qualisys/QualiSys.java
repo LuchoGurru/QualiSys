@@ -22,6 +22,7 @@ import ar.unsl.qualisys.frames.QsFrame;
 public class QualiSys {
 
 public static void main(String[] args){
-        new QsFrame();
+        Sesion begin = Sesion.getInstance();
+        new QsFrame(begin);
     }
 }

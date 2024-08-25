@@ -1,5 +1,6 @@
 package ar.unsl.qualisys.frames;
  
+import ar.unsl.qualisys.Sesion;
 import ar.unsl.qualisys.componentes.QsTabPanel;
 import ar.unsl.qualisys.componentes.QsMenuSuperior;
 import ar.unsl.qualisys.paneles.texto.QsTextPanel;
@@ -7,14 +8,13 @@ import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.paneles.grafo.QsGraphicPanel;
 import ar.unsl.qualisys.utils.Item;
 import ar.unsl.qualisys.paneles.QsEvaluacionPanel;
-import GUIUtils.Chart;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import javax.swing.*;
-
-import GUIUtils.ModelChart;
 import ar.unsl.qualisys.componentes.nodos.QsOperador;
 import ar.unsl.qualisys.componentes.nodos.QsVariable;
+import ar.unsl.qualisys.controllers.PanelEvaluacionController;
+import ar.unsl.qualisys.controllers.PanelGrafoController;
+import ar.unsl.qualisys.controllers.PanelTextoController;
 import java.util.ArrayList;
 import java.util.Map;
 import javax.swing.event.ChangeEvent;
@@ -27,6 +27,10 @@ public class QsFrame extends JFrame{
     
     private static boolean TURN_OFF_LISTENERS = false;    //ajjaja
     
+    PanelTextoController controlTab0 = PanelTextoController.getInstance();
+    PanelGrafoController controlTab1 = PanelGrafoController.getInstance();
+    PanelEvaluacionController controlTab2 = PanelEvaluacionController.getInstance();
+
     private QsTextPanel tabTexto; // panel donde se forma la estructura de variables
     private QsGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
     private QsEvaluacionPanel tabInstancias; // panel donde se asignan valores a las variables de distintos modelos LPS en particular
@@ -36,24 +40,20 @@ public class QsFrame extends JFrame{
     
     public ArrayList<Item> g_variables;
     public ArrayList<QsNodo> g_nodos;
-    //public ArrayList<QualyVariable> g_instancias;
-  //GLOBALES
-   //cargarItems
-           //Nodos 
-            //Instancias
-    
-    // Otro panel que se me ocurra
-    
-    public QsFrame(){
+    private Sesion sesion;
+    public QsFrame(Sesion sesion){
         this.setBounds(200,200,1300,700);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLayout(new BorderLayout());
+        this.sesion=sesion;
         tabbedPane = new QsTabPanel();
-        tabTexto = new QsTextPanel(this);
-        tabGrafico = new QsGraphicPanel(this);
-        tabInstancias = new QsEvaluacionPanel(this);
+        tabTexto = new QsTextPanel(this,controlTab0);
+        tabGrafico = new QsGraphicPanel(this,controlTab1);
+        tabInstancias = new QsEvaluacionPanel(this,controlTab2);
         //this.setBackground(Color.decode("#A3A380"));
+        
+        
         
         this.add(new QsMenuSuperior(this,tabTexto,tabGrafico,tabInstancias),BorderLayout.NORTH);  // PARA ABRIR Y CERRAR ARCHIVO
         tabbedPane.addTab("Variables de Preferencia", tabTexto);
@@ -102,8 +102,8 @@ public class QsFrame extends JFrame{
      * Se llama antes de cambiar la pestaña
      */
     public void initPanelGrafico(){
-        if(tabTexto.isTextoBienFormado()){ 
-            this.tabGrafico.setVariables(tabTexto.getVariablesDelTexto()); 
+        if(controlTab0.isTextoBienFormado()){ 
+            this.tabGrafico.setVariables(controlTab0.getVariablesDelTexto()); 
         }
     }
 
@@ -112,19 +112,19 @@ public class QsFrame extends JFrame{
      */
     public void initPanelInstancias(){
         ArrayList<QsVariable> listaVariables = new ArrayList<QsVariable>();
-        for(Item item : tabTexto.getVariablesDelTexto()){
+        for(Item item : controlTab0.getVariablesDelTexto()){
             QsVariable var = new QsVariable(this.tabGrafico.getDAD(), 50, 0, item.getNumeration(),item.getCadenaDeTexto(),item.getNumeroDeLinea());
             listaVariables.add(var);
         }
-        Map<String, ArrayList<QsNodo>>  relPadreHijos = this.tabGrafico.getDAD().getRelPadreHijos();
-        Map<String, QsOperador> opers = this.tabGrafico.getDAD().getOperadores();
-        Map<String, QsVariable> variables = this.tabGrafico.getDAD().getVariables();
+        Map<String, ArrayList<QsNodo>>  relPadreHijos = this.sesion.getRelPadreHijos();
+        Map<String, QsOperador> opers = this.sesion.getOperadores();
+        Map<String, QsVariable> variables = this.sesion.getVariables();
         
         this.tabInstancias.setDAD(this.tabGrafico.getDAD());
-        this.tabInstancias.setListaVariables(listaVariables); // Asigno lista de variables ordenadas para muestra por pantalla
-        this.tabInstancias.setRelPadreHijos(relPadreHijos);
-        this.tabInstancias.setOperadores(opers);
-        this.tabInstancias.setVariables(variables);
+        this.controlTab2.setListaVariables(listaVariables); // Asigno lista de variables ordenadas para muestra por pantalla
+        this.controlTab2.setRelPadreHijos(relPadreHijos);
+        this.controlTab2.setOperadores(opers);
+        this.controlTab2.setVariables(variables);
         this.tabInstancias.setInit(true);
         this.tabInstancias.repaint();
     }
@@ -169,7 +169,7 @@ public class QsFrame extends JFrame{
         boolean cambia = false;
         switch(pagina){
             case 1:{
-                if(cambia = tabTexto.isTextoBienFormado()){
+                if(cambia = controlTab0.isTextoBienFormado()){
                   initPanelGrafico();
                 }else{
                     JOptionPane.showMessageDialog(this, "El listado de variables no esta bien formado"); 
@@ -177,7 +177,7 @@ public class QsFrame extends JFrame{
                 break;
             }
             case 2:{
-                if(cambia = tabGrafico.getDAD().isArbolBienFormado()){
+                if(cambia = controlTab1.isArbolBienFormado()){
                     // CAMBIO DE PAGINA
                     initPanelInstancias();
                 }else{

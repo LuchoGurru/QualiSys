@@ -11,6 +11,7 @@ import ar.unsl.qualisys.componentes.nodos.QsVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,18 +28,21 @@ public class Sesion {
     public Map<String, ArrayList<QsNodo>> relPadreHijos;
     public ArrayList<QsInstancia> instancias; 
     public ArrayList<QsVariable> listaVariables;
+    public double[] resultados;
     
-    private Sesion(String texto, Map<String, QsVariable> variables, Map<String, QsOperador> operadores, Map<String, ArrayList<QsNodo>> relPadreHijos, ArrayList<QsInstancia> instancias) {
+    private Sesion(String texto, Map<String, QsVariable> variables, Map<String, QsOperador> operadores, Map<String, ArrayList<QsNodo>> relPadreHijos, ArrayList<QsInstancia> instancias, ArrayList<QsVariable> listaVariables, double[] resultados) {
         this.texto = texto;
         this.variables = variables;
         this.operadores = operadores;
         this.relPadreHijos = relPadreHijos;
         this.instancias = instancias;
+        this.listaVariables = listaVariables;
+        this.resultados = resultados;
     }
     
     public static Sesion getInstance(){
         if(sesion == null){
-            sesion = new Sesion(null,null,null, null, null);
+            sesion = new Sesion("",new HashMap<String, QsVariable>(),new HashMap<String, QsOperador>(), new HashMap<String, ArrayList<QsNodo>>(),new  ArrayList<QsInstancia>(),new ArrayList<QsVariable>(), new double[0]);
         }
         return sesion;
     }
@@ -81,6 +85,10 @@ public class Sesion {
 
     public void setInstancias(ArrayList<QsInstancia> instancias) {
         this.instancias = instancias;
+    }
+    
+    public void setResultados(double[] resultados) {
+        this.resultados = resultados;
     }
     
     /**

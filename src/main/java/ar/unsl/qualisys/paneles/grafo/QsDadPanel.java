@@ -176,6 +176,14 @@ public class QsDadPanel extends JPanel implements DrawAndDropView { //implements
             }
         }
     }
+
+    public Dimension getArea() {
+        return area;
+    }
+
+    public void setArea(Dimension area) {
+        this.area = area;
+    }
     
     private Point obtenerPadreLocation(QsNodo h,Map<String, QsOperador> operadores){
         Point padreLocation = null;
@@ -217,6 +225,10 @@ public class QsDadPanel extends JPanel implements DrawAndDropView { //implements
     }      
     @Override 
     public void repintar(){
-        this.repaint();
+        super.repaint();
     } 
+    
+    public PanelGrafoController getController(){
+        return PanelGrafoController.getInstance();
+    }
 }

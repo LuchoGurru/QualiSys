@@ -355,7 +355,7 @@ public class QsOperador extends QsNodo implements QsOperacion{
         public void mousePressed(MouseEvent evt){
         PanelGrafoController c = PanelGrafoController.getInstance();
             if(editable && DADParent!=null){
-                //this.qsOpInstance.setBackground(Color.decode("#A3A380"));
+                this.qsOpInstance.setBackground(Color.decode("#FFFFFF"));
                 c.setNodoSeleccionado(this.qsOpInstance);
             }
         }

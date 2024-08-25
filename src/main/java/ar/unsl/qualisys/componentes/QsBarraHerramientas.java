@@ -8,14 +8,19 @@ import LSP.QsInstancia;
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.componentes.nodos.QsOperador;
 import ar.unsl.qualisys.componentes.nodos.QsVariable;
+import ar.unsl.qualisys.controllers.PanelEvaluacionController;
+import ar.unsl.qualisys.controllers.PanelGrafoController;
+import ar.unsl.qualisys.controllers.PanelTextoController;
 import ar.unsl.qualisys.frames.QsFrame;
 import ar.unsl.qualisys.paneles.*;
 import ar.unsl.qualisys.paneles.texto.*;
 import ar.unsl.qualisys.paneles.grafo.*;
 import ar.unsl.qualisys.paneles.grafo.memento.EstadoGrafo;
+import ar.unsl.qualisys.utils.Item;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,11 +28,14 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.BorderFactory;
@@ -39,6 +47,7 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
@@ -51,6 +60,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.undo.UndoManager;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.util.Matrix;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -65,14 +82,28 @@ public class QsBarraHerramientas extends JToolBar{
     private QsGraphicPanel tabGrafico; // panel grafico donde se forma el árbol de preferencias
     private QsEvaluacionPanel tabInstanciado;
     
+    private PanelTextoController controlTab0;
     
-    public void stylingComponent(JComponent b){
+    private PanelGrafoController controlTab1;
+    
+    private PanelEvaluacionController controlTab2;
+    
+    
+    
+    public void stylingComponent(JComponent b,String toolTip){
         b.setBackground(Color.decode("#D6CE93"));
         b.setForeground(Color.decode("#BB8588"));
         b.setBorder(BorderFactory.createLineBorder(Color.decode("#A3A380"),0,true));
         b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        b.setToolTipText(toolTip);
     }
     public QsBarraHerramientas(QsFrame ventana,QsTextPanel tabText,QsGraphicPanel tabGrafic,QsEvaluacionPanel tabInstancias){//[Mostrar resultados en el panel de instancias todo junto],JPanel panelDeResultados) {
+        
+        controlTab0 = PanelTextoController.getInstance();
+        controlTab1 = PanelGrafoController.getInstance();
+        controlTab2 = PanelEvaluacionController.getInstance();
+        
+        
         this.setBackground(Color.decode("#D6CE93")); 
         //this.setForeground(Color.decode("#EFEBCE"));
         this.ventana = ventana;
@@ -80,30 +111,40 @@ public class QsBarraHerramientas extends JToolBar{
         this.tabGrafico = tabGrafic;
         this.tabInstanciado = tabInstancias;
         //JToolBar menuHerramientas = new JToolBar();
-        JButton volver = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/back-30.png"));
-        stylingComponent(volver);
-        JButton siguiente = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/forward-30.png"));
-        stylingComponent(siguiente);
-        JButton nuevo = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/new-file-30.png"));
-        stylingComponent(nuevo);
-        JButton abrir = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/open-file-30.png"));
-        stylingComponent(abrir);
-        JButton guardar = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/save-30.png"));
-        stylingComponent(guardar);
-        JButton deshacer = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/undo-30.png"));
-        stylingComponent(deshacer);
-        JButton actualizar = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/update-30.png"));
-        stylingComponent(actualizar);
-        JButton rehacer = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/redo-30.png"));
-        stylingComponent(rehacer);
-        JButton color = new JButton(new ImageIcon("/home/luciano/Documentos/Proyectos-Git/QualiSys/src/main/resources/color-30.png"));
-        stylingComponent(color);
+        
+        
+        
+        String strPath = QsBarraHerramientas.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+        String aux = File.separator + "src" +File.separator +"main"+File.separator+"resources"+File.separator;
+        strPath = strPath.replace("/target/classes/",aux);
+     //   strPath.replace("build/classes/", "").replace(JAR_FILE, "") + CONFIG_FILE_NAME;
+        
+        JButton volver = new JButton(new ImageIcon(strPath + "back-30.png"));
+        stylingComponent(volver,"Volver");
+        JButton siguiente = new JButton(new ImageIcon(strPath + "forward-30.png"));
+        stylingComponent(siguiente,"Siguiente");
+        JButton nuevo = new JButton(new ImageIcon(strPath + "new-file-30.png"));
+        stylingComponent(nuevo,"Nuevo Archivo");
+        JButton abrir = new JButton(new ImageIcon(strPath + "open-file-30.png"));
+        stylingComponent(abrir,"Abrir Archivo");
+        JButton guardar = new JButton(new ImageIcon(strPath + "save-30.png"));
+        stylingComponent(guardar,"Guardar Sesión");
+        JButton deshacer = new JButton(new ImageIcon(strPath + "undo-30.png"));
+        stylingComponent(deshacer,"Deshacer");
+        JButton actualizar = new JButton(new ImageIcon(strPath + "update-30.png"));
+        stylingComponent(actualizar,"Refrescar");
+        JButton rehacer = new JButton(new ImageIcon(strPath + "redo-30.png"));
+        stylingComponent(rehacer,"Rehacer");
+        JButton exportar = new JButton(new ImageIcon(strPath + "export-30.png"));
+        stylingComponent(exportar,"Exportar Sesión");
+        JButton color = new JButton(new ImageIcon(strPath + "color-30.png"));
+        stylingComponent(color,"Color del Texto");
         JSpinner tam = new JSpinner(new SpinnerNumberModel(12, 0, 84, 2));
-        stylingComponent(tam); 
+        stylingComponent(tam,"Tamaño de letra"); 
         //JButton centrado = new JButton();
         String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
         JComboBox fuente = new JComboBox(fontNames);
-        stylingComponent(fuente); 
+        stylingComponent(fuente,"Tipo de Fuente"); 
         fuente.setSelectedIndex(15);
 
         this.setFloatable(false);
@@ -139,22 +180,15 @@ public class QsBarraHerramientas extends JToolBar{
             }            
         });
         
-        //onFocus Texto
-        nuevo.setToolTipText("Nuevo Archivo");
-        abrir.setToolTipText("Abrir Archivo");
-        actualizar.setToolTipText("Actualizar Texto");
-        deshacer.setToolTipText("Ctrl + Z");
-        rehacer.setToolTipText("Ctrl + Y");
-        //
         this.add(volver);
         this.add(nuevo);
-        this.add(guardar);
         this.add(abrir);
         this.add(deshacer);
         this.add(actualizar);
         this.add(rehacer);
+        this.add(guardar);
+        this.add(exportar);
         this.add(color);
-        //this.add(centrado);
         this.add(fuente);
         this.add(tam);
         this.add(siguiente);
@@ -193,7 +227,7 @@ public class QsBarraHerramientas extends JToolBar{
             @Override
             public void actionPerformed(ActionEvent e) {
                 int caretPosition = tabTexto.getJTextPanel().getCaretPosition();
-                tabTexto.setTextoConCaret(tabTexto.getJTextPanel().getText(),caretPosition);// El setTexto llama ala ctualizar  estado
+                controlTab0.setTextoConCaret(tabTexto.getJTextPanel().getText(),caretPosition);// El setTexto llama ala ctualizar  estado
             }
         }
         );
@@ -217,11 +251,11 @@ public class QsBarraHerramientas extends JToolBar{
                     ar.unsl.qualisys.paneles.texto.memento.Memento undoMemento = caretaker.undo();                    // Undo
                     if (undoMemento != null) {
                         originator.restaurar(undoMemento);
-                        tabTexto.setTextoConCaret(originator.getEstado().getTexto(),originator.getEstado().getPos()+1); //ajusto pq se corre
+                        controlTab0.setTextoConCaret(originator.getEstado().getTexto(),originator.getEstado().getPos()+1); //ajusto pq se corre
                     }
                 }else if(tab == 1){
-                    ar.unsl.qualisys.paneles.grafo.memento.CaretTaker caretaker = tabGrafico.getDAD().getCaretTaker();
-                    ar.unsl.qualisys.paneles.grafo.memento.Originator originator = tabGrafico.getDAD().getOriginator();
+                    ar.unsl.qualisys.paneles.grafo.memento.CaretTaker caretaker = controlTab1.getCaretTaker();
+                    ar.unsl.qualisys.paneles.grafo.memento.Originator originator = controlTab1.getOriginator();
                     ar.unsl.qualisys.paneles.grafo.memento.Memento undoMemento = caretaker.undo();
                     if (undoMemento != null) {
                         originator.restaurar(undoMemento);
@@ -237,12 +271,11 @@ public class QsBarraHerramientas extends JToolBar{
                         Map<String,ArrayList<QsNodo>> relNuevas = estadoSolicitado.factoryRelPadreHijos(varNuevas,opNuevos,relSolicitadas);
                         
                         
-                        tabGrafico.getDAD().setVariables(varNuevas);
-                        tabGrafico.getDAD().setOperadores(opNuevos);
-                        tabGrafico.getDAD().setRelPadreHijos(relNuevas);
+                        controlTab1.setVariables(varNuevas);
+                        controlTab1.setOperadores(opNuevos);
+                        controlTab1.setRelPadreHijos(relNuevas);
                         tabGrafico.getDAD().repaint();  
                     }
-//                    
                 }
                 
                 
@@ -261,12 +294,12 @@ public class QsBarraHerramientas extends JToolBar{
                     ar.unsl.qualisys.paneles.texto.memento.Memento redoMemento = caretaker.redo();                    // Redo
                     if (redoMemento != null) {
                         originator.restaurar(redoMemento);
-                        tabTexto.setTextoConCaret(originator.getEstado().getTexto(),originator.getEstado().getPos()+1); //ajusto pq se corre
+                        controlTab0.setTextoConCaret(originator.getEstado().getTexto(),originator.getEstado().getPos()+1); //ajusto pq se corre
                     }
                 }else if(tab == 1){
                 
-                    ar.unsl.qualisys.paneles.grafo.memento.CaretTaker caretaker = tabGrafico.getDAD().getCaretTaker();
-                    ar.unsl.qualisys.paneles.grafo.memento.Originator originator = tabGrafico.getDAD().getOriginator();
+                    ar.unsl.qualisys.paneles.grafo.memento.CaretTaker caretaker = controlTab1.getCaretTaker();
+                    ar.unsl.qualisys.paneles.grafo.memento.Originator originator = controlTab1.getOriginator();
                     ar.unsl.qualisys.paneles.grafo.memento.Memento redoMemento = caretaker.redo();
                     if (redoMemento != null) {
                         originator.restaurar(redoMemento);
@@ -283,15 +316,34 @@ public class QsBarraHerramientas extends JToolBar{
                         
                         
                         
-                        tabGrafico.getDAD().setVariables(varNuevas);
-                        tabGrafico.getDAD().setOperadores(opNuevos);
-                        tabGrafico.getDAD().setRelPadreHijos(relNuevas);
+                        controlTab1.setVariables(varNuevas);
+                        controlTab1.setOperadores(opNuevos);
+                        controlTab1.setRelPadreHijos(relNuevas);
                         tabGrafico.getDAD().repaint();  
                     }
                 }
             }
         });
+        exportar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                int selected = fileChooser.showSaveDialog(ventana); // componente padre
+                if (selected == fileChooser.APPROVE_OPTION) {
+                    File fichero = fileChooser.getSelectedFile();
 
+
+                    if (fichero.exists()) {
+                        int sobreescribir = JOptionPane.showConfirmDialog(null, "El fichero ya Existe");
+                        if(sobreescribir==0){ // Opcion si
+                            exportarArchivo(fichero.getPath());
+                        }
+                    } else {
+                        exportarArchivo(fichero.getPath());
+                    }
+                }
+            }
+        });
         //Stylos
         //centrado.addActionListener(new StyledEditorKit.AlignmentAction("Medio", StyleConstants.ALIGN_CENTER)); // left rigth justify
         color.addActionListener(new ActionListener() {
@@ -328,7 +380,7 @@ public class QsBarraHerramientas extends JToolBar{
     
     private void abrirArchivo(){
         /*En esta parte tenemos que leer una estructura JSON */
-        QsDadPanel.cantOperadores =-1; // x las dudas
+        controlTab1.cantOperadores =-1; // x las dudas
         String cadena="";
         JFileChooser fileExplorer = new JFileChooser(); // Elector de archivos
         JMenuBar barra = new JMenuBar();
@@ -353,9 +405,9 @@ public class QsBarraHerramientas extends JToolBar{
         
         if(!cadena.equals("")){
             JSONObject sesion = new JSONObject(cadena);
-            this.tabTexto.setTexto(sesion.getString("texto"));
+            this.controlTab0.setTexto(sesion.getString("texto"));
 //            String texto = this.tabTexto.getJTextPanel().getText();
-            ArrayList<QsVariable> variablesList  = this.tabGrafico.getDAD().getListaVariables();//ordenada
+            ArrayList<QsVariable> variablesList  = this.controlTab1.getListaOrdenadaVariables();//ordenada
            
             System.out.println(sesion.getString("texto"));
 
@@ -401,10 +453,10 @@ public class QsBarraHerramientas extends JToolBar{
                 );
                 mapaDeOperadores.put(qsOp.getName(),qsOp);
                 int operadorMayor = Integer.parseInt(opJson.getString("name").split("_")[1]);
-                if(operadorMayor>QsDadPanel.cantOperadores) 
-                    QsDadPanel.cantOperadores = operadorMayor;
+                if(operadorMayor>controlTab1.cantOperadores) 
+                    controlTab1.cantOperadores = operadorMayor;
             }        
-            this.tabGrafico.getDAD().setOperadores(mapaDeOperadores);
+            this.controlTab1.setOperadores(mapaDeOperadores);
 
             JSONArray relaciones = nodos.getJSONArray("relaciones");
 
@@ -430,7 +482,7 @@ public class QsBarraHerramientas extends JToolBar{
                 }
             }
             
-            this.tabGrafico.getDAD().setRelPadreHijos(mapaDeRelPadreHijos); 
+            this.controlTab1.setRelPadreHijos(mapaDeRelPadreHijos); 
             JSONArray instanciasJA = sesion.getJSONArray("instancias");
             ArrayList<QsInstancia> instancias = new ArrayList<>();// this.tabInstanciado.getInstancias();
 
@@ -448,7 +500,7 @@ public class QsBarraHerramientas extends JToolBar{
                         valores);
                 instancias.add(i);
             }
-            this.tabInstanciado.setInstancias(instancias);
+            this.controlTab2.setInstancias(instancias);
         }
         
     }
@@ -463,10 +515,10 @@ public class QsBarraHerramientas extends JToolBar{
         JSONArray jsonInstancias = new JSONArray();
         
         String texto = this.tabTexto.getJTextPanel().getText();
-        ArrayList<QsVariable> variablesList  = this.tabGrafico.getDAD().getListaVariables();//ordenada
-        Map<String, QsOperador> operadores = this.tabGrafico.getDAD().getOperadores();
-        Map<String, ArrayList<QsNodo>> relPadreHijos = this.tabGrafico.getDAD().getRelPadreHijos();
-        ArrayList<QsInstancia> instancias = this.tabInstanciado.getInstancias();
+        ArrayList<QsVariable> variablesList  = this.controlTab1.getListaOrdenadaVariables();//ordenada
+        Map<String, QsOperador> operadores = this.controlTab1.getOperadores();
+        Map<String, ArrayList<QsNodo>> relPadreHijos = this.controlTab1.getRelPadreHijos();
+        ArrayList<QsInstancia> instancias = this.controlTab2.getInstancias();
 
         for(QsVariable v : variablesList ){
             System.out.println("v = " + v.getName());
@@ -509,10 +561,11 @@ public class QsBarraHerramientas extends JToolBar{
         
         JFileChooser fileChooser = new JFileChooser();
         int selected = fileChooser.showSaveDialog(this); // componente padre
+        int sobreescribir = 0;
         if (selected == fileChooser.APPROVE_OPTION) {
             File fichero = fileChooser.getSelectedFile();
             if (fichero.exists()) {
-                int abrir = JOptionPane.showConfirmDialog(null, "El fichero ya Existe");
+                sobreescribir = JOptionPane.showConfirmDialog(null, "El fichero ya Existe"); // si pone que sí queda en 0
             } else {
                 File dir = fichero.getParentFile();
                 dir.mkdir();
@@ -522,17 +575,271 @@ public class QsBarraHerramientas extends JToolBar{
                     System.out.println("No se pudo crear");
                 }
             }
-            try {
-                FileWriter f = new FileWriter(fichero);
-                String jsonString = sesion.toString();
-                String lineas[] = jsonString.split("\n");
-                for (String linea : lineas) {
-                    f.write(linea + "\n");
+            if(sobreescribir== 0 ){
+                try {
+                    FileWriter f = new FileWriter(fichero);
+                    String jsonString = sesion.toString();
+                    String lineas[] = jsonString.split("\n");
+                    for (String linea : lineas) {
+                        f.write(linea + "\n");
+                    }
+                    f.close();
+                } catch (IOException ex) {
+                    System.out.println("No se pudo escribir el fichero");
                 }
-                f.close();
-            } catch (IOException ex) {
-                System.out.println("No se pudo escribir el fichero");
+            }else{
+                System.out.println("No quiso guardarlo");
             }
         }
+    }
+    
+    private BufferedImage redimensionarImagen(BufferedImage image,int nuevoAncho, int nuevoAlto){
+            BufferedImage resizedImage = new BufferedImage(nuevoAncho, nuevoAlto, image.getType());
+            Graphics2D g = resizedImage.createGraphics();
+            g.drawImage(image, 0, 0, nuevoAncho, nuevoAlto, null);
+            g.dispose();
+            return resizedImage;
+    }
+    
+    private static BufferedImage panelToImage(QsDadPanel DAD, int ancho, int alto, int anchoReducido, int altoReducido) {
+        BufferedImage image = new BufferedImage(ancho , alto, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = image.createGraphics(); // Obtengo los Graphics2D para poder dibujar en él.
+        DAD.paint(graphics); // ejecuto el metodo paint pasandole por parametro los graficos de la imagen.
+        graphics.dispose(); // cierro 
+        //Reduccion
+        BufferedImage resizedImage = new BufferedImage(anchoReducido, altoReducido, image.getType());
+        Graphics2D g = resizedImage.createGraphics();
+        g.drawImage(image, 0, 0, anchoReducido, altoReducido, null);
+        g.dispose();
+        return resizedImage;
+   //     return image; // retorno la imagen ya pintada.
+    }
+
+    private void exportarDAD(PDDocument document) throws IOException {
+        QsDadPanel DAD = this.tabGrafico.getDAD();
+        //Panel DAD
+        int anchoPanel = (int) DAD.getArea().getWidth();
+        int altoPanel = (int) DAD.getArea().getHeight();
+        
+        int anchoReducido = (int) ((float) anchoPanel * 0.7f);
+        int altoReducido = altoPanel; // no lo reduzco(int) ((float) altoPanel * 0.7f);
+        
+        
+        float A4X = PDRectangle.A4.getWidth() - 52f; // Margen
+        float A4Y = PDRectangle.A4.getHeight(); // Tamaño
+        
+        int rows = (int) (Math.ceil(altoReducido / A4Y));
+        int cols = (int) (Math.ceil(anchoReducido / A4X));
+
+        if (anchoPanel > 0) { // Esto se da cuando se intenta guardar el pdf antes de haber siquiera creado el grafo
+            BufferedImage imagenCompleta = panelToImage(DAD, anchoPanel, altoPanel,anchoReducido,altoReducido);
+                int x = 0;
+                int y = 0;
+                PDPage page = null;
+                PDPageContentStream contentStream = null;
+                for (int col = 0; col < cols; col++) {
+                    x = (int) (col * A4X);
+                    for (int row = 0; row < rows; row++) {
+                        page = new PDPage(PDRectangle.A4);
+                        document.addPage(page);
+                        contentStream = new PDPageContentStream(document, page); //Creo la pág
+                        y = (int) (row * A4Y);
+//                        int width = Math.min((int) A4X, anchoPanel - x);
+//                        int height = Math.min((int) A4Y, altoPanel - y);
+                        int width = Math.min((int) A4X, anchoReducido - x);
+                        int height = Math.min((int) A4Y, altoReducido - y);
+
+                        System.out.println("W " + width);
+                        System.out.println("H " + height);
+                        BufferedImage croppedImage = imagenCompleta.getSubimage(x, y, width, height); 
+                        PDImageXObject pdImage = LosslessFactory.createFromImage(document, croppedImage);
+                        contentStream.drawImage(pdImage, 26, Math.abs(A4Y - croppedImage.getHeight()), croppedImage.getWidth(), croppedImage.getHeight());
+                        // Añadir marca de agua (fila y columna)
+                        String watermark = String.format("Fila: %d, Columna: %d", row + 1, col + 1);
+                        contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
+                        contentStream.setNonStrokingColor(0.5f, 0.5f, 0.5f);
+                        contentStream.beginText();
+                        contentStream.setTextMatrix(Matrix.getTranslateInstance(26, 26));
+                        contentStream.showText(watermark);
+                        contentStream.endText();
+                        contentStream.close();
+                    }
+                }
+                if (contentStream != null) {
+                    contentStream.close();
+                }
+        }
+    }
+
+        private void exportarTexto(PDDocument document,PDPageContentStream contentStream) throws IOException {
+            PDPage page = null;
+            ArrayList<Item> renglones = tabTexto.getRenglones();
+            int posY = 520;
+            for(int i = 0 ; i < renglones.size();i++){
+                posY = posY-20; //le resto 20 de lugar a posY
+                if(posY <= 0 ){ //se sale de la pagina
+                    contentStream.close();
+                    page = new PDPage(PDRectangle.A4);
+                    document.addPage(page);
+                    contentStream = new PDPageContentStream(document, page);
+                    posY=720; // principaio de la pagina
+                } 
+                String nombre = renglones.get(i).constructRenglon().replaceAll("\t","        ");      
+                System.out.println(nombre.length()+ "Tam renglon" + nombre);
+                if(nombre.length()>67){
+                    posY = posY+20; //le resto 20 de lugar a posY
+                    while(nombre.length()>67){
+                        posY = posY-20; //le resto 20 de lugar a posY
+                        System.out.println("while");
+                        contentStream.setFont(PDType1Font.COURIER_BOLD, 12);
+                        contentStream.beginText();
+                        contentStream.newLineAtOffset(100, posY);
+                        String rebanada = nombre.substring(0, 67);    
+                        System.out.println(rebanada.length() + "Tam rebanada" + rebanada);
+                        nombre = nombre.substring(67,nombre.length());
+                        System.out.println(nombre.length() + "Tam renglon" +  nombre);
+                        contentStream.showText(rebanada); 
+                        contentStream.endText();
+                    }
+                }
+                posY = posY-20; //le resto 20 de lugar a posY
+                contentStream.setFont(PDType1Font.COURIER_BOLD, 12);
+                contentStream.beginText();
+                contentStream.newLineAtOffset(100, posY);
+                contentStream.showText(nombre);
+                contentStream.endText();
+
+            }
+            if (contentStream != null) {
+                    contentStream.close();
+            }
+        }
+        
+    private void drawLine(PDPageContentStream contentStream,int posX,int posY, String texto,boolean bold){
+        try{
+            if(bold)
+                contentStream.setFont(PDType1Font.COURIER_BOLD, 12);
+            else
+                contentStream.setFont(PDType1Font.COURIER, 12);
+            contentStream.beginText();
+            contentStream.newLineAtOffset(posX, posY);   
+            contentStream.showText(texto); 
+            contentStream.endText();  
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }    
+        
+        
+    private void exportarInstancias(PDDocument document) throws IOException {
+            PDPage page = null;
+            PDPageContentStream contentStream = null;
+            ArrayList<QsVariable> variables = this.controlTab2.getVars();
+            ArrayList<QsInstancia> instancias = this.controlTab2.getInstancias();
+            double [] resultados = this.controlTab2.getResultados();
+            int posY = 0;
+            for(int i = 0 ; i < instancias.size();i++){
+                posY-=20;
+                if(posY <= 0 ){ //se sale de la pagina
+                    page = new PDPage(PDRectangle.A4);
+                    document.addPage(page);
+                    contentStream = new PDPageContentStream(document, page);
+                    posY=720; // principaio de la pagina
+                } 
+                String nombre = instancias.get(i).getNombre();
+                drawLine(contentStream,100,posY,"Instancia:     ' " + nombre + " '",true);
+                posY-=20;
+                drawLine(contentStream,100,posY,"Variable:       Valor: ",false);
+                for(int j=0; j < variables.size() ;j++){
+                    posY-=20;
+                    if(posY <= 0 ){ //se sale de la pagina
+                        page = new PDPage(PDRectangle.A4);
+                        document.addPage(page);
+                        contentStream = new PDPageContentStream(document, page);
+                        posY=720; // principaio de la pagina
+                    }
+                    drawLine(contentStream, 100, posY, variables.get(j).getName() + "              " + instancias.get(i).getValores().get(variables.get(j).getName()),false);
+                }
+                posY-=20;
+                if(posY <= 0 ){ //se sale de la pagina
+                    page = new PDPage(PDRectangle.A4);
+                    document.addPage(page);
+                    contentStream = new PDPageContentStream(document, page);
+                    posY=720; // principaio de la pagina
+                } 
+                try{
+                    drawLine(contentStream, 100, posY,"Resultado Evaluación:"  + "              " + resultados[i],true);
+                }catch(IndexOutOfBoundsException iobe){
+                    drawLine(contentStream, 100, posY, "No se ha evaluado la instancia",false);
+                }     
+            }
+            if (contentStream != null) {
+                    contentStream.close();
+            }
+        }
+        
+        
+        // Método para obtener la fecha actual en el formato especificado
+    private static String obtenerFechaActual() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        return dateFormat.format(new Date());
+    }
+    
+    private void exportarArchivo(String ruta) {
+        PDDocument document = new PDDocument();
+        try {  
+            // Crear la carátula
+            PDPage coverPage = new PDPage(PDRectangle.A4);
+            document.addPage(coverPage);
+            
+            PDPageContentStream contentStreamChapter = new PDPageContentStream(document, coverPage);
+            contentStreamChapter.setFont(PDType1Font.TIMES_BOLD, 26);
+            contentStreamChapter.beginText();
+            contentStreamChapter.newLineAtOffset(100, 700);
+            contentStreamChapter.showText("HeVaLog");
+            contentStreamChapter.endText();
+
+            contentStreamChapter.beginText();
+            contentStreamChapter.setFont(PDType1Font.TIMES_ROMAN, 12);
+            contentStreamChapter.newLineAtOffset(100, 650);
+            contentStreamChapter.showText("Sesion: "+ obtenerFechaActual());
+            contentStreamChapter.endText();
+
+            contentStreamChapter.beginText();
+            contentStreamChapter.setFont(PDType1Font.TIMES_ROMAN, 12);
+            contentStreamChapter.newLineAtOffset(100, 630);
+            contentStreamChapter.showText("Evaluación Actual");
+            contentStreamChapter.endText();
+ 
+            contentStreamChapter.setFont(PDType1Font.TIMES_BOLD, 26);
+            contentStreamChapter.beginText();
+            contentStreamChapter.newLineAtOffset(100, 570);
+            contentStreamChapter.showText("Arbol de Preferencias: ");
+            contentStreamChapter.endText(); 
+
+            contentStreamChapter.setFont(PDType1Font.TIMES_BOLD, 18);
+            contentStreamChapter.beginText();
+            contentStreamChapter.newLineAtOffset(100, 550);
+            contentStreamChapter.showText("Subtítulo del Capítulo");
+            contentStreamChapter.endText();
+            
+            exportarTexto(document,contentStreamChapter);
+            if(contentStreamChapter!=null)
+                contentStreamChapter.close();
+            exportarDAD(document);
+            exportarInstancias(document);
+            
+           
+            
+            // Guardar el documento PDF
+            document.save(ruta);
+            document.close();
+            System.out.println("PDF generado correctamente.");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //MAs PDF
     }
 }
