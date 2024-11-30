@@ -150,7 +150,6 @@ public class QsFrame extends JFrame{
         this.tabbedPane.setSelectedIndex(0);
     }
 
-
     public void retrocederTab(){
         this.tabbedPane.setSelectedIndex(indiceAnterior - 1);
     }

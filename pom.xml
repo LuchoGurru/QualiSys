@@ -5,13 +5,6 @@
     <artifactId>QualiSys</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <repositories>
-        <repository>
-            <id>unknown-jars-temp-repo</id>
-            <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
-            <url>file:${project.basedir}/lib</url>
-        </repository>
-    </repositories>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
@@ -19,7 +12,6 @@
         <exec.mainClass>ar.unsl.qualisys.QualiSys</exec.mainClass>
     </properties>
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/net.java.timingframework/timingframework-core -->
         <dependency>
             <groupId>net.java.timingframework</groupId>
             <artifactId>timingframework-core</artifactId>
@@ -41,7 +33,7 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.12.2</version> 
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.json/json -->
+
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -53,4 +45,43 @@
             <version>2.0.24</version>
         </dependency>
     </dependencies>
+    <build>
+      <plugins>
+	<plugin>
+	  <groupId>org.apache.maven.plugins</groupId>
+	  <artifactId>maven-jar-plugin</artifactId>
+	  <version>3.2.0</version>
+	  <configuration>
+            <archive>
+              <manifest>
+		<addClasspath>true</addClasspath>
+		<classpathPrefix>lib/</classpathPrefix>
+		<mainClass>ar.unsl.qualisys.QualiSys</mainClass>
+              </manifest>
+            </archive>
+	  </configuration>
+	</plugin>
+
+	<plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.2.4</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>shade</goal>
+                    </goals>
+                    <configuration>
+                        <transformers>
+                            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <mainClass>ar.unsl.qualisys.QualiSys</mainClass>
+                            </transformer>
+                        </transformers>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+      </plugins>
+    </build>
 </project>

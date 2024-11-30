@@ -22,6 +22,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -42,14 +43,15 @@ public class QsMenuSuperior extends JPanel {
     public QsMenuSuperior (QsFrame parent, QsTextPanel tabTexto,QsGraphicPanel tabGrafico, QsEvaluacionPanel tabInstanciado){
         this.setLayout(new BorderLayout());
         this.tabTexto = tabTexto;
-        barraDeMenu();
+        QsBarraHerramientas toolBarra = new QsBarraHerramientas(parent,tabTexto,tabGrafico,tabInstanciado);
+        barraDeMenu(parent, toolBarra);
         this.add(barra,BorderLayout.NORTH);
-        this.add(new QsBarraHerramientas(parent,tabTexto,tabGrafico,tabInstanciado),BorderLayout.CENTER);
+        this.add(toolBarra,BorderLayout.CENTER);
         this.setVisible(true);
   
     }        
 
-    public void barraDeMenu(){
+    public void barraDeMenu(QsFrame parent, QsBarraHerramientas toolBarra){
         barra.setBackground(Color.decode("#D6CE93"));
         //JMenus
         JMenu archivo = new JMenu("Archivo");
@@ -61,25 +63,69 @@ public class QsMenuSuperior extends JPanel {
         
         //JMenuItems: Archivo
         JMenuItem abrirArchivo = new JMenuItem("Abrir");
+        JMenuItem nuevoArchivo = new JMenuItem("Nuevo");
+        JMenuItem guardarArchivo = new JMenuItem("Guardar");
+        JMenuItem exportarArchivo = new JMenuItem("Exportar");
+        JMenuItem salir = new JMenuItem("Salir");
+        
+        salir.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toolBarra.salir();
+            }
+        });     
+        
         abrirArchivo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                abrirArchivo();
+                toolBarra.abrirArchivo();
+                parent.reinicializarTab();
+            }
+        });
+        
+        nuevoArchivo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toolBarra.nuevoArchivo();
             }
         });
 
-        JMenuItem nuevoArchivo = new JMenuItem("Nuevo");
-        JMenuItem guardarArchivo = new JMenuItem("Guardar");
-        JMenuItem exportar = new JMenuItem("Exportar");
-        JMenuItem salir = new JMenuItem("Salir");
+        guardarArchivo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toolBarra.guardarArchivo();
+            }
+        });
+        
 
+        exportarArchivo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                int selected = fileChooser.showSaveDialog(parent); // componente padre
+                if (selected == fileChooser.APPROVE_OPTION) {
+                    File fichero = fileChooser.getSelectedFile();
+
+
+                    if (fichero.exists()) {
+                        int sobreescribir = JOptionPane.showConfirmDialog(null, "El fichero ya Existe");
+                        if(sobreescribir==0){ // Opcion si
+                            toolBarra.exportarArchivo(fichero.getPath());
+                        }
+                    } else {
+                        toolBarra.exportarArchivo(fichero.getPath());
+                    }
+                }            
+            }
+        });
+        
         // Atajos del teclado
         abrirArchivo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
         //Agregamos los JMenuItems a archivo
         archivo.add(abrirArchivo);
         archivo.add(nuevoArchivo);
         archivo.add(guardarArchivo);
-        archivo.add(exportar);
+        archivo.add(exportarArchivo);
         archivo.add(salir); 
 
         //JMnuItems Editar
@@ -100,7 +146,7 @@ public class QsMenuSuperior extends JPanel {
 
         //JMenuItems: Ayuda
         JMenuItem listaComandos = new JMenuItem("Lista de comandos");
-        JMenuItem contactoDesarrollador = new JMenuItem("Contacto con el desarrolador");
+        JMenuItem contactoDesarrollador = new JMenuItem("Manual de usuario");
         ayuda.add(listaComandos);
         ayuda.add(contactoDesarrollador);
 
@@ -108,32 +154,10 @@ public class QsMenuSuperior extends JPanel {
         //this.add(BorderLayout.NORTH);
         //Se agregan los menus a la barra
         barra.add(archivo);
-        barra.add(herramientas);
+    //    barra.add(herramientas);
         barra.add(ayuda);
     }
-    private void abrirArchivo(){
-        PanelTextoController controlTab0 = PanelTextoController.getInstance();
-        JFileChooser fileExplorer = new JFileChooser(); // Elector de archivos
-        JMenuBar barra = new JMenuBar();
-        FileNameExtensionFilter fileExtensions = new FileNameExtensionFilter("Archivos de calidad", "txt"); // Filtro de archivos
-        fileExplorer.setFileFilter(fileExtensions);
-        int selected = fileExplorer.showOpenDialog(barra);// Archivo seleccionado
-        if (selected == fileExplorer.APPROVE_OPTION) {
-            File fichero = fileExplorer.getSelectedFile();
-            try (FileReader arch = new FileReader(fichero)) {
-                String cadena = "";
-                int valor = arch.read();
-                while (valor != -1) {
-                    cadena = cadena + (char) valor;
-                    valor = arch.read();
-                }
-                controlTab0.setTexto(cadena);
-                arch.close();
-            } catch (IOException ex) {
-                System.out.println("no file");
-            }
-        }
-    }
+     
     
     
     

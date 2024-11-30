@@ -95,11 +95,12 @@ public class PanelEvaluacionController {
             }
         });         
 
-        jScrollPane1 = new JScrollPane(jTableInstancias);
+        jScrollPane1 = new JScrollPane(jTableInstancias,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         jScrollPane1.getViewport().setBackground(Color.decode("#EFEBCE"));
+ 
         jPanel1.setLayout(new BorderLayout());
         jPanel1.add(jScrollPane1,BorderLayout.CENTER);
-        vista.repintar();
+        vista.repintar();   
     }
     
     
@@ -115,7 +116,7 @@ public class PanelEvaluacionController {
         table.getTableHeader().setReorderingAllowed(false);
         table.getTableHeader().setBackground(new Color(250, 250, 250));
         table.getTableHeader().setDefaultRenderer(new TableHeaderCustomCellRender(jTableInstancias));
-        table.setSelectionBackground(Color.decode("#D8A48F")); 
+        table.setSelectionBackground(Color.decode("#D8A48F"));  
         table.setRowHeight(40);
     }
     /** 
@@ -430,9 +431,15 @@ public class PanelEvaluacionController {
                 tmodel.addRow(fila);           
             }
             jTableInstancias.setModel(tmodel);
+            jTableInstancias.getColumnModel().getColumn(0).setMinWidth(160);
+
             for (int columnIndex = 1; columnIndex < jTableInstancias.getColumnCount(); columnIndex++) {
+                jTableInstancias.getColumnModel().getColumn(columnIndex).setMinWidth(99);
                 jTableInstancias.getColumnModel().getColumn(columnIndex).setCellEditor(new CustomCellEditor(PanelEvaluacionController.getInstance(), new JTextField()));
             }
+             if(jTableInstancias.getAutoResizeMode()!= 0 && jTableInstancias.getColumnCount() > 11){
+                jTableInstancias.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+             }
     }
      /**
      * Carga las relaciones de los operadores y reinicializa las variables

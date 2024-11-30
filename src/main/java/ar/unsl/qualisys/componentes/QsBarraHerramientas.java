@@ -5,6 +5,9 @@
 package ar.unsl.qualisys.componentes;
 
 import LSP.QsInstancia;
+import ar.unsl.qualisys.Constantes;
+import ar.unsl.qualisys.QualiSys;
+import ar.unsl.qualisys.Sesion;
 import ar.unsl.qualisys.componentes.nodos.QsNodo;
 import ar.unsl.qualisys.componentes.nodos.QsOperador;
 import ar.unsl.qualisys.componentes.nodos.QsVariable;
@@ -33,6 +36,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -110,15 +114,17 @@ public class QsBarraHerramientas extends JToolBar{
         this.tabTexto = tabText; // panel donde se forma la estructura de variables
         this.tabGrafico = tabGrafic;
         this.tabInstanciado = tabInstancias;
-        //JToolBar menuHerramientas = new JToolBar();
-        
-        
+               
         
         String strPath = QsBarraHerramientas.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+        System.out.println("path :" + strPath);
         String aux = File.separator + "src" +File.separator +"main"+File.separator+"resources"+File.separator;
+        System.out.println("aux :" + aux);
+
         strPath = strPath.replace("/target/classes/",aux);
-     //   strPath.replace("build/classes/", "").replace(JAR_FILE, "") + CONFIG_FILE_NAME;
-        
+        System.out.println("path :" + strPath);
+        strPath = strPath.replace(Constantes.JAR_FILE, "classes/");
+        System.out.println("path :" + strPath);
         JButton volver = new JButton(new ImageIcon(strPath + "back-30.png"));
         stylingComponent(volver,"Volver");
         JButton siguiente = new JButton(new ImageIcon(strPath + "forward-30.png"));
@@ -206,7 +212,12 @@ public class QsBarraHerramientas extends JToolBar{
                 ventana.getTabbedPane().setSelectedIndex(2); 
             }
         });
-        
+        nuevo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                nuevoArchivo();
+            }
+        });
         // Listeners
         abrir.addActionListener(new ActionListener() {
             @Override
@@ -378,7 +389,7 @@ public class QsBarraHerramientas extends JToolBar{
         });
     } 
     
-    private void abrirArchivo(){
+    protected void abrirArchivo(){
         /*En esta parte tenemos que leer una estructura JSON */
         controlTab1.cantOperadores =-1; // x las dudas
         String cadena="";
@@ -505,7 +516,7 @@ public class QsBarraHerramientas extends JToolBar{
         
     }
 
-    private void guardarArchivo(){
+    protected void guardarArchivo(){
         
         JSONObject sesion = new JSONObject();
         JSONObject nodos = new JSONObject();
@@ -593,13 +604,6 @@ public class QsBarraHerramientas extends JToolBar{
         }
     }
     
-    private BufferedImage redimensionarImagen(BufferedImage image,int nuevoAncho, int nuevoAlto){
-            BufferedImage resizedImage = new BufferedImage(nuevoAncho, nuevoAlto, image.getType());
-            Graphics2D g = resizedImage.createGraphics();
-            g.drawImage(image, 0, 0, nuevoAncho, nuevoAlto, null);
-            g.dispose();
-            return resizedImage;
-    }
     
     private static BufferedImage panelToImage(QsDadPanel DAD, int ancho, int alto, int anchoReducido, int altoReducido) {
         BufferedImage image = new BufferedImage(ancho , alto, BufferedImage.TYPE_INT_RGB);
@@ -671,7 +675,7 @@ public class QsBarraHerramientas extends JToolBar{
         }
     }
 
-        private void exportarTexto(PDDocument document,PDPageContentStream contentStream) throws IOException {
+    private void exportarTexto(PDDocument document,PDPageContentStream contentStream) throws IOException {
             PDPage page = null;
             ArrayList<Item> renglones = tabTexto.getRenglones();
             int posY = 520;
@@ -691,36 +695,24 @@ public class QsBarraHerramientas extends JToolBar{
                     while(nombre.length()>67){
                         posY = posY-20; //le resto 20 de lugar a posY
                         System.out.println("while");
-                        contentStream.setFont(PDType1Font.COURIER_BOLD, 12);
-                        contentStream.beginText();
-                        contentStream.newLineAtOffset(100, posY);
                         String rebanada = nombre.substring(0, 67);    
                         System.out.println(rebanada.length() + "Tam rebanada" + rebanada);
                         nombre = nombre.substring(67,nombre.length());
                         System.out.println(nombre.length() + "Tam renglon" +  nombre);
-                        contentStream.showText(rebanada); 
-                        contentStream.endText();
+                        drawLine(contentStream,100,posY,rebanada,PDType1Font.COURIER_BOLD, 12);
                     }
                 }
                 posY = posY-20; //le resto 20 de lugar a posY
-                contentStream.setFont(PDType1Font.COURIER_BOLD, 12);
-                contentStream.beginText();
-                contentStream.newLineAtOffset(100, posY);
-                contentStream.showText(nombre);
-                contentStream.endText();
-
+                drawLine(contentStream,100,posY,nombre,PDType1Font.COURIER_BOLD, 12);
             }
-            if (contentStream != null) {
-                    contentStream.close();
+            if(contentStream != null){
+                contentStream.close();
             }
         }
         
-    private void drawLine(PDPageContentStream contentStream,int posX,int posY, String texto,boolean bold){
+    private void drawLine(PDPageContentStream contentStream,int posX,int posY, String texto,PDType1Font font,int tam){
         try{
-            if(bold)
-                contentStream.setFont(PDType1Font.COURIER_BOLD, 12);
-            else
-                contentStream.setFont(PDType1Font.COURIER, 12);
+            contentStream.setFont(font, tam);
             contentStream.beginText();
             contentStream.newLineAtOffset(posX, posY);   
             contentStream.showText(texto); 
@@ -747,9 +739,9 @@ public class QsBarraHerramientas extends JToolBar{
                     posY=720; // principaio de la pagina
                 } 
                 String nombre = instancias.get(i).getNombre();
-                drawLine(contentStream,100,posY,"Instancia:     ' " + nombre + " '",true);
+                drawLine(contentStream,100,posY,"Instancia:     ' " + nombre + " '",PDType1Font.COURIER_BOLD,12);
                 posY-=20;
-                drawLine(contentStream,100,posY,"Variable:       Valor: ",false);
+                drawLine(contentStream,100,posY,"Variable:       Valor: ",PDType1Font.COURIER,12);
                 for(int j=0; j < variables.size() ;j++){
                     posY-=20;
                     if(posY <= 0 ){ //se sale de la pagina
@@ -758,7 +750,7 @@ public class QsBarraHerramientas extends JToolBar{
                         contentStream = new PDPageContentStream(document, page);
                         posY=720; // principaio de la pagina
                     }
-                    drawLine(contentStream, 100, posY, variables.get(j).getName() + "              " + instancias.get(i).getValores().get(variables.get(j).getName()),false);
+                    drawLine(contentStream, 100, posY, variables.get(j).getName() + "              " + instancias.get(i).getValores().get(variables.get(j).getName()),PDType1Font.COURIER,12);
                 }
                 posY-=20;
                 if(posY <= 0 ){ //se sale de la pagina
@@ -768,9 +760,9 @@ public class QsBarraHerramientas extends JToolBar{
                     posY=720; // principaio de la pagina
                 } 
                 try{
-                    drawLine(contentStream, 100, posY,"Resultado Evaluación:"  + "              " + resultados[i],true);
+                    drawLine(contentStream, 100, posY,"Resultado Evaluación:"  + "              " + resultados[i],PDType1Font.COURIER_BOLD,12);
                 }catch(IndexOutOfBoundsException iobe){
-                    drawLine(contentStream, 100, posY, "No se ha evaluado la instancia",false);
+                    drawLine(contentStream, 100, posY, "No se ha evaluado la instancia",PDType1Font.COURIER,12);
                 }     
             }
             if (contentStream != null) {
@@ -785,61 +777,79 @@ public class QsBarraHerramientas extends JToolBar{
         return dateFormat.format(new Date());
     }
     
-    private void exportarArchivo(String ruta) {
+    protected void exportarArchivo(String ruta) {
         PDDocument document = new PDDocument();
         try {  
             // Crear la carátula
-            PDPage coverPage = new PDPage(PDRectangle.A4);
-            document.addPage(coverPage);
-            
-            PDPageContentStream contentStreamChapter = new PDPageContentStream(document, coverPage);
-            contentStreamChapter.setFont(PDType1Font.TIMES_BOLD, 26);
-            contentStreamChapter.beginText();
-            contentStreamChapter.newLineAtOffset(100, 700);
-            contentStreamChapter.showText("HeVaLog");
-            contentStreamChapter.endText();
+            PDPage page = new PDPage(PDRectangle.A4);
+            document.addPage(page);
+            PDPageContentStream contentStream = new PDPageContentStream(document, page);
+            drawLine(contentStream,100,700,"HeVaLog",PDType1Font.TIMES_BOLD, 26);
+            drawLine(contentStream,100,650,"Sesion: "+ obtenerFechaActual(),PDType1Font.TIMES_ROMAN, 12);
+            drawLine(contentStream,100,630,"Evaluación Actual"+ obtenerFechaActual(),PDType1Font.TIMES_ROMAN, 12);
+            drawLine(contentStream,100,570,"Arbol de Preferencias: ",PDType1Font.TIMES_BOLD, 26);
 
-            contentStreamChapter.beginText();
-            contentStreamChapter.setFont(PDType1Font.TIMES_ROMAN, 12);
-            contentStreamChapter.newLineAtOffset(100, 650);
-            contentStreamChapter.showText("Sesion: "+ obtenerFechaActual());
-            contentStreamChapter.endText();
-
-            contentStreamChapter.beginText();
-            contentStreamChapter.setFont(PDType1Font.TIMES_ROMAN, 12);
-            contentStreamChapter.newLineAtOffset(100, 630);
-            contentStreamChapter.showText("Evaluación Actual");
-            contentStreamChapter.endText();
- 
-            contentStreamChapter.setFont(PDType1Font.TIMES_BOLD, 26);
-            contentStreamChapter.beginText();
-            contentStreamChapter.newLineAtOffset(100, 570);
-            contentStreamChapter.showText("Arbol de Preferencias: ");
-            contentStreamChapter.endText(); 
-
-            contentStreamChapter.setFont(PDType1Font.TIMES_BOLD, 18);
-            contentStreamChapter.beginText();
-            contentStreamChapter.newLineAtOffset(100, 550);
-            contentStreamChapter.showText("Subtítulo del Capítulo");
-            contentStreamChapter.endText();
-            
-            exportarTexto(document,contentStreamChapter);
-            if(contentStreamChapter!=null)
-                contentStreamChapter.close();
+            exportarTexto(document,contentStream); // le paso el content stream por que sigue en la misma pagina
+            contentStream.close();
             exportarDAD(document);
-            exportarInstancias(document);
-            
-           
-            
-            // Guardar el documento PDF
-            document.save(ruta);
+            exportarInstancias(document);            
+            document.save(ruta);// Guardar el documento PDF
             document.close();
             System.out.println("PDF generado correctamente.");
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        //MAs PDF
     }
+    
+    protected void nuevoArchivo()   {
+        int confirma = JOptionPane.showConfirmDialog(null, "Se perderán los cambios no guardados");
+        if(confirma==0){ // Opcion si
+            // Obtener la ruta al ejecutable de Java
+            try{
+                String java = System.getProperty("java.home") + "/bin/java";
+
+                // Añadir .exe para Windows si fuera necesario (aunque no lo uses en este caso)
+        //        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+        //            java += ".exe";  // Esto es opcional si usas el JAR directamente
+        //        }
+
+                // Obtener la ruta del archivo JAR actual
+                String currentJar = null;
+                try {
+                    currentJar = new File(QsBarraHerramientas.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                    System.exit(1);  // Salir con error si no se puede obtener la ruta
+                }
+
+                // Comprobar si el archivo actual es un JAR
+                if (!currentJar.endsWith(".jar")) {
+                    System.out.println("La aplicación no está corriendo desde un archivo JAR");
+                    System.exit(1);
+                }
+
+                // Crear el nuevo proceso para reiniciar la aplicación
+                ProcessBuilder builder = new ProcessBuilder(java, "-jar", currentJar);
+
+                // Iniciar el nuevo proceso
+                builder.start();
+
+                // Salir del proceso actual
+                System.exit(0); 
+            }catch(IOException IOE){
+                IOE.printStackTrace();
+            }
+        }  
+    }
+    
+    protected void salir() {
+        int confirma = JOptionPane.showConfirmDialog(null, "Se perderán los cambios no guardados");
+        if(confirma==0){ // Opcion si
+            System.exit(1);
+            // exportarArchivo(fichero.getPath());
+        } 
+    }
+
+    
+    
 }
