@@ -733,6 +733,9 @@ public class QsBarraHerramientas extends JToolBar{
             for(int i = 0 ; i < instancias.size();i++){
                 posY-=20;
                 if(posY <= 0 ){ //se sale de la pagina
+                    if (contentStream != null) {
+                        contentStream.close(); // Cerrar el flujo actual antes de crear uno nuevo
+                    }
                     page = new PDPage(PDRectangle.A4);
                     document.addPage(page);
                     contentStream = new PDPageContentStream(document, page);
@@ -745,6 +748,9 @@ public class QsBarraHerramientas extends JToolBar{
                 for(int j=0; j < variables.size() ;j++){
                     posY-=20;
                     if(posY <= 0 ){ //se sale de la pagina
+                        if (contentStream != null) {
+                            contentStream.close(); // Cerrar el flujo actual antes de crear uno nuevo
+                        }
                         page = new PDPage(PDRectangle.A4);
                         document.addPage(page);
                         contentStream = new PDPageContentStream(document, page);
@@ -790,14 +796,25 @@ public class QsBarraHerramientas extends JToolBar{
             drawLine(contentStream,100,570,"Arbol de Preferencias: ",PDType1Font.TIMES_BOLD, 26);
 
             exportarTexto(document,contentStream); // le paso el content stream por que sigue en la misma pagina
-            contentStream.close();
-            exportarDAD(document);
+                        
+            if(contentStream != null){
+                contentStream.close();
+            }            
+            exportarDAD(document); 
             exportarInstancias(document);            
             document.save(ruta);// Guardar el documento PDF
             document.close();
             System.out.println("PDF generado correctamente.");
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (document != null) {
+                try {
+                    document.close(); // Asegúrate de liberar el documento
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
     
